@@ -460,7 +460,8 @@ const TH='border:1px solid #64748B;padding:6px 8px;font-size:16px;background:#E2
 function pageWrap(inner,pg){return `<div class="pg" style="font-family:IBM Plex Sans Thai;color:#0F172A;width:1240px;height:1754px;background:#fff;padding:60px 72px;box-sizing:border-box;position:relative;overflow:hidden">${inner}<div style="position:absolute;bottom:30px;left:72px;right:72px;display:flex;justify-content:space-between;font-size:14px;color:#64748B"><span>ส33265 เหตุการณ์ปัจจุบัน 2 · ใบงานสัปดาห์ที่ 1 · ตอบผ่านระบบ</span><span>${esc(S.me.name)} ${esc(S.me.cls)} เลขที่ ${esc(S.me.no)} · หน้า ${pg}/2</span></div></div>`}
 function sheetPages(){
  const total=ACTS.reduce((t,a)=>t+scoreOf(a.k),0);
- const head=`<div style="text-align:center;border-bottom:3px double #1C3652;padding-bottom:10px">
+ const head=`<div style="position:relative;text-align:center;border-bottom:3px double #1C3652;padding-bottom:10px;min-height:104px">
+  <img src="emblem.png" style="position:absolute;left:0;top:-6px;width:96px;height:auto">
   <div style="font-family:Anuphan;font-weight:700;font-size:30px">ใบงาน กิจกรรมตรวจข่าวก่อนแชร์</div>
   <div style="font-size:17px">รายวิชาเหตุการณ์ปัจจุบัน 2 รหัสวิชา ส33265 ชั้นมัธยมศึกษาปีที่ 6 · สัปดาห์ที่ 1 ข่าวจริง ข่าวปลอม และภาพหรือคลิปจาก AI</div>
   <div style="font-size:15px;color:#475569">โรงเรียนมหาวชิราวุธ จังหวัดสงขลา · ภาคเรียนที่ 2 ปีการศึกษา 2569</div></div>
@@ -517,7 +518,7 @@ async function a6Sheet(){
  view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 6</span><h2>ใบงานของนักเรียน</h2><p>ใบงาน 2 หน้า บันทึกเป็นรูปทั้ง 2 หน้า แล้วแนบในงานของ Google Classroom</p><p class="mute" id="st">กำลังสร้างใบงาน…</p><div id="out"></div></div>`);
  const pages=sheetPages(),urls=[];
  try{await document.fonts.ready;
-  for(const p of pages){$('#ws').innerHTML=p;const c=await html2canvas($('#ws .pg'),{scale:1,backgroundColor:'#fff'});urls.push(c.toDataURL('image/png'))}
+  for(const p of pages){$('#ws').innerHTML=p;await Promise.all($$('#ws img').map(i=>i.complete?0:new Promise(r=>{i.onload=i.onerror=r})));const c=await html2canvas($('#ws .pg'),{scale:1,backgroundColor:'#fff'});urls.push(c.toDataURL('image/png'))}
   const base=`ใบงานสัปดาห์1_${S.me.cls.replace('ม.','ม')}_เลขที่${S.me.no}`.replace(/\//g,'-');
   $('#st').textContent='สร้างใบงานแล้ว';
   $('#out').innerHTML=urls.map((u,i)=>`<a class="btn acc" href="${u}" download="${base}_หน้า${i+1}.png">บันทึกหน้า ${i+1}</a>`).join('')+`<p class="mute" style="margin-top:8px">ถ้ากดแล้วไม่บันทึก ให้กดค้างที่รูปแล้วเลือกบันทึกรูปภาพ</p>${urls.map(u=>`<img class="wsimg" src="${u}" alt="ใบงาน">`).join('')}
