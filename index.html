@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ตรวจข่าวก่อนแชร์ | ส33265</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root{--bg:#F4F5F7;--ink:#0F172A;--ink2:#334155;--mute:#64748B;--line:#E2E8F0;--card:#fff;--acc:#2563EB;--acc2:#1D4ED8;--ok:#16A34A;--bad:#DC2626;--warn:#D97706;--navy:#1C3652}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Thai',sans-serif;font-size:16px}
+h1,h2,h3,.hd,button,.btn{font-family:'Anuphan',sans-serif}
+.app{max-width:600px;margin:0 auto;padding:0 16px calc(40px + env(safe-area-inset-bottom))}
+.topbar{position:sticky;top:0;z-index:5;background:rgba(244,245,247,.9);backdrop-filter:blur(12px);margin:0 -16px;padding:calc(12px + env(safe-area-inset-top)) 16px 10px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.topbar .t{font-family:'Anuphan';font-weight:700;font-size:18px;letter-spacing:-.2px}
+.topbar .s{font-size:12px;color:var(--mute)}
+.who{font-size:13px;color:var(--ink2);text-align:right}
+.back{background:none;border:0;color:var(--acc);font-size:15px;padding:12px 0 4px;cursor:pointer}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin:12px 0}
+h2{font-size:22px;margin:4px 0 6px;letter-spacing:-.3px}h3{font-size:17px;margin:16px 0 8px}
+p{line-height:1.65;margin:6px 0;color:var(--ink2)}
+.mute{color:var(--mute);font-size:14px}
+.btn{display:block;width:100%;border:0;border-radius:14px;padding:14px;font-size:17px;font-weight:600;background:var(--ink);color:#fff;cursor:pointer;margin-top:12px;text-align:center}
+.btn:active{transform:scale(.98)}.btn:disabled{opacity:.35}
+.btn.acc{background:var(--acc)}.btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row2 .btn{margin-top:0}
+label.f{display:block;font-family:'Anuphan';font-weight:600;font-size:15px;margin:14px 0 6px}
+.hint{font-size:13px;color:var(--mute);margin:-2px 0 6px;line-height:1.5}
+input[type=text],textarea,select{width:100%;border:1px solid #CBD5E1;border-radius:12px;padding:12px;font:inherit;font-size:16px;background:#fff;color:var(--ink);outline:none}
+input[type=text]:focus,textarea:focus,select:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(37,99,235,.15)}
+textarea{min-height:90px;resize:vertical;line-height:1.6}
+.count{font-size:12px;color:var(--mute);text-align:right;margin-top:2px}
+/* home */
+.hero{padding:18px 2px 4px}.hero h1{font-size:28px;margin:0;letter-spacing:-.5px}.hero p{margin:4px 0 0}
+.bar{height:6px;background:var(--line);border-radius:6px;overflow:hidden;margin:14px 0 4px}.bar i{display:block;height:100%;background:var(--acc);transition:width .4s}
+.act{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;margin:10px 0;cursor:pointer}
+.act .n{width:40px;height:40px;border-radius:12px;background:#EEF2FF;color:var(--acc2);display:grid;place-items:center;font-family:'Anuphan';font-weight:700;font-size:18px;flex:none}
+.act.done .n{background:#DCFCE7;color:var(--ok)}
+.act .m{flex:1}.act .m b{display:block;font-family:'Anuphan';font-size:16px}.act .m span{font-size:13px;color:var(--mute)}
+.act .r{font-size:13px;color:var(--mute);text-align:right;white-space:nowrap}.act.done .r{color:var(--ok);font-weight:600}
+.pill{display:inline-block;font-size:12px;font-family:'Anuphan';font-weight:600;padding:3px 10px;border-radius:999px;background:#EEF2FF;color:var(--acc2)}
+/* options */
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{border:1px solid #CBD5E1;background:#fff;border-radius:999px;padding:9px 14px;font-size:15px;cursor:pointer;user-select:none;font-family:'Anuphan'}
+.opt.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.opt.hit{background:#DCFCE7;border-color:var(--ok);color:#14532D}.opt.wrong{background:#FEE2E2;border-color:var(--bad);color:#7F1D1D}.opt.missed{border-style:dashed;color:var(--warn);border-color:var(--warn)}
+/* game */
+.ghead{display:flex;align-items:center;justify-content:space-between;margin:12px 0 8px}
+.timer{font-family:'Anuphan';font-weight:700;font-size:15px;padding:6px 12px;border-radius:999px;background:var(--ink);color:#fff;min-width:64px;text-align:center}
+.timer.low{background:var(--bad)}
+.vote{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.vote button{border:0;border-radius:14px;padding:16px;font-size:19px;font-weight:700;cursor:pointer}
+.vt{background:#E0E7FF;color:#1E3A8A}.vf{background:#FEE2E2;color:#7F1D1D}
+.vote button:disabled{opacity:.4}
+.fb{border-radius:14px;padding:14px;margin-top:12px}
+.fb.ok{background:#F0FDF4;border:1px solid #BBF7D0}.fb.no{background:#FEF2F2;border:1px solid #FECACA}
+.fb b.h{font-family:'Anuphan';font-size:17px}
+.tag{display:inline-block;font-size:13px;padding:4px 10px;border-radius:999px;background:#FEF3C7;color:#78350F;margin:6px 6px 0 0;font-family:'Anuphan'}
+.tag.g{background:#E0F2FE;color:#0C4A6E}
+.note{font-size:13px;color:var(--mute);background:#F8FAFC;border:1px dashed var(--line);border-radius:12px;padding:10px 12px;margin-top:10px;line-height:1.55}
+/* mocks */
+.mock{border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#fff;font-family:'IBM Plex Sans Thai'}
+.web .wbar{background:#111827;color:#fff;padding:10px 14px;font-family:'Anuphan';font-weight:700;display:flex;justify-content:space-between;font-size:15px}
+.web .wbar span{font-weight:400;color:#9CA3AF;font-size:13px}
+.web .wbody{padding:14px}
+.web .cat{font-size:12px;color:var(--acc);font-weight:600;letter-spacing:.3px}
+.web .ttl{font-family:'Anuphan';font-weight:700;font-size:21px;line-height:1.4;margin:6px 0}
+.web .meta{font-size:12px;color:var(--mute)}
+.web .lead{font-size:15px;color:var(--ink2);line-height:1.65;margin-top:10px}
+.fbp .hd{display:flex;gap:10px;align-items:center;padding:12px 14px}
+.av{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:#fff;font-family:'Anuphan';font-weight:700;flex:none}
+.fbp .hd b{display:block;font-size:15px}.fbp .hd span{font-size:12px;color:var(--mute)}
+.fbp .tx{padding:0 14px 10px;font-size:16px;line-height:1.6;white-space:pre-line}
+.fbp .img{height:180px;display:grid;place-items:center;color:#fff;font-family:'Anuphan';font-weight:700;font-size:22px;text-align:center;padding:16px;line-height:1.4}
+.fbp .stat{display:flex;justify-content:space-between;font-size:13px;color:var(--mute);padding:10px 14px;border-bottom:1px solid var(--line)}
+.fbp .acts{display:grid;grid-template-columns:repeat(3,1fr);text-align:center;font-size:14px;color:var(--ink2);padding:8px 0;font-weight:600}
+.link{margin:0 14px 12px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.link .d{font-size:11px;color:var(--mute);padding:8px 10px 0;text-transform:uppercase;letter-spacing:.4px}
+.link .h{font-family:'Anuphan';font-weight:600;font-size:16px;padding:2px 10px 10px;line-height:1.45}
+.line{background:#7494C0}
+.line .lb{background:#1F2937;color:#fff;padding:10px 14px;font-size:15px;font-family:'Anuphan';font-weight:600}
+.line .chat{padding:14px 10px;display:flex;flex-direction:column;gap:10px}
+.bub{max-width:82%;padding:10px 12px;border-radius:16px;font-size:15px;line-height:1.55;background:#fff;align-self:flex-start;border-top-left-radius:4px;white-space:pre-line}
+.bub.me{align-self:flex-end;background:#06C755;color:#fff;border-top-left-radius:16px;border-top-right-radius:4px}
+.bub .nm{font-size:12px;color:var(--mute);margin-bottom:2px;font-family:'Anuphan'}
+.bub .fw{font-size:12px;color:var(--mute);border-left:3px solid #CBD5E1;padding-left:8px;margin-bottom:6px}
+.line .tm{font-size:11px;color:#E5E7EB;align-self:flex-start;margin:-6px 0 0 6px}
+.tt{background:#000;color:#fff;aspect-ratio:9/13;position:relative;background-size:cover;background-position:center}
+.tt:after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.25) 0,transparent 30%,transparent 50%,rgba(0,0,0,.85) 100%)}
+.tt .top{position:absolute;top:12px;left:0;right:0;text-align:center;z-index:1;font-size:14px;font-family:'Anuphan';font-weight:600;opacity:.9}
+.tt .cap{position:absolute;left:14px;right:70px;bottom:16px;z-index:1;font-size:15px;line-height:1.5}
+.tt .cap b{font-family:'Anuphan';display:block;margin-bottom:4px}
+.tt .side{position:absolute;right:10px;bottom:24px;z-index:1;display:flex;flex-direction:column;gap:16px;text-align:center;font-size:12px;font-family:'Anuphan';font-weight:600}
+.tt .side i{display:block;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.18);margin:0 auto 4px}
+.sms{background:#F2F2F7;padding:14px}
+.sms .from{text-align:center;font-size:13px;color:var(--mute);margin-bottom:10px}
+.sms .bub{background:#E5E5EA;border-radius:18px;border-bottom-left-radius:4px}
+.sim{font-size:11px;color:var(--mute);text-align:center;padding:6px;background:#F8FAFC;border-top:1px solid var(--line)}
+/* steps */
+.step{border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0;background:#fff}
+.step .sh{display:flex;gap:10px;align-items:center;font-family:'Anuphan';font-weight:700}
+.step .sh i{font-style:normal;width:28px;height:28px;border-radius:8px;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:14px}
+.step .how{font-size:14px;color:var(--ink2);margin:8px 0;line-height:1.6}
+.step a{color:var(--acc);font-size:14px;display:inline-block;margin:0 10px 6px 0}
+.facts{font-size:14px;line-height:1.7;color:var(--ink2);background:#F8FAFC;border-radius:12px;padding:10px 12px;margin-top:10px}
+.facts b{color:var(--ink)}
+.score{font-family:'Anuphan';font-weight:700;font-size:56px;text-align:center;letter-spacing:-1px;margin:6px 0}
+.rub{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:8px 0;font-size:14px;line-height:1.55}
+.rub.ok{border-color:#BBF7D0;background:#F0FDF4}.rub.no{border-color:#FECACA;background:#FEF2F2}
+.rub b{font-family:'Anuphan'}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:20;max-width:90vw;text-align:center}
+.toast.on{opacity:1}
+.modal{position:fixed;inset:0;background:rgba(15,23,42,.5);display:grid;place-items:center;z-index:30;padding:20px}
+.modal .card{max-width:420px;width:100%}
+#ws{position:fixed;left:-99999px;top:0}
+.wsimg{width:100%;border:1px solid var(--line);border-radius:8px;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar"><div><div class="t">ตรวจข่าวก่อนแชร์</div><div class="s">ส33265 เหตุการณ์ปัจจุบัน 2 · สัปดาห์ที่ 1</div></div><div class="who" id="who"></div></div>
+  <div id="v"></div>
+</div>
+<div id="ws"></div>
+<div class="toast" id="toast"></div>
+<script>
+const SB_URL='https://rqtiuaiimyzuayctgrwk.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxdGl1YWlpbXl6dWF5Y3RncndrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk3ODA1NjUsImV4cCI6MjEwNTM1NjU2NX0.26zCCI0Og1Gv4qK18I_Jq8VGHE2hRhXiuWnGEe5h4uA';
+const HW_IMG='https://upload.wikimedia.org/wikipedia/commons/7/7a/AI-generated_deepfake_hoax_image_of_the_Hollywood_sign_during_the_2025_California_wildfires.jpg';
+const SIG={rush:'เร่งให้รีบ ส่งต่อด่วน',exag:'อ้างผลเกินจริง',nosrc:'ไม่มีแหล่งที่มา',shot:'ภาพหน้าจอ ตรวจที่มาไม่ได้',personal:'ขอข้อมูลส่วนตัวหรือเงิน',ai:'ภาพหรือคลิปจาก AI',nomedia:'ไม่มีสื่อหลักรายงาน',emotion:'ปลุกให้ตกใจหรือกลัว'};
+const TYPES={mis:'ข้อมูลผิดพลาด',dis:'ข้อมูลบิดเบือน',mal:'ข้อมูลที่มุ่งร้าย'};
+const PLAT={web:'เว็บไซต์ข่าว',facebook:'เฟซบุ๊ก',tiktok:'ติ๊กต็อก',line:'ไลน์',sms:'ข้อความสั้น (SMS)'};
+/* ---------- news items ---------- */
+const Q=[
+ {id:1,a:true,p:'web',outlet:'กรุงเทพธุรกิจ',cat:'เทคโนโลยี / AI',date:'14 ก.ค. 2569 เวลา 16:30 น.',
+  h:'แคสเปอร์สกี้เตือน ดีปเฟกยุค AI สมจริงขึ้น ต้นทุนเริ่มราว 1,000 บาท',
+  lead:'บริษัทด้านความปลอดภัยไซเบอร์ระบุว่า เสียงปลอมที่สร้างด้วย AI เริ่มต้นราว 30 ดอลลาร์สหรัฐ และวิดีโอปลอมเริ่มต้นราว 50 ดอลลาร์สหรัฐ มิจฉาชีพนำใบหน้านักร้องและนักแสดงมาทำคลิปชวนเล่นพนันออนไลน์',
+  why:'ข่าวจริง กรุงเทพธุรกิจรายงานเมื่อ 14 ก.ค. 2569 ระบุแหล่งข้อมูลชัดเจน',good:['ระบุสำนักข่าว','ระบุวันที่','ระบุแหล่งข้อมูล'],kw:'แคสเปอร์สกี้ ดีปเฟก ต้นทุน 1,000 บาท'},
+ {id:2,a:false,p:'facebook',page:'สุขภาพดีทุกวัน',av:'#16A34A',time:'2 ชม. · สาธารณะ',
+  h:'ดื่มน้ำมะนาวผสมโซดาร้อนทุกเช้า ฆ่าเซลล์มะเร็งได้หมดภายใน 7 วัน',
+  text:'ความลับที่โรงพยาบาลไม่อยากให้คุณรู้\nดื่มน้ำมะนาวผสมโซดาร้อนทุกเช้า ฆ่าเซลล์มะเร็งได้หมดภายใน 7 วัน\nแชร์ให้คนที่คุณรักด่วน',img:['#F59E0B','#65A30D','น้ำมะนาวโซดาร้อน\nสูตรต้านมะเร็ง'],stat:['1.2 หมื่น','3,104 ความคิดเห็น','8,412 แชร์'],
+  why:'หลอก (ข้อความสมมติ) อ้างผลการรักษาเกินจริง ไม่ระบุแพทย์ งานวิจัย หรือหน่วยงานใด',sig:['exag','nosrc','emotion'],kw:'น้ำมะนาวโซดาร้อน ฆ่ามะเร็ง ข่าวปลอม',
+  facts:'เพจเปิดมาได้ 3 เดือน ผู้ติดตาม 2.1 หมื่นคน โพสต์ไม่ระบุแหล่งที่มา ภาพประกอบเป็นภาพตกแต่ง'},
+ {id:3,a:true,p:'fblink',page:'ข่าวสังคมออนไลน์',av:'#DB2777',time:'23 ก.ย. 2566',
+  text:'ใครในบ้านชอบส่งข่าวทางไลน์บ้าง',domain:'dailynews.co.th',h:'ดีอีเผย กลุ่มที่แชร์ข่าวปลอมมากที่สุดคือผู้ที่มีอายุ 40 ปีขึ้นไป',stat:['2,450','312 ความคิดเห็น','905 แชร์'],
+  why:'ข่าวจริง เดลินิวส์รายงานเมื่อ 23 ก.ย. 2566 จากข้อมูลกระทรวงดิจิทัลเพื่อเศรษฐกิจและสังคม',good:['ลิงก์ไปสำนักข่าว','ระบุหน่วยงาน'],kw:'ดีอี แชร์ข่าวปลอม อายุ 40 ปีขึ้นไป เดลินิวส์'},
+ {id:4,a:false,p:'line',group:'ผู้ปกครอง ม.6 (148)',from:'คุณแม่น้องเอ',time:'22:14',
+  h:'กระทรวงศึกษาธิการประกาศงดสอบปลายภาคนักเรียน ม.6 ทั่วประเทศ ปีการศึกษา 2569',
+  text:'ประกาศด่วน! กระทรวงศึกษาธิการประกาศงดสอบปลายภาคนักเรียน ม.6 ทั่วประเทศ ปีการศึกษา 2569 ให้ใช้คะแนนเก็บแทน\n(ส่งต่อจากกลุ่มอื่น)',
+  why:'หลอก (ข้อความสมมติ) เป็นข้อความส่งต่อ ไม่มีเลขที่ประกาศ ไม่มีลิงก์ไปเว็บไซต์ทางการของกระทรวง',sig:['shot','nosrc','nomedia'],kw:'กระทรวงศึกษาธิการ งดสอบปลายภาค ม.6',
+  facts:'ข้อความถูกส่งต่อมาจากกลุ่มอื่น ไม่มีภาพประกาศ ไม่มีเลขที่หนังสือ ไม่มีลิงก์'},
+ {id:5,a:true,p:'web',outlet:'THE STANDARD',cat:'ธุรกิจ',date:'10 เม.ย. 2567',
+  h:'ลาบูบู้ราคาป้ายราว 550 บาท แต่สีที่หายากถูกตั้งราคาขายต่อ 12,000–20,000 บาท',
+  lead:'หลังศิลปินชื่อดังโพสต์ภาพถือกล่องอาร์ตทอย แฟนคลับทั้งในไทยและต่างประเทศพากันตามหาสินค้า ราคาขายต่อเฉลี่ยเพิ่มเป็น 1,000–1,300 บาท',
+  why:'ข่าวจริง THE STANDARD รายงานเมื่อ 10 เม.ย. 2567',good:['ระบุสำนักข่าว','ระบุวันที่'],kw:'ลาบูบู้ ราคาขายต่อ THE STANDARD'},
+ {id:6,a:false,p:'tiktok',acc:'@ข่าวด่วนทั่วโลก',img:HW_IMG,
+  h:'ภาพป้ายฮอลลีวูดถูกไฟไหม้ระหว่างไฟป่าลอสแอนเจลิส เดือนมกราคม 2568',
+  text:'ป้ายฮอลลีวูดไหม้แล้ว! ไฟป่าแอลเอลุกลามหนัก #ไฟป่า #ฮอลลีวูด',stat:['1.8M','2.3 หมื่น','9.1 หมื่น'],
+  why:'หลอก ภาพนี้สร้างด้วย AI ป้ายฮอลลีวูดไม่ได้ถูกไฟไหม้ สำนักข่าวต่างประเทศตรวจสอบแล้วว่าเป็นภาพปลอม',sig:['ai','nomedia','emotion'],kw:'Hollywood sign fire AI image fact check',
+  facts:'ภาพถูกแชร์ช่วงไฟป่าลอสแอนเจลิส ม.ค. 2568 ภาพดูเหมือนฉากภาพยนตร์ ไฟลุกเป็นแนวสวยงามผิดธรรมชาติ'},
+ {id:7,a:true,p:'web',outlet:'ไทยพีบีเอส',cat:'เศรษฐกิจ',date:'29 เม.ย. 2567',
+  h:'ถอดบทเรียนลาบูบู้ ต่อยอดผลิตอาร์ตทอยไทย',
+  lead:'ปี 2566 ไทยนำเข้าของเล่นรวมอาร์ตทอยมูลค่า 128.26 ล้านดอลลาร์สหรัฐ เพิ่มขึ้นร้อยละ 11.79 ขณะที่ตำบลบ้านสิงห์ จังหวัดราชบุรี ส่งออกตุ๊กตาได้ปีละกว่า 1,000 ล้านบาท',
+  why:'ข่าวจริง ไทยพีบีเอสรายงานเมื่อ 29 เม.ย. 2567 พร้อมตัวเลขและแหล่งข้อมูล',good:['ระบุสำนักข่าว','มีตัวเลขที่ตรวจสอบได้'],kw:'ไทยพีบีเอส ถอดบทเรียนลาบูบู้ อาร์ตทอยไทย'},
+ {id:8,a:false,p:'sms',from:'+66 9x-xxx-xxxx',time:'วันนี้ 08:02',
+  h:'ด่วน! ธนาคารแจกเงินเยียวยาน้ำท่วมหาดใหญ่ คนละ 5,000 บาท กรอกเลขบัญชีที่ลิงก์นี้ภายในวันนี้',
+  text:'[ธนาคาร] ด่วน! แจกเงินเยียวยาน้ำท่วมหาดใหญ่ คนละ 5,000 บาท กรอกเลขบัญชีและรหัสที่ลิงก์นี้ภายในวันนี้ หมดเขต 18:00 น.\nxxxx-help.xyz/rcv',
+  why:'หลอก (ข้อความสมมติ) ส่งจากเบอร์ส่วนตัว เร่งให้รีบทำ ขอเลขบัญชีผ่านลิงก์ ธนาคารจริงไม่ส่งลิงก์ขอข้อมูลบัญชีทางข้อความสั้น',sig:['rush','personal','nosrc'],kw:'SMS แจกเงินเยียวยา หลอกลวง ธนาคาร',
+  facts:'ส่งจากเบอร์โทรศัพท์ส่วนตัว ไม่ใช่ชื่อผู้ส่งของธนาคาร ลิงก์เป็นโดเมนแปลก ไม่ระบุชื่อธนาคาร'}
+];
+/* ---------- state ---------- */
+let S;try{S=JSON.parse(localStorage.getItem('ckn1')||'null')}catch(e){}
+if(!S)S={me:null,cid:(crypto.randomUUID?crypto.randomUUID():String(Math.random()).slice(2)+Date.now()),a1:null,a2:null,a3:null,a4:null,a5:null,a6:null};
+const save=()=>{try{localStorage.setItem('ckn1',JSON.stringify(S))}catch(e){}};
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),2200)}
+function view(h){$('#v').innerHTML=h;scrollTo(0,0)}
+const back=()=>`<button class="back" onclick="home()">‹ กลับหน้ารวมกิจกรรม</button>`;
+function confirmBox(msg,ok){const d=document.createElement('div');d.className='modal';d.innerHTML=`<div class="card"><p style="color:var(--ink)">${msg}</p><div class="row2"><button class="btn ghost" id="cn">ยกเลิก</button><button class="btn" id="cy">ยืนยัน</button></div></div>`;document.body.appendChild(d);d.querySelector('#cn').onclick=()=>d.remove();d.querySelector('#cy').onclick=()=>{d.remove();ok()}}
+async function rpc(fn,body){const r=await fetch(`${SB_URL}/rest/v1/rpc/${fn}`,{method:'POST',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json'},body:JSON.stringify(body)});const t=await r.text();if(!r.ok)throw new Error(t);return t?JSON.parse(t):null}
+function optsHTML(id,map,sel,multi){return `<div class="opts" id="${id}">${Object.entries(map).map(([k,v])=>`<span class="opt ${(multi?(sel||[]).includes(k):sel===k)?'on':''}" data-k="${k}" onclick="${multi?"this.classList.toggle('on')":`pickOne('${id}',this)`}">${v}</span>`).join('')}</div>`}
+function pickOne(id,el){$$('#'+id+' .opt').forEach(o=>o.classList.remove('on'));el.classList.add('on')}
+const picked=id=>$$('#'+id+' .opt.on').map(o=>o.dataset.k);
+function counter(id,max){const e=$('#'+id);const c=document.createElement('div');c.className='count';e.after(c);const u=()=>c.textContent=e.value.length+'/'+max;e.maxLength=max;e.addEventListener('input',u);u()}
+/* ---------- mocks ---------- */
+function mock(q,big){
+ const sim='<div class="sim">หน้าจอจำลองเพื่อการเรียน</div>';
+ if(q.p==='web')return `<div class="mock web"><div class="wbar">${esc(q.outlet)}<span>ข่าว</span></div><div class="wbody"><div class="cat">${esc(q.cat)}</div><div class="ttl">${esc(q.h)}</div><div class="meta">${esc(q.date)}</div>${big?`<div class="lead">${esc(q.lead)}</div>`:''}</div>${sim}</div>`;
+ if(q.p==='facebook')return `<div class="mock fbp"><div class="hd"><div class="av" style="background:${q.av}">${esc(q.page[0])}</div><div><b>${esc(q.page)}</b><span>${esc(q.time)}</span></div></div><div class="tx">${esc(q.text)}</div><div class="img" style="background:linear-gradient(135deg,${q.img[0]},${q.img[1]})">${esc(q.img[2]).replace(/\n/g,'<br>')}</div><div class="stat"><span>ถูกใจ ${q.stat[0]}</span><span>${q.stat[1]} · ${q.stat[2]}</span></div><div class="acts"><span>ถูกใจ</span><span>แสดงความคิดเห็น</span><span>แชร์</span></div>${sim}</div>`;
+ if(q.p==='fblink')return `<div class="mock fbp"><div class="hd"><div class="av" style="background:${q.av}">${esc(q.page[0])}</div><div><b>${esc(q.page)}</b><span>${esc(q.time)}</span></div></div><div class="tx">${esc(q.text)}</div><div class="link"><div class="d">${esc(q.domain)}</div><div class="h">${esc(q.h)}</div></div><div class="stat"><span>ถูกใจ ${q.stat[0]}</span><span>${q.stat[1]} · ${q.stat[2]}</span></div>${sim}</div>`;
+ if(q.p==='line')return `<div class="mock line"><div class="lb">‹  ${esc(q.group)}</div><div class="chat"><div class="bub"><div class="nm">${esc(q.from)}</div>${esc(q.text)}</div><div class="tm">${esc(q.time)}</div></div>${sim}</div>`;
+ if(q.p==='tiktok')return `<div class="mock"><div class="tt" style="background-image:url('${q.img}')"><div class="top">สำหรับคุณ</div><div class="side"><div><i></i>${q.stat[0]}</div><div><i></i>${q.stat[1]}</div><div><i></i>${q.stat[2]}</div></div><div class="cap"><b>${esc(q.acc)}</b>${esc(q.text)}</div></div>${sim}</div>`;
+ if(q.p==='sms')return `<div class="mock sms"><div class="from">${esc(q.from)}<br>${esc(q.time)}</div><div class="bub">${esc(q.text)}</div></div>`;
+ if(q.p==='user')return userMock(q);
+}
+function userMock(q){
+ const P=q.platform;
+ if(P==='web')return mock({p:'web',outlet:q.sender,cat:'ข่าว',date:'วันนี้',h:q.headline,lead:q.body},true);
+ if(P==='facebook')return `<div class="mock fbp"><div class="hd"><div class="av" style="background:#64748B">${esc((q.sender||'?')[0])}</div><div><b>${esc(q.sender)}</b><span>เมื่อสักครู่ · สาธารณะ</span></div></div><div class="tx"><b>${esc(q.headline)}</b>${q.body?'\n'+esc(q.body):''}</div><div class="acts"><span>ถูกใจ</span><span>แสดงความคิดเห็น</span><span>แชร์</span></div></div>`;
+ if(P==='tiktok')return `<div class="mock"><div class="tt" style="aspect-ratio:9/11;background:linear-gradient(160deg,#334155,#0F172A)"><div class="top">สำหรับคุณ</div><div class="cap" style="right:14px"><b>${esc(q.sender)}</b>${esc(q.headline)}${q.body?'<br><span style="opacity:.8">'+esc(q.body)+'</span>':''}</div></div></div>`;
+ if(P==='line')return `<div class="mock line"><div class="lb">‹  กลุ่มไลน์</div><div class="chat"><div class="bub"><div class="nm">${esc(q.sender)}</div><b>${esc(q.headline)}</b>${q.body?'\n'+esc(q.body):''}</div></div></div>`;
+ return `<div class="mock sms"><div class="from">${esc(q.sender)}</div><div class="bub"><b>${esc(q.headline)}</b>${q.body?'\n'+esc(q.body):''}</div></div>`;
+}
+/* ---------- start ---------- */
+const ACTS=[
+ {k:'a1',t:'เกมจริงหรือหลอก',d:'ตัดสินข่าว 8 ข่าวจากหลายช่องทาง',min:8,max:8},
+ {k:'a2',t:'สรุปสัญญาณเตือนและประเภทข่าวปลอม',d:'จำแนกประเภท 3 ข้อ และตอบคำถาม 3 ข้อ',min:7,max:3},
+ {k:'a3',t:'ตรวจสอบข่าว 5 ขั้น',d:'ตรวจข่าว 1 ข่าวตามขั้นตอน พร้อมหลักฐาน',min:15,max:5},
+ {k:'a4',t:'แต่งข่าวปลอม แล้วตรวจข่าวของเพื่อน',d:'ส่งข่าวขึ้นระบบ ระบบสุ่มข่าวของเพื่อนมาให้ตรวจ',min:12,max:3},
+ {k:'a5',t:'ตอบข้อความในไลน์ครอบครัว',d:'เขียนข้อความตอบตามเกณฑ์ 4 ข้อ',min:5,max:4},
+ {k:'a6',t:'สรุปท้ายคาบและส่งใบงาน',d:'บันทึกใบงานเป็นรูป ส่งใน Google Classroom',min:3,max:2}
+];
+const TOTAL=ACTS.reduce((s,a)=>s+a.max,0);
+const scoreOf=k=>S[k]?S[k].score:0;
+function setWho(){$('#who').innerHTML=S.me?`${esc(S.me.name)}<br>${esc(S.me.cls)} เลขที่ ${esc(S.me.no)}`:''}
+function start(){
+ view(`<div class="hero"><h1>เริ่มต้น</h1><p>กรอกข้อมูลให้ถูกต้อง ข้อมูลนี้จะอยู่บนใบงานที่ส่งครู</p></div>
+ <div class="card"><label class="f">ชื่อ-สกุล</label><input type="text" id="nm" placeholder="เช่น นายสมชาย ใจดี" maxlength="60">
+ <div class="row2"><div><label class="f">ชั้น</label><select id="cl">${[1,2,3,4,5,6,7,8,9,10].map(i=>`<option>ม.6/${i}</option>`).join('')}</select></div><div><label class="f">เลขที่</label><input type="text" id="no" inputmode="numeric" maxlength="3" placeholder="เช่น 12"></div></div>
+ <button class="btn" onclick="doStart()">เริ่มกิจกรรม</button>
+ <p class="mute" style="margin-top:12px">คำตอบเก็บไว้ในมือถือเครื่องนี้ ยกเว้นข่าวที่แต่งในกิจกรรมที่ 4 ซึ่งส่งขึ้นระบบเพื่อให้เพื่อนตรวจ</p></div>`);
+}
+function doStart(){const n=$('#nm').value.trim(),c=$('#cl').value,no=$('#no').value.trim();if(n.length<4||!no){toast('กรอกชื่อ-สกุลและเลขที่');return}S.me={name:n,cls:c,no};save();setWho();home()}
+function home(){
+ if(!S.me)return start();
+ const done=ACTS.filter(a=>S[a.k]).length,sc=ACTS.reduce((s,a)=>s+scoreOf(a.k),0);
+ view(`<div class="hero"><h1>กิจกรรมวันนี้</h1><p>ทำตามลำดับ 1–6 ภายใน 50 นาที</p><div class="bar"><i style="width:${done/6*100}%"></i></div><div class="mute">ทำแล้ว ${done}/6 · คะแนน ${sc}/${TOTAL}</div></div>
+ ${ACTS.map((a,i)=>`<div class="act ${S[a.k]?'done':''}" onclick="go(${i+1})"><div class="n">${i+1}</div><div class="m"><b>${a.t}</b><span>${a.d}</span></div><div class="r">${S[a.k]?`${S[a.k].score}/${a.max}`:a.min+' นาที'}</div></div>`).join('')}
+ <button class="btn ghost" style="margin-top:20px" onclick="confirmBox('ล้างคำตอบทั้งหมดในเครื่องนี้และเริ่มใหม่?',()=>{localStorage.removeItem('ckn1');location.reload()})">ล้างข้อมูลและเริ่มใหม่</button>`);
+}
+function go(n){[a1,a2,a3,a4,a5,a6][n-1]()}
+/* ---------- 1 game ---------- */
+const T=25;let G;
+function a1(){
+ if(S.a1)return a1Result();
+ view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 1</span><h2>เกมจริงหรือหลอก</h2><p>ข่าว ${Q.length} ข่าวจากเว็บไซต์ เฟซบุ๊ก ไลน์ ติ๊กต็อก และข้อความสั้น ตัดสินภายในข่าวละ ${T} วินาที ตอบแล้วแก้ไม่ได้</p><p class="mute">ข่าวที่เฉลยว่าหลอกเป็นข้อความสมมติที่ครูแต่งขึ้น ยกเว้นภาพป้ายฮอลลีวูดซึ่งเป็นภาพปลอมที่ถูกแชร์จริง</p><button class="btn acc" onclick="gStart()">เริ่ม</button></div>`);
+}
+function gStart(){G={order:[...Q].sort(()=>Math.random()-.5).map(q=>q.id),i:0,res:[]};gShow()}
+function gShow(){
+ const q=Q.find(x=>x.id===G.order[G.i]);G.left=T;
+ view(`<div class="ghead"><span class="pill">ข่าวที่ ${G.i+1}/${Q.length} · ${PLAT[q.p==='fblink'?'facebook':q.p]}</span><span class="timer" id="tm">${T} วิ</span></div>${mock(q,true)}
+ <div class="vote" id="vote"><button class="vt" onclick="gAns(true)">จริง</button><button class="vf" onclick="gAns(false)">หลอก</button></div><div id="fb"></div>`);
+ clearInterval(G.t);G.t=setInterval(()=>{G.left--;const e=$('#tm');if(!e)return clearInterval(G.t);e.textContent=G.left+' วิ';e.classList.toggle('low',G.left<=5);if(G.left<=0)gAns(null)},1000);
+}
+function gAns(v){
+ clearInterval(G.t);const q=Q.find(x=>x.id===G.order[G.i]),ok=v===q.a;G.res.push({id:q.id,v,ok});
+ $$('#vote button').forEach(b=>b.disabled=true);
+ $('#fb').innerHTML=`<div class="fb ${ok?'ok':'no'}"><b class="h" style="color:${ok?'var(--ok)':'var(--bad)'}">${v===null?'หมดเวลา':ok?'ถูกต้อง':'ยังไม่ถูก'} · ข่าวนี้${q.a?'จริง':'หลอก'}</b><p>${esc(q.why)}</p>${(q.sig||[]).map(s=>`<span class="tag">${SIG[s]}</span>`).join('')}${(q.good||[]).map(s=>`<span class="tag g">${s}</span>`).join('')}</div><button class="btn" onclick="gNext()">${G.i<Q.length-1?'ข่าวถัดไป':'ดูผล'}</button>`;
+}
+function gNext(){G.i++;if(G.i<Q.length)gShow();else{S.a1={res:G.res,score:G.res.filter(r=>r.ok).length};save();a1Result()}}
+function a1Result(){
+ const r=S.a1;
+ view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 1</span><h2>ผลเกมจริงหรือหลอก</h2><div class="score">${r.score}/8</div>
+ ${r.res.map(x=>{const q=Q.find(y=>y.id===x.id);return `<div style="display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px"><b style="color:${x.ok?'var(--ok)':'var(--bad)'};min-width:44px">${x.ok?'ถูก':'ผิด'}</b><span>${esc(q.h)} <span class="mute">(${q.a?'จริง':'หลอก'})</span></span></div>`}).join('')}
+ <button class="btn acc" onclick="go(2)">ไปกิจกรรมที่ 2</button></div>`);
+}
+/* ---------- 2 signals ---------- */
+const CASES=[{t:'เพื่อนส่งต่อโพสต์ว่าพรุ่งนี้โรงเรียนหยุดเรียน เพราะเข้าใจว่าเป็นประกาศจริง',a:'mis'},
+ {t:'บัญชีที่ตั้งชื่อเหมือนธนาคารส่งข้อความให้กดลิงก์ยืนยันตัวตน ไม่เช่นนั้นบัญชีจะถูกระงับ',a:'dis'},
+ {t:'มีผู้นำที่อยู่และเบอร์โทรศัพท์จริงของเพื่อนร่วมชั้นมาโพสต์ประจานในกลุ่ม',a:'mal'}];
+const A2Q=['ข่าวใดในเกมที่ตัดสินยากที่สุด เพราะอะไร','ข่าวจริงในเกมมีลักษณะอะไรที่ข่าวปลอมไม่มี (บอกอย่างน้อย 2 ลักษณะ)','สัญญาณเตือนใดที่นักเรียนพบบ่อยที่สุดในไลน์ครอบครัวหรือโซเชียลของตัวเอง ยกตัวอย่างประกอบ'];
+function a2(){
+ if(S.a2)return a2Result();
+ view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 2</span><h2>สรุปสัญญาณเตือนและประเภทข่าวปลอม</h2>
+ <h3>สัญญาณเตือน 8 แบบ</h3><div>${Object.values(SIG).map(s=>`<span class="tag">${s}</span>`).join('')}</div>
+ <h3>ประเภทของข่าวปลอม</h3>
+ <div class="facts"><b>ข้อมูลผิดพลาด</b> ข้อมูลเท็จ ผู้ส่งต่อไม่ได้ตั้งใจหลอก เพราะเข้าใจว่าจริง<br><b>ข้อมูลบิดเบือน</b> ข้อมูลเท็จที่สร้างขึ้นโดยตั้งใจหลอกลวง<br><b>ข้อมูลที่มุ่งร้าย</b> ข้อมูลจริงที่ถูกนำไปใช้ทำร้ายผู้อื่น</div>
+ <h3>ตอนที่ 1 จำแนกประเภท (3 คะแนน)</h3>${CASES.map((c,i)=>`<label class="f">${i+1}. ${c.t}</label>${optsHTML('c'+i,TYPES)}`).join('')}
+ <h3>ตอนที่ 2 ตอบคำถาม</h3><p class="mute">ตอบด้วยภาษาของตัวเอง อย่างน้อย 20 ตัวอักษร</p>
+ ${A2Q.map((q,i)=>`<label class="f">${i+1}. ${q}</label><textarea id="w${i}"></textarea>`).join('')}
+ <button class="btn acc" onclick="a2Done()">ส่งคำตอบ</button></div>`);
+ A2Q.forEach((q,i)=>counter('w'+i,300));
+}
+function a2Done(){
+ const ch=CASES.map((c,i)=>picked('c'+i)[0]),w=A2Q.map((q,i)=>$('#w'+i).value.trim());
+ if(ch.some(x=>!x)){toast('เลือกประเภทให้ครบ 3 ข้อ');return}
+ if(w.some(x=>x.length<20)){toast('ตอบคำถามทุกข้อ อย่างน้อย 20 ตัวอักษร');return}
+ S.a2={ch,w,score:ch.filter((x,i)=>x===CASES[i].a).length};save();a2Result();
+}
+function a2Result(){
+ const r=S.a2;
+ view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 2</span><h2>ผลการจำแนก</h2><div class="score">${r.score}/3</div>
+ ${CASES.map((c,i)=>`<div class="rub ${r.ch[i]===c.a?'ok':'no'}"><b>${i+1}.</b> ${c.t}<br>คำตอบ: ${TYPES[r.ch[i]]} · เฉลย: <b>${TYPES[c.a]}</b></div>`).join('')}
+ <h3>คำตอบของนักเรียน</h3>${A2Q.map((q,i)=>`<div class="facts"><b>${q}</b><br>${esc(r.w[i])}</div>`).join('')}
+ <button class="btn acc" onclick="go(3)">ไปกิจกรรมที่ 3</button></div>`);
+}
+/* ---------- 3 investigate ---------- */
+const STEPS=[
+ {t:'ดูแหล่งที่มา',how:'ใครเป็นผู้เผยแพร่ เป็นสำนักข่าวหรือหน่วยงานที่มีตัวตนจริงหรือไม่ ชื่อเพจหรือลิงก์สะกดแปลกหรือไม่ ลองค้นชื่อผู้เผยแพร่ใน Google',ph:'ผู้เผยแพร่คือ… มีตัวตนจริงหรือไม่ เพราะ…'},
+ {t:'ดูวันที่',how:'ข่าวเผยแพร่เมื่อไร เป็นข่าวเก่าที่นำกลับมาแชร์ใหม่หรือไม่ ถ้าไม่มีวันที่ ให้เขียนว่าไม่มี',ph:'วันที่… / ไม่มีวันที่'},
+ {t:'อ่านเนื้อหาทั้งหมด',how:'อ่านทั้งโพสต์ ไม่ตัดสินจากพาดหัว จดสิ่งที่ข่าวอ้าง และคำที่เร่งเร้าหรือปลุกอารมณ์',ph:'ข่าวอ้างว่า… มีคำเร่งเร้าหรือไม่…'},
+ {t:'ตรวจสอบกับแหล่งอื่น',how:'ค้นด้วยคำค้นที่แนะนำ ดูว่าสำนักข่าวหลักหรือหน่วยงานรัฐรายงานตรงกันหรือไม่ ระบุอย่างน้อย 2 แหล่ง ถ้าไม่พบ ให้เขียนว่าไม่พบ',ph:'แหล่งที่ 1… แหล่งที่ 2…'},
+ {t:'ตรวจสอบภาพ',how:'ถ้ามีภาพ ใช้ Google Lens ค้นหาด้วยภาพ ดูว่าภาพเคยเผยแพร่ที่ใดมาก่อน หรือมีจุดผิดปกติแบบภาพจาก AI หรือไม่ ถ้าไม่มีภาพ ให้เขียนว่าไม่มี',ph:'ผลการตรวจภาพ…'}
+];
+function a3(){
+ if(S.a3&&S.a3.done)return a3Result();
+ view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 3 · งานกลุ่ม 4 คน</span><h2>ตรวจสอบข่าว 5 ขั้น</h2><p>จับสลากหมายเลขข่าว แล้วเลือกข่าวที่ได้ ช่วยกันค้นในกลุ่ม แต่ทุกคนบันทึกในเครื่องของตัวเอง</p>
+ <label class="f">หมายเลขข่าวที่จับสลากได้</label><select id="cs"><option value="">เลือกหมายเลข</option>${Q.map(q=>`<option value="${q.id}">ข่าวที่ ${q.id}</option>`).join('')}</select>
+ <div id="case"></div></div>`);
+ $('#cs').onchange=e=>caseShow(+e.target.value);
+}
+function caseShow(id){
+ if(!id){$('#case').innerHTML='';return}
+ const q=Q.find(x=>x.id===id),gq=encodeURIComponent(q.kw);
+ $('#case').innerHTML=`<h3>ข่าวที่ ${id}</h3>${mock(q,true)}
+ <div class="facts"><b>ข้อมูลประกอบ</b><br>ช่องทาง: ${PLAT[q.p==='fblink'?'facebook':q.p]}${q.facts?'<br>'+esc(q.facts):''}<br><b>คำค้นแนะนำ:</b> ${esc(q.kw)}</div>
+ ${STEPS.map((s,i)=>`<div class="step"><div class="sh"><i>${i+1}</i>${s.t}</div><div class="how">${s.how}</div>
+  ${i===3?`<a href="https://www.google.com/search?q=${gq}" target="_blank" rel="noopener">ค้นใน Google</a><a href="https://www.google.com/search?q=${gq}&tbm=nws" target="_blank" rel="noopener">ค้นในหมวดข่าว</a><a href="https://www.antifakenewscenter.com/" target="_blank" rel="noopener">ศูนย์ต่อต้านข่าวปลอม</a>`:''}
+  ${i===4?`<a href="https://lens.google.com/" target="_blank" rel="noopener">Google Lens</a>`:''}
+  <textarea id="s${i}" placeholder="${s.ph}" style="min-height:70px"></textarea></div>`).join('')}
+ <label class="f">ข้อสรุป</label>${optsHTML('vd',{real:'ข่าวจริง',fake:'ข่าวปลอม',unsure:'ยังสรุปไม่ได้'})}
+ <label class="f">เหตุผลประกอบข้อสรุป (อ้างหลักฐานจากขั้นตอนข้างบน)</label><textarea id="rs"></textarea>
+ <button class="btn acc" onclick="a3Done(${id})">ส่งผลการตรวจสอบ</button>`;
+ STEPS.forEach((s,i)=>counter('s'+i,250));counter('rs',300);
+}
+function a3Done(id){
+ const st=STEPS.map((s,i)=>$('#s'+i).value.trim()),v=picked('vd')[0],rs=$('#rs').value.trim();
+ if(st.some(x=>x.length<3)){toast('บันทึกผลให้ครบทั้ง 5 ขั้น (ถ้าไม่พบให้เขียนว่าไม่พบ)');return}
+ if(!v||rs.length<15){toast('เลือกข้อสรุปและเขียนเหตุผลอย่างน้อย 15 ตัวอักษร');return}
+ const q=Q.find(x=>x.id===id),full=st.filter(x=>x.length>=10).length;
+ const vOk=(v==='real'&&q.a)||(v==='fake'&&!q.a)||v==='unsure';
+ const score=Math.round((full*0.8+(vOk?1:0))*10)/10;
+ S.a3={done:1,id,st,v,rs,score};save();a3Result();
+}
+function a3Result(){
+ const r=S.a3,q=Q.find(x=>x.id===r.id);
+ view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 3</span><h2>ผลการตรวจสอบข่าวที่ ${r.id}</h2><div class="score">${r.score}/5</div>
+ <p class="mute">บันทึกครบและมีรายละเอียดขั้นละ 0.8 คะแนน (อย่างน้อย 10 ตัวอักษร) ข้อสรุปสอดคล้องกับหลักฐาน 1 คะแนน</p>
+ ${STEPS.map((s,i)=>`<div class="facts"><b>${i+1}. ${s.t}</b><br>${esc(r.st[i])}</div>`).join('')}
+ <div class="facts"><b>ข้อสรุป: ${{real:'ข่าวจริง',fake:'ข่าวปลอม',unsure:'ยังสรุปไม่ได้'}[r.v]}</b><br>${esc(r.rs)}</div>
+ <div class="fb ${((r.v==='real')===q.a&&r.v!=='unsure')?'ok':'no'}"><b class="h">เฉลย: ข่าวนี้${q.a?'จริง':'หลอก'}</b><p>${esc(q.why)}</p></div>
+ <p class="mute">เตรียมรายงาน 1 นาที: หลักฐานที่ดีที่สุดของกลุ่มคืออะไร และขั้นใดช่วยตัดสินได้มากที่สุด</p>
+ <button class="btn acc" onclick="go(4)">ไปกิจกรรมที่ 4</button></div>`);
+}
+/* ---------- 4 compose & check ---------- */
+function a4(){
+ const A=S.a4||{};
+ if(!A.postId)return a4Compose();
+ if(!A.check)return a4Fetch();
+ a4Result();
+}
+function a4Compose(){
+ view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 4 · ทำคนเดียว</span><h2>แต่งข่าวปลอม</h2><p>แต่งข่าวปลอมเรื่องในหาดใหญ่หรือในโรงเรียน ซ่อนสัญญาณเตือนอย่างน้อย 2 แบบ ส่งขึ้นระบบ แล้วระบบจะสุ่มข่าวของเพื่อนมาให้ตรวจ</p>
+ <div class="note">ข่าวที่ส่งจะแสดงให้เพื่อนเห็นโดยไม่มีชื่อผู้แต่ง แต่ครูเห็นชื่อ ห้ามใช้ชื่อบุคคลจริง ห้ามใช้คำหยาบหรือเนื้อหาที่ทำร้ายผู้อื่น และห้ามนำไปโพสต์จริง</div>
+ <label class="f">ช่องทาง</label>${optsHTML('pf',PLAT,'facebook')}
+ <label class="f">ชื่อผู้เผยแพร่ (สมมติ)</label><input type="text" id="sd" placeholder="เช่น เพจข่าวหาดใหญ่ทันใจ">
+ <label class="f">พาดหัว</label><input type="text" id="hl" placeholder="พาดหัวข่าวปลอม">
+ <label class="f">รายละเอียด</label><div class="hint">เขียนเนื้อหาข่าวเหมือนโพสต์จริง 1–3 ประโยค</div><textarea id="bd"></textarea>
+ <label class="f">สัญญาณเตือนที่ซ่อนไว้ (เลือกอย่างน้อย 2)</label>${optsHTML('sg',SIG,[],true)}
+ <label class="f">ประเภทข่าวปลอมที่ตั้งใจ</label>${optsHTML('ty',TYPES)}
+ <button class="btn acc" id="sb" onclick="a4Submit()">ส่งข่าวขึ้นระบบ</button></div>`);
+ counter('sd',40);counter('hl',150);counter('bd',400);
+}
+async function a4Submit(){
+ const d={platform:picked('pf')[0],sender:$('#sd').value.trim(),headline:$('#hl').value.trim(),body:$('#bd').value.trim(),signals:picked('sg'),type:picked('ty')[0]};
+ if(!d.platform||d.sender.length<3||d.headline.length<10||d.body.length<20){toast('กรอกชื่อผู้เผยแพร่ พาดหัว (10 ตัวอักษรขึ้นไป) และรายละเอียด (20 ตัวอักษรขึ้นไป)');return}
+ if(d.signals.length<2||!d.type){toast('เลือกสัญญาณเตือนอย่างน้อย 2 แบบ และประเภท');return}
+ $('#sb').disabled=true;$('#sb').textContent='กำลังส่ง…';
+ try{const id=await rpc('news_submit_post',{p_room:S.me.cls.replace('ม.',''),p_client:S.cid,p_name:`${S.me.name} (${S.me.cls} เลขที่ ${S.me.no})`,p_platform:d.platform,p_sender:d.sender,p_headline:d.headline,p_body:d.body,p_signals:d.signals,p_type:d.type});
+  S.a4={postId:id,mine:d,seen:[]};save();a4Fetch();
+ }catch(e){$('#sb').disabled=false;$('#sb').textContent='ส่งข่าวขึ้นระบบ';toast(/limit/.test(e.message)?'ส่งได้ไม่เกิน 3 ข่าวต่อเครื่อง':'ส่งไม่สำเร็จ ตรวจสอบอินเทอร์เน็ตแล้วลองใหม่')}
+}
+async function a4Fetch(){
+ view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 4</span><h2>ตรวจข่าวของเพื่อน</h2><p class="mute">กำลังสุ่มข่าวของเพื่อน…</p></div>`);
+ try{const r=await rpc('news_random_post',{p_room:S.me.cls.replace('ม.',''),p_client:S.cid,p_exclude:S.a4.seen||[]});
+  if(!r||!r.length){view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 4</span><h2>ยังไม่มีข่าวของเพื่อน</h2><p>รอให้เพื่อนส่งข่าวขึ้นระบบสักครู่ แล้วกดสุ่มใหม่</p><button class="btn acc" onclick="a4Fetch()">สุ่มใหม่</button></div>`);return}
+  S.a4.cur=r[0];save();a4Check();
+ }catch(e){view(back()+`<div class="card"><h2>เชื่อมต่อไม่สำเร็จ</h2><p>ตรวจสอบอินเทอร์เน็ตแล้วลองใหม่</p><button class="btn acc" onclick="a4Fetch()">ลองใหม่</button></div>`)}
+}
+function a4Check(){
+ const p=S.a4.cur;
+ view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 4</span><h2>ตรวจข่าวของเพื่อน</h2><p class="mute">ข่าวที่เพื่อนแต่ง (ข้อความสมมติ) · ${PLAT[p.platform]}</p>
+ ${userMock(p)}
+ <label class="f">พบสัญญาณเตือนอะไรบ้าง</label>${optsHTML('gs',SIG,[],true)}
+ <label class="f">เป็นข่าวปลอมประเภทใด</label>${optsHTML('gt',TYPES)}
+ <button class="btn acc" id="ck" onclick="a4Send()">ตรวจคำตอบ</button>
+ ${(S.a4.seen||[]).length<2?`<button class="btn ghost" onclick="S.a4.seen=(S.a4.seen||[]).concat([S.a4.cur.id]);save();a4Fetch()">ข่าวนี้อ่านไม่เข้าใจ สุ่มข่าวอื่น</button>`:''}</div>`);
+}
+async function a4Send(){
+ const sg=picked('gs'),ty=picked('gt')[0];if(!sg.length||!ty){toast('เลือกสัญญาณเตือนและประเภท');return}
+ $('#ck').disabled=true;
+ try{const r=await rpc('news_check_answer',{p_post:S.a4.cur.id,p_client:S.cid,p_signals:sg,p_type:ty});
+  S.a4.check={post:S.a4.cur,mySig:sg,myType:ty,key:r};S.a4.score=Number(r.score);save();a4Result();
+ }catch(e){$('#ck').disabled=false;toast('ส่งไม่สำเร็จ ลองใหม่')}
+}
+function a4Result(){
+ const A=S.a4,c=A.check,k=c.key;
+ view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 4</span><h2>ผลการตรวจข่าวของเพื่อน</h2><div class="score">${A.score}/3</div>
+ <p class="mute">สัญญาณเตือนที่ตรงกับผู้แต่ง 2 คะแนน (เลือกเกินหักข้อละ 0.5) ประเภทถูก 1 คะแนน</p>
+ ${userMock(c.post)}
+ <label class="f">สัญญาณเตือน</label><div class="opts">${Object.keys(SIG).map(s=>{const a=k.signals.includes(s),m=c.mySig.includes(s);if(!a&&!m)return'';return `<span class="opt ${a&&m?'hit':m?'wrong':'missed'}">${SIG[s]} ${a&&m?'(พบ)':m?'(ไม่ได้ซ่อนไว้)':'(ยังไม่พบ)'}</span>`}).join('')}</div>
+ <p>ประเภทที่ผู้แต่งตั้งใจ: <b>${TYPES[k.type]}</b> · คำตอบของนักเรียน: ${TYPES[c.myType]}</p>
+ <h3>ข่าวที่นักเรียนแต่ง</h3>${userMock({platform:A.mine.platform,sender:A.mine.sender,headline:A.mine.headline,body:A.mine.body})}
+ <div>${A.mine.signals.map(s=>`<span class="tag">${SIG[s]}</span>`).join('')}<span class="tag g">${TYPES[A.mine.type]}</span></div>
+ <button class="btn acc" onclick="go(5)">ไปกิจกรรมที่ 5</button></div>`);
+}
+/* ---------- 5 line reply ---------- */
+const RUB=[
+ {t:'ขอบคุณที่หวังดี',d:'แสดงว่าเข้าใจว่าผู้ส่งตั้งใจดี เช่น มีคำว่า ขอบคุณ',re:/ขอบคุณ|ขอบใจ/},
+ {t:'สุภาพ',d:'ใช้คำลงท้ายสุภาพ ไม่ตำหนิหรือประชดผู้ส่ง',re:/ครับ|ค่ะ|คะ|จ้ะ|จ้า|นะคะ|นะครับ/,bad:/โง่|บ้า|มั่ว|ไม่รู้เรื่อง|แก่แล้ว|เชื่ออะไรง่าย/},
+ {t:'บอกหลักฐาน',d:'บอกว่าตรวจสอบกับใคร เช่น ศูนย์ต่อต้านข่าวปลอม สำนักข่าว หน่วยงาน หรือแนบลิงก์',re:/ศูนย์ต่อต้านข่าวปลอม|ชัวร์ก่อนแชร์|กระทรวง|สำนักข่าว|หน่วยงาน|เว็บไซต์|ประกาศ|ตรวจสอบ|ลิงก์|http|ธนาคาร|ข่าว/},
+ {t:'ชวนทำสิ่งที่ถูกต้อง',d:'ชวนลบข้อความ แจ้งในกลุ่มว่าไม่จริง หรือไม่ส่งต่อ',re:/ลบ|แก้|แจ้ง|บอกในกลุ่ม|อย่าส่งต่อ|ไม่ส่งต่อ|ไม่แชร์|อย่าแชร์|ระวัง/}
+];
+function a5Fake(){return S.a4&&S.a4.mine?S.a4.mine.headline:Q[7].h}
+function a5(){
+ if(S.a5)return a5Result();
+ view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 5 · ทำคนเดียว</span><h2>ตอบข้อความในไลน์ครอบครัว</h2><p>ป้าส่งข่าวปลอมเข้ากลุ่มไลน์ครอบครัว เขียนข้อความตอบให้สุภาพและได้ผล</p>
+ <div class="mock line"><div class="lb">‹  ครอบครัว (12)</div><div class="chat"><div class="bub"><div class="nm">ป้า</div>${esc(a5Fake())}</div><div class="bub"><div class="nm">ป้า</div>ส่งต่อให้ทุกคนนะ เผื่อเป็นประโยชน์</div><div id="mine"></div></div></div>
+ <h3>เกณฑ์การให้คะแนน (ข้อละ 1 คะแนน)</h3>${RUB.map((r,i)=>`<div class="rub"><b>${i+1}. ${r.t}</b> ${r.d}</div>`).join('')}
+ <label class="f">ข้อความตอบของนักเรียน</label><div class="hint">พิมพ์เอง อย่างน้อย 60 ตัวอักษร ระบบไม่อนุญาตให้วางข้อความ</div><textarea id="rp" style="min-height:120px"></textarea>
+ <button class="btn acc" onclick="a5Done()">ส่งข้อความ</button></div>`);
+ counter('rp',400);
+ const t=$('#rp');t.addEventListener('paste',e=>{e.preventDefault();toast('กรุณาพิมพ์ข้อความเอง')});t.addEventListener('drop',e=>e.preventDefault());
+}
+function a5Done(){
+ const v=$('#rp').value.trim();if(v.length<60){toast('เขียนอย่างน้อย 60 ตัวอักษร');return}
+ const ck=RUB.map(r=>r.re.test(v)&&!(r.bad&&r.bad.test(v)));
+ S.a5={text:v,ck,score:ck.filter(Boolean).length};save();a5Result();
+}
+function a5Result(){
+ const r=S.a5;
+ view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 5</span><h2>ผลการตอบข้อความ</h2><div class="score">${r.score}/4</div>
+ <div class="mock line"><div class="lb">‹  ครอบครัว (12)</div><div class="chat"><div class="bub"><div class="nm">ป้า</div>${esc(a5Fake())}</div><div class="bub me">${esc(r.text)}</div><div class="bub"><div class="nm">ป้า</div>${r.score>=3?'จริงเหรอลูก ขอบใจนะ เดี๋ยวป้าลบให้':'หมายความว่ายังไงลูก ป้าไม่เข้าใจ'}</div></div></div>
+ ${RUB.map((x,i)=>`<div class="rub ${r.ck[i]?'ok':'no'}"><b>${r.ck[i]?'ผ่าน':'ยังไม่ผ่าน'} · ${x.t}</b><br>${x.d}</div>`).join('')}
+ <p class="mute">คะแนนจากระบบตรวจจากคำในข้อความ ครูจะตรวจทานอีกครั้ง</p>
+ <div class="facts"><b>ตัวอย่างข้อความที่ดี</b><br>ขอบคุณป้าที่ส่งมาเตือนนะครับ ผมลองตรวจสอบแล้ว ศูนย์ต่อต้านข่าวปลอมชี้แจงว่าเรื่องนี้ไม่เป็นความจริงครับ ป้าช่วยลบข้อความเดิม หรือแจ้งในกลุ่มว่าไม่จริงได้ไหมครับ จะได้ไม่มีใครหลงเชื่อ</div>
+ <button class="btn acc" onclick="go(6)">ไปกิจกรรมที่ 6</button></div>`);
+}
+/* ---------- 6 summary & worksheet ---------- */
+const SRC=['ศูนย์ต่อต้านข่าวปลอมประเทศไทย','ชัวร์ก่อนแชร์','สำนักข่าวหลักหลายแห่ง','เว็บไซต์หรือเพจทางการของหน่วยงาน','การค้นหาด้วยภาพ (Google Lens)'];
+function a6(){
+ const miss=ACTS.slice(0,5).filter(a=>!S[a.k]).map((a,i)=>ACTS.indexOf(a)+1);
+ if(S.a6)return a6Sheet();
+ view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 6</span><h2>สรุปท้ายคาบ</h2>
+ ${miss.length?`<div class="note">ยังไม่ได้ทำกิจกรรมที่ ${miss.join(', ')} ใบงานจะแสดงว่ายังไม่ได้ทำ</div>`:''}
+ <label class="f">สัญญาณเตือนที่จำได้ (เลือก 3 แบบ)</label>${optsHTML('es',SIG,[],true)}
+ <label class="f">แหล่งตรวจสอบข่าวที่จะใช้ (1 แหล่ง)</label>${optsHTML('eo',Object.fromEntries(SRC.map((s,i)=>[i,s])))}
+ <label class="f">ครั้งหน้าเมื่อเห็นข่าวน่าสงสัย ฉันจะ</label><textarea id="ew" style="min-height:70px"></textarea>
+ <button class="btn acc" onclick="a6Done()">สร้างใบงาน</button></div>`);
+ counter('ew',200);
+}
+function a6Done(){
+ const sg=picked('es'),so=picked('eo')[0],w=$('#ew').value.trim();
+ if(sg.length!==3){toast('เลือกสัญญาณเตือน 3 แบบพอดี');return}
+ if(so===undefined||w.length<15){toast('เลือกแหล่งตรวจสอบและเขียนอย่างน้อย 15 ตัวอักษร');return}
+ S.a6={sg,so:SRC[+so],w,score:2,at:new Date().toLocaleString('th-TH',{dateStyle:'long',timeStyle:'short'})};save();a6Sheet();
+}
+function cut(s,n){s=String(s||'');return s.length>n?s.slice(0,n)+'…':s}
+const BL='#1D4ED8';
+const box=(on)=>`<span style="display:inline-block;width:18px;height:18px;border:1.5px solid #0F172A;border-radius:3px;vertical-align:-3px;margin-right:6px;text-align:center;line-height:16px;font-size:15px;color:${BL};font-weight:700">${on?'✓':''}</span>`;
+const ans=(t,lines=1)=>`<div style="color:${BL};font-size:18px;line-height:34px;min-height:${34*lines}px;background:repeating-linear-gradient(transparent 0 33px,#94A3B8 33px 34px);padding:0 4px">${esc(t||'')}</div>`;
+const sec=(n,t,k,inst)=>`<div style="display:flex;justify-content:space-between;align-items:center;background:#1C3652;color:#fff;padding:8px 14px;margin:18px 0 8px;font-family:Anuphan;font-weight:700;font-size:20px"><span>ตอนที่ ${n} ${t}</span><span>คะแนน ${S[k]?S[k].score:0}/${ACTS.find(x=>x.k===k).max}</span></div>${inst?`<div style="font-size:16px;margin-bottom:6px"><b style="font-family:Anuphan">คำชี้แจง</b> ${inst}</div>`:''}`;
+const TD='border:1px solid #64748B;padding:6px 8px;font-size:16px;vertical-align:top';
+const TH='border:1px solid #64748B;padding:6px 8px;font-size:16px;background:#E2E8F0;font-family:Anuphan;font-weight:600';
+function pageWrap(inner,pg){return `<div class="pg" style="font-family:IBM Plex Sans Thai;color:#0F172A;width:1240px;height:1754px;background:#fff;padding:60px 72px;box-sizing:border-box;position:relative;overflow:hidden">${inner}<div style="position:absolute;bottom:30px;left:72px;right:72px;display:flex;justify-content:space-between;font-size:14px;color:#64748B"><span>ส33265 เหตุการณ์ปัจจุบัน 2 · ใบงานสัปดาห์ที่ 1 · ตอบผ่านระบบ</span><span>${esc(S.me.name)} ${esc(S.me.cls)} เลขที่ ${esc(S.me.no)} · หน้า ${pg}/2</span></div></div>`}
+function sheetPages(){
+ const total=ACTS.reduce((t,a)=>t+scoreOf(a.k),0);
+ const head=`<div style="text-align:center;border-bottom:3px double #1C3652;padding-bottom:10px">
+  <div style="font-family:Anuphan;font-weight:700;font-size:30px">ใบงาน กิจกรรมตรวจข่าวก่อนแชร์</div>
+  <div style="font-size:17px">รายวิชาเหตุการณ์ปัจจุบัน 2 รหัสวิชา ส33265 ชั้นมัธยมศึกษาปีที่ 6 · สัปดาห์ที่ 1 ข่าวจริง ข่าวปลอม และภาพหรือคลิปจาก AI</div>
+  <div style="font-size:15px;color:#475569">โรงเรียนมหาวชิราวุธ จังหวัดสงขลา · ภาคเรียนที่ 2 ปีการศึกษา 2569</div></div>
+ <table style="width:100%;border-collapse:collapse;margin-top:10px"><tr>
+  <td style="${TD};width:46%"><b style="font-family:Anuphan">ชื่อ-สกุล</b> <span style="color:${BL}">${esc(S.me.name)}</span></td><td style="${TD}"><b style="font-family:Anuphan">ชั้น</b> <span style="color:${BL}">${esc(S.me.cls)}</span></td><td style="${TD}"><b style="font-family:Anuphan">เลขที่</b> <span style="color:${BL}">${esc(S.me.no)}</span></td><td style="${TD};text-align:center;width:150px"><b style="font-family:Anuphan">คะแนนรวม</b><br><span style="font-family:Anuphan;font-weight:700;font-size:26px;color:${BL}">${total}</span>/${TOTAL}</td></tr></table>`;
+ // 1
+ const r1=S.a1?S.a1.res:[];
+ const p1=sec(1,'เกมจริงหรือหลอก','a1','อ่านข่าวแต่ละข่าว แล้วตัดสินว่าเป็นข่าวจริงหรือข่าวหลอก')+
+ `<table style="width:100%;border-collapse:collapse"><tr><th style="${TH};width:60px">ข่าวที่</th><th style="${TH}">พาดหัวข่าว</th><th style="${TH};width:120px">ช่องทาง</th><th style="${TH};width:90px">จริง</th><th style="${TH};width:90px">หลอก</th><th style="${TH};width:70px">ผล</th></tr>
+ ${Q.map(q=>{const r=r1.find(x=>x.id===q.id);return `<tr><td style="${TD};text-align:center">${q.id}</td><td style="${TD}">${esc(cut(q.h,62))}</td><td style="${TD}">${PLAT[q.p==='fblink'?'facebook':q.p].replace(' (SMS)','')}</td><td style="${TD};text-align:center">${box(r&&r.v===true)}</td><td style="${TD};text-align:center">${box(r&&r.v===false)}</td><td style="${TD};text-align:center;color:${r?(r.ok?'#15803D':'#B91C1C'):'#64748B'}">${r?(r.ok?'ถูก':'ผิด'):'-'}</td></tr>`}).join('')}</table>`;
+ // 2
+ const r2=S.a2;
+ const p2=sec(2,'สัญญาณเตือนและประเภทข่าวปลอม','a2','ตอนที่ 2.1 ทำเครื่องหมายเลือกประเภทของข่าวปลอม ตอนที่ 2.2 ตอบคำถาม')+
+ CASES.map((c,i)=>`<div style="font-size:16px;margin:6px 0">${i+1}. ${c.t}<br><span style="margin-left:22px">${Object.entries(TYPES).map(([k,v])=>`${box(r2&&r2.ch[i]===k)}${v}`).join('&nbsp;&nbsp;&nbsp;&nbsp;')}</span></div>`).join('')+
+ A2Q.map((q,i)=>`<div style="font-size:16px;margin-top:8px">${i+1}. ${q}</div>${ans(r2?cut(r2.w[i],150):'',1)}`).join('');
+ // 3
+ const r3=S.a3,q3=r3?Q.find(q=>q.id===r3.id):null;
+ const p3=sec(3,'ตรวจสอบข่าว 5 ขั้น','a3','ตรวจสอบข่าวที่จับสลากได้ตามหลักการตรวจสอบข่าว 5 ขั้น แล้วสรุปผลพร้อมเหตุผล')+
+ `<div style="font-size:16px">ข่าวที่ <span style="color:${BL}">${r3?r3.id:'....'}</span> พาดหัว <span style="color:${BL}">${q3?esc(cut(q3.h,90)):''}</span></div>
+ <table style="width:100%;border-collapse:collapse;margin-top:6px"><tr><th style="${TH};width:200px">ขั้นการตรวจสอบ</th><th style="${TH}">ผลการตรวจสอบ</th></tr>
+ ${STEPS.map((st,i)=>`<tr><td style="${TD}">${i+1}. ${st.t}</td><td style="${TD};color:${BL}">${r3?esc(cut(r3.st[i],140)):''}</td></tr>`).join('')}</table>
+ <div style="font-size:16px;margin-top:8px">ข้อสรุป&nbsp;&nbsp;${[['real','ข่าวจริง'],['fake','ข่าวปลอม'],['unsure','ยังสรุปไม่ได้']].map(([k,v])=>`${box(r3&&r3.v===k)}${v}`).join('&nbsp;&nbsp;&nbsp;&nbsp;')}</div>
+ <div style="font-size:16px;margin-top:4px">เหตุผล</div>${ans(r3?cut(r3.rs,200):'',1)}`;
+ // 4
+ const A=S.a4||{},m=A.mine,c=A.check;
+ const sigBoxes=(sel)=>`<div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 20px;font-size:16px;margin:4px 0 4px 22px">${Object.entries(SIG).map(([k,v])=>`<div>${box(sel&&sel.includes(k))}${v}</div>`).join('')}</div>`;
+ const typeBoxes=(sel)=>`<span>${Object.entries(TYPES).map(([k,v])=>`${box(sel===k)}${v}`).join('&nbsp;&nbsp;&nbsp;&nbsp;')}</span>`;
+ const p4=sec(4,'แต่งข่าวปลอมและตรวจข่าวของเพื่อน','a4','4.1 แต่งข่าวปลอมโดยซ่อนสัญญาณเตือนอย่างน้อย 2 แบบ 4.2 ตรวจข่าวของเพื่อนที่ระบบสุ่มให้')+
+ `<div style="font-family:Anuphan;font-weight:600;font-size:17px">4.1 ข่าวปลอมที่ฉันแต่ง</div>
+ <table style="width:100%;border-collapse:collapse;margin:4px 0"><tr><td style="${TD};width:200px">ช่องทาง / ผู้เผยแพร่</td><td style="${TD};color:${BL}">${m?PLAT[m.platform]+' / '+esc(m.sender):''}</td></tr><tr><td style="${TD}">พาดหัว</td><td style="${TD};color:${BL}">${m?esc(cut(m.headline,120)):''}</td></tr><tr><td style="${TD}">รายละเอียด</td><td style="${TD};color:${BL}">${m?esc(cut(m.body,200)):''}</td></tr></table>
+ <div style="font-size:16px">สัญญาณเตือนที่ซ่อนไว้</div>${sigBoxes(m&&m.signals)}<div style="font-size:16px">ประเภท&nbsp;&nbsp;${typeBoxes(m&&m.type)}</div>
+ <div style="font-family:Anuphan;font-weight:600;font-size:17px;margin-top:10px">4.2 ข่าวของเพื่อนที่ระบบสุ่มให้</div>
+ <div style="font-size:16px">พาดหัว <span style="color:${BL}">${c?esc(cut(c.post.headline,110)):''}</span></div>
+ <div style="font-size:16px">สัญญาณเตือนที่พบ</div>${sigBoxes(c&&c.mySig)}<div style="font-size:16px">ประเภท&nbsp;&nbsp;${typeBoxes(c&&c.myType)}</div>
+ <div style="font-size:15px;color:#475569;margin-top:4px">${c?`ผลเทียบกับผู้แต่ง: ตรงกัน ${c.key.hits} จาก ${c.key.signals.length} สัญญาณ · ประเภทที่ผู้แต่งตั้งใจคือ ${TYPES[c.key.type]}`:''}</div>`;
+ // 5
+ const r5=S.a5;
+ const p5=sec(5,'ตอบข้อความในไลน์ครอบครัว','a5','ป้าส่งข่าวปลอมเข้ากลุ่มไลน์ครอบครัว ให้เขียนข้อความตอบอย่างสุภาพและได้ผล')+
+ `<div style="font-size:16px;background:#F1F5F9;border-left:4px solid #94A3B8;padding:6px 10px">ข้อความจากป้า: “${esc(cut(a5Fake(),120))}”</div>
+ <div style="font-size:16px;margin-top:6px">ข้อความตอบของฉัน</div>${ans(r5?cut(r5.text,330):'',3)}
+ <table style="width:100%;border-collapse:collapse;margin-top:6px"><tr><th style="${TH}">เกณฑ์</th><th style="${TH};width:90px">ผ่าน</th><th style="${TH};width:90px">ไม่ผ่าน</th></tr>
+ ${RUB.map((x,i)=>`<tr><td style="${TD}">${i+1}. ${x.t} – ${x.d}</td><td style="${TD};text-align:center">${box(r5&&r5.ck[i])}</td><td style="${TD};text-align:center">${box(r5&&!r5.ck[i])}</td></tr>`).join('')}</table>`;
+ // 6
+ const r6=S.a6;
+ const p6=sec(6,'สรุปท้ายคาบ','a6','สรุปสิ่งที่ได้เรียนรู้')+
+ `<div style="font-size:16px">1. สัญญาณเตือนที่จำได้ 3 แบบ</div>${ans(r6?r6.sg.map(x=>SIG[x]).join(', '):'',1)}
+ <div style="font-size:16px;margin-top:6px">2. แหล่งตรวจสอบข่าวที่จะใช้</div>${ans(r6?r6.so:'',1)}
+ <div style="font-size:16px;margin-top:6px">3. ครั้งหน้าเมื่อเห็นข่าวน่าสงสัย ฉันจะ</div>${ans(r6?cut(r6.w,150):'',2)}`;
+ const sum=`<table style="width:100%;border-collapse:collapse;margin-top:20px"><tr>${ACTS.map((a,i)=>`<th style="${TH};text-align:center">ตอนที่ ${i+1}</th>`).join('')}<th style="${TH};text-align:center">รวม</th></tr><tr>${ACTS.map(a=>`<td style="${TD};text-align:center;color:${BL};font-size:18px">${scoreOf(a.k)}/${a.max}</td>`).join('')}<td style="${TD};text-align:center;color:${BL};font-size:18px;font-weight:700">${total}/${TOTAL}</td></tr></table>
+ <div style="display:flex;justify-content:space-between;margin-top:22px;font-size:16px"><span>คะแนนจากระบบ ครูตรวจทานได้ · ส่งเมื่อ ${S.a6?S.a6.at:''}</span><span>ลงชื่อครูผู้ตรวจ ..................................</span></div>`;
+ return [pageWrap(head+p1+p2+p3,1),pageWrap(p4+p5+p6+sum,2)];
+}
+async function a6Sheet(){
+ view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 6</span><h2>ใบงานของนักเรียน</h2><p>ใบงาน 2 หน้า บันทึกเป็นรูปทั้ง 2 หน้า แล้วแนบในงานของ Google Classroom</p><p class="mute" id="st">กำลังสร้างใบงาน…</p><div id="out"></div></div>`);
+ const pages=sheetPages(),urls=[];
+ try{await document.fonts.ready;
+  for(const p of pages){$('#ws').innerHTML=p;const c=await html2canvas($('#ws .pg'),{scale:1,backgroundColor:'#fff'});urls.push(c.toDataURL('image/png'))}
+  const base=`ใบงานสัปดาห์1_${S.me.cls.replace('ม.','ม')}_เลขที่${S.me.no}`.replace(/\//g,'-');
+  $('#st').textContent='สร้างใบงานแล้ว';
+  $('#out').innerHTML=urls.map((u,i)=>`<a class="btn acc" href="${u}" download="${base}_หน้า${i+1}.png">บันทึกหน้า ${i+1}</a>`).join('')+`<p class="mute" style="margin-top:8px">ถ้ากดแล้วไม่บันทึก ให้กดค้างที่รูปแล้วเลือกบันทึกรูปภาพ</p>${urls.map(u=>`<img class="wsimg" src="${u}" alt="ใบงาน">`).join('')}
+  <h3>วิธีส่งใน Google Classroom</h3><div class="facts">1. เปิดงานที่ครูมอบหมาย<br>2. กด เพิ่มหรือสร้าง แล้วเลือก ไฟล์<br>3. เลือกรูปใบงานทั้ง 2 หน้า<br>4. กด ส่ง</div>
+  <button class="btn ghost" onclick="S.a6=null;save();a6()">แก้ไขสรุปท้ายคาบ</button>`;
+ }catch(e){$('#st').textContent='สร้างรูปไม่สำเร็จ ให้จับภาพหน้าจอส่งแทน';}
+ $('#ws').innerHTML='';
+}
+setWho();home();
+</script>
+</body>
+</html>
