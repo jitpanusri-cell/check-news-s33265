@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ครูตรวจใบงาน | ส33265</title>
+<meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="common.js"></script>
+<style>
+:root{--ink:#1E1B4B;--mute:#6B7280;--line:#E5E7EB;--acc:#6D28D9;--g1:linear-gradient(135deg,#7C3AED,#DB2777);--red:#C8102E}
+*{box-sizing:border-box}body{margin:0;background:#F5F3FF;color:var(--ink);font-family:'IBM Plex Sans Thai',sans-serif}
+h1,h2,button,.hd{font-family:'Anuphan',sans-serif}
+.wrap{max-width:1400px;margin:0 auto;padding:18px}
+.top{display:flex;align-items:center;gap:14px;background:var(--g1);color:#fff;border-radius:20px;padding:16px 20px}
+.top img{width:46px;filter:brightness(0) invert(1)}.top h1{margin:0;font-size:22px}.top span{opacity:.85;font-size:14px}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;margin-top:14px}
+button{border:0;border-radius:12px;padding:11px 16px;font-size:15px;font-weight:600;cursor:pointer;background:var(--ink);color:#fff}
+button.acc{background:var(--g1)}button.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}button.red{background:var(--red)}
+input,select,textarea{font:inherit;font-size:15px;border:1px solid #CBD5E1;border-radius:10px;padding:10px;background:#fff}
+table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid var(--line);text-align:left;font-size:15px}th{font-family:'Anuphan';color:var(--mute);font-weight:600}
+tr.row{cursor:pointer}tr.row:hover{background:#FAF5FF}
+.badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:13px;font-family:'Anuphan';font-weight:600}
+.b-ok{background:#FEE2E2;color:var(--red)}.b-wait{background:#EEF2FF;color:#4338CA}
+.grid{display:grid;grid-template-columns:1fr 320px;gap:16px;align-items:start}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.sheetbox{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;position:relative}
+.sheetbox .pg{transform-origin:0 0}
+.side label{display:block;font-family:'Anuphan';font-weight:600;margin:12px 0 4px}
+.side textarea,.side input{width:100%}
+.stampdrop{animation:drop .5s cubic-bezier(.2,1.6,.4,1)}
+@keyframes drop{0%{transform:scale(2.4) rotate(10deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
+.mute{color:var(--mute);font-size:14px}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:12px;opacity:0;transition:.25s;pointer-events:none}.toast.on{opacity:1}
+#ws{position:fixed;left:-99999px;top:0}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <div class="top"><img src="emblem.png" alt=""><div><h1>ครูตรวจใบงาน</h1><span>ส33265 เหตุการณ์ปัจจุบัน 2 สัปดาห์ที่ 1 ตรวจข่าวก่อนแชร์</span></div></div>
+ <div id="v"></div>
+</div>
+<div id="ws"></div><div class="toast" id="toast"></div>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+let PIN=sessionStorage.getItem('tpin')||'',LIST=[],CUR=null;
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),2000)}
+function login(){
+ $('#v').innerHTML=`<div class="card" style="max-width:380px"><h2 style="margin-top:0">เข้าสู่ระบบครู</h2><input id="pin" type="password" inputmode="numeric" placeholder="รหัสครู 6 หลัก" style="width:100%"><button class="acc" style="width:100%;margin-top:10px" onclick="tryLogin()">เข้าสู่ระบบ</button></div>`;
+ $('#pin').onkeydown=e=>{if(e.key==='Enter')tryLogin()};
+}
+async function tryLogin(){PIN=$('#pin').value.trim();try{await rpc('news_teacher_list',{p_pin:PIN,p_cls:''});sessionStorage.setItem('tpin',PIN);list()}catch(e){toast('รหัสไม่ถูกต้อง')}}
+async function list(){
+ const cls=sessionStorage.getItem('tcls')||'';
+ $('#v').innerHTML=`<div class="card"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><select id="cls"><option value="">ทุกห้อง</option>${[1,2,3,4,5,6,7,8,9,10].map(i=>`<option ${cls==='ม.6/'+i?'selected':''}>ม.6/${i}</option>`).join('')}</select><button class="ghost" onclick="list()">รีเฟรช</button><span class="mute" id="cnt"></span><button class="ghost" style="margin-left:auto" onclick="sessionStorage.removeItem('tpin');login()">ออกจากระบบ</button></div>
+ <table style="margin-top:10px"><thead><tr><th>ชั้น</th><th>เลขที่</th><th>ชื่อ-สกุล</th><th>คะแนน</th><th>สถานะ</th><th>ส่งล่าสุด</th></tr></thead><tbody id="tb"><tr><td colspan="6" class="mute">กำลังโหลด</td></tr></tbody></table></div>`;
+ $('#cls').onchange=e=>{sessionStorage.setItem('tcls',e.target.value);list()};
+ try{LIST=await rpc('news_teacher_list',{p_pin:PIN,p_cls:cls})}catch(e){return login()}
+ const done=LIST.filter(x=>x.checked_at).length;$('#cnt').textContent=`ส่งแล้ว ${LIST.length} คน ตรวจแล้ว ${done} คน`;
+ $('#tb').innerHTML=LIST.length?LIST.map((r,i)=>`<tr class="row" onclick="openSheet(${i})"><td>${esc(r.cls)}</td><td>${esc(r.no)}</td><td>${esc(r.name)}</td><td>${r.score_override??r.total}/${TOTAL}</td><td>${r.checked_at?'<span class="badge b-ok">ตรวจแล้ว</span>':'<span class="badge b-wait">รอตรวจ</span>'}</td><td class="mute">${new Date(r.updated_at).toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'})}</td></tr>`).join(''):'<tr><td colspan="6" class="mute">ยังไม่มีใบงาน</td></tr>';
+}
+async function openSheet(i){
+ CUR={i,row:LIST[i]};
+ $('#v').innerHTML=`<div class="card"><button class="ghost" onclick="list()">กลับรายชื่อ</button></div><div class="grid" style="margin-top:14px"><div class="sheetbox" id="sb"><p class="mute" style="padding:16px">กำลังโหลด</p></div><div class="card side" style="margin-top:0" id="side"></div></div>`;
+ const r=await rpc('news_teacher_get',{p_pin:PIN,p_id:CUR.row.id});CUR.full=r;
+ renderCur();
+}
+function chkOf(r){return r.checked_at?{checked_at:r.checked_at,comment:r.comment,score_override:r.score_override}:(r.comment||r.score_override!=null?{comment:r.comment,score_override:r.score_override}:null)}
+function renderCur(anim){
+ const r=CUR.full,sb=$('#sb');
+ sb.innerHTML=renderSheet(r.data,chkOf(r));
+ const pg=sb.querySelector('.pg'),sc=sb.clientWidth/1754;pg.style.transform=`scale(${sc})`;sb.style.height=(1240*sc)+'px';
+ if(anim){const st=pg.querySelector('.stamp');if(st)st.firstElementChild.classList.add('stampdrop')}
+ $('#side').innerHTML=`<div class="hd" style="font-size:18px;font-weight:700">${esc(r.name)}</div><div class="mute">${esc(r.cls)} เลขที่ ${esc(r.no)}</div>
+ <div style="margin-top:10px">คะแนนจากระบบ <b>${r.total}/${TOTAL}</b></div>
+ <label>ปรับคะแนนรวม (เว้นว่างถ้าใช้คะแนนจากระบบ)</label><input id="ov" type="number" step="0.5" min="0" max="${TOTAL}" value="${r.score_override??''}">
+ <label>ความคิดเห็นของครู</label><textarea id="cm" rows="3" maxlength="200">${esc(r.comment||'')}</textarea>
+ ${r.checked_at?`<button class="ghost" style="width:100%;margin-top:12px" onclick="doCheck(false)">บันทึกการแก้ไข</button><button class="ghost" style="width:100%;margin-top:8px" onclick="doCheck(true)">ยกเลิกการตรวจ</button>`:`<button class="red" style="width:100%;margin-top:12px;font-size:17px" onclick="doCheck(false,true)">ตรวจแล้ว ปั๊มตรา</button>`}
+ <button class="ghost" style="width:100%;margin-top:8px" onclick="saveImg()">บันทึกใบงานเป็นรูป</button>
+ <div style="display:flex;gap:8px;margin-top:8px"><button class="ghost" style="flex:1" ${CUR.i<=0?'disabled':''} onclick="openSheet(${CUR.i-1})">คนก่อนหน้า</button><button class="acc" style="flex:1" ${CUR.i>=LIST.length-1?'disabled':''} onclick="openSheet(${CUR.i+1})">คนถัดไป</button></div>`;
+}
+async function doCheck(undo,anim){
+ const ov=$('#ov').value.trim(),cm=$('#cm').value.trim();
+ try{const r=await rpc('news_teacher_check',{p_pin:PIN,p_id:CUR.row.id,p_comment:cm,p_score:ov===''?null:Number(ov),p_undo:!!undo});
+  Object.assign(CUR.full,r);Object.assign(LIST[CUR.i],r);renderCur(anim);toast(undo?'ยกเลิกการตรวจแล้ว':'บันทึกแล้ว');
+ }catch(e){toast('บันทึกไม่สำเร็จ')}
+}
+async function saveImg(){
+ const r=CUR.full;$('#ws').innerHTML=renderSheet(r.data,chkOf(r));
+ await Promise.all($$('#ws img').map(i=>i.complete?0:new Promise(z=>{i.onload=i.onerror=z})));
+ const c=await html2canvas($('#ws .pg'),{scale:1,backgroundColor:'#fff'});$('#ws').innerHTML='';
+ const a=document.createElement('a');a.href=c.toDataURL('image/png');a.download=`ใบงาน_${r.cls}_เลขที่${r.no}.png`.replace(/\//g,'-');a.click();
+}
+window.addEventListener('resize',()=>{if(CUR&&CUR.full&&$('#sb'))renderCur()});
+PIN?list():login();
+</script>
+</body>
+</html>
