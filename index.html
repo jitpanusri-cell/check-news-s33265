@@ -167,7 +167,7 @@ function setWho(){$('#who').innerHTML=S.me?`${esc(S.me.name)}<br>${esc(S.me.cls)
 function start(){
  view(`<div class="hero"><h1>เริ่มต้น</h1><p>กรอกข้อมูลให้ถูกต้อง ข้อมูลนี้จะอยู่บนใบงานที่ส่งครู</p></div>
  <div class="card"><label class="f">ชื่อ-สกุล</label><input type="text" id="nm" placeholder="เช่น นายสมชาย ใจดี" maxlength="60">
- <div class="row2"><div><label class="f">ชั้น</label><select id="cl">${[1,2,3,4,5,6,7,8,9,10].map(i=>`<option>ม.6/${i}</option>`).join('')}</select></div><div><label class="f">เลขที่</label><input type="text" id="no" inputmode="numeric" maxlength="3" placeholder="เช่น 12"></div></div>
+ <div class="row2"><div><label class="f">ชั้น</label><select id="cl"><option>ม.6/17</option></select></div><div><label class="f">เลขที่</label><input type="text" id="no" inputmode="numeric" maxlength="3" placeholder="เช่น 12"></div></div>
  <button class="btn" onclick="doStart()">เริ่มกิจกรรม</button>
  <p class="mute" style="margin-top:12px">คำตอบเก็บไว้ในมือถือเครื่องนี้ ยกเว้นข่าวที่แต่งในกิจกรรมที่ 4 ซึ่งส่งขึ้นระบบเพื่อให้เพื่อนตรวจ</p></div>`);
 }
