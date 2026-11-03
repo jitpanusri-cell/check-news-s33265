@@ -121,7 +121,7 @@ let MON=null;
 const ANAME=['เกม','สัญญาณเตือน','ตรวจข่าว','แต่งข่าว','ตอบไลน์','ใบงาน'];
 async function monitor(){
  clearInterval(MON);
- $('#v').innerHTML=`<div class="card"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="ghost" onclick="clearInterval(MON);list()">กลับรายชื่อ</button><b class="hd" style="font-size:18px">มอนิเตอร์ห้อง ม.6/17</b><span class="mute" id="mt"></span></div><div class="ctl" id="ctl"></div><div id="sum" style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:12px"></div></div><div class="card"><table><thead><tr><th>เลขที่</th><th>ชื่อ</th>${ANAME.map((a,i)=>`<th style="text-align:center">${i+1}<br><span style="font-weight:400">${a}</span></th>`).join('')}<th>กำลังทำ</th><th>คะแนน</th><th>ล่าสุด</th></tr></thead><tbody id="mb"></tbody></table></div>`;
+ $('#v').innerHTML=`<div class="card"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="ghost" onclick="clearInterval(MON);list()">กลับรายชื่อ</button><b class="hd" style="font-size:18px">มอนิเตอร์ห้อง ม.6/17</b><span class="mute" id="mt"></span><button class="ghost" style="margin-left:auto" onclick="hard()">ข่าวในเกมที่ตัดสินยากสุด</button></div><div class="ctl" id="ctl"></div><div id="sum" style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:12px"></div></div><div class="card"><table><thead><tr><th>เลขที่</th><th>ชื่อ</th>${ANAME.map((a,i)=>`<th style="text-align:center">${i+1}<br><span style="font-weight:400">${a}</span></th>`).join('')}<th>กำลังทำ</th><th>คะแนน</th><th>ล่าสุด</th></tr></thead><tbody id="mb"></tbody></table></div>`;
  const load=async()=>{let R;try{R=await rpc('news_teacher_progress',{p_pin:PIN,p_cls:'ม.6/17'})}catch(e){return}
   const now=Date.now();
   $('#sum').innerHTML=ANAME.map((a,i)=>{const k='a'+(i+1),n=R.filter(r=>r.done.includes(k)).length;return `<div style="background:#F5F3FF;border-radius:12px;padding:10px;text-align:center"><div class="mute">${i+1}. ${a}</div><div class="hd" style="font-size:26px;font-weight:700;color:#6D28D9">${n}/${R.length}</div></div>`}).join('');
@@ -176,6 +176,38 @@ function workTab(d,n){
 async function setReveal(on){try{await rpc('news_teacher_reveal',{p_pin:PIN,p_on:on});reveal()}catch(e){toast('บันทึกไม่สำเร็จ')}}
 window.addEventListener('resize',()=>{if(CUR&&CUR.full&&$('#sb'))renderCur()});
 PIN?list():login();
+
+let HQ=null;
+async function hard(){
+ let R;try{R=await rpc('news_teacher_a1_stats',{p_pin:PIN,p_cls:'ม.6/17'})}catch(e){return}
+ HQ=Q.map(q=>{let t=0,f=0,n=0,ok=0;R.forEach(res=>{const x=(res||[]).find(y=>y.id===q.id);if(!x)return;x.v===true?t++:x.v===false?f++:n++;if(x.ok)ok++});const all=t+f+n;return {q,t,f,n,all,ok,pc:all?ok/all:1}}).sort((a,b)=>a.pc-b.pc||b.n-a.n);
+ const pairs=R.length;
+ $('#v').innerHTML=`<div class="card"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="ghost" onclick="monitor()">กลับมอนิเตอร์</button><b class="hd" style="font-size:18px">ข่าวในเกมที่ตัดสินยากสุด</b><span class="mute">เล่นเกมจบแล้ว ${pairs} คู่ เรียงจากตอบถูกน้อยที่สุด คลิกข่าวเพื่อขึ้นจอ</span><button class="ghost" style="margin-left:auto" onclick="hard()">รีเฟรช</button></div></div>
+ <div class="card">${HQ.map((h,i)=>{const w=v=>h.all?(v/h.all*100):0;return `<div class="row" onclick="hardShow(${i})" style="display:flex;gap:14px;align-items:center;padding:12px 6px;border-bottom:1px solid #EEE;cursor:pointer">
+ <b class="hd" style="font-size:22px;color:#6D28D9;min-width:28px">${i+1}</b>
+ <div style="flex:1"><div style="font-weight:600">${esc(cut(h.q.h,90))}</div><div class="mute" style="font-size:13px">${PLAT[h.q.p==='fblink'?'facebook':h.q.p]||''}</div>
+ <div style="display:flex;height:10px;border-radius:6px;overflow:hidden;background:#EEE;margin-top:6px"><div style="width:${w(h.ok)}%;background:#16A34A"></div><div style="width:${w(h.all-h.ok-h.n)}%;background:#E11D48"></div><div style="width:${w(h.n)}%;background:#94A3B8"></div></div></div>
+ <div style="min-width:150px;text-align:right"><b style="font-size:20px">${h.all?Math.round(h.pc*100):'-'}%</b> <span class="mute">ตอบถูก</span><div class="mute" style="font-size:13px">ถูก ${h.ok} ผิด ${h.all-h.ok-h.n} หมดเวลา ${h.n}</div></div></div>`}).join('')}
+ <div class="mute" style="margin-top:10px;font-size:13px">เขียว ตอบถูก แดง ตอบผิด เทา หมดเวลา (นับเป็นคู่)</div></div>`;
+}
+let HS={i:0,ans:false};
+function hardShow(i){HS={i,ans:false};drawHard()}
+function drawHard(){
+ const h=HQ[HS.i],q=h.q,ov=$('#proj')||document.body.appendChild(Object.assign(document.createElement('div'),{id:'proj',className:'proj'}));
+ const bar=(lb,v,c)=>`<div style="margin:10px 0"><div style="display:flex;justify-content:space-between;font-size:20px"><b>${lb}</b><b>${v} คู่</b></div><div style="height:16px;border-radius:8px;background:#EDE9FE;overflow:hidden"><div style="height:100%;width:${h.all?v/h.all*100:0}%;background:${c}"></div></div></div>`;
+ ov.innerHTML=`<div class="bar"><span class="alias">ข่าวที่ตัดสินยากอันดับ ${HS.i+1}</span>
+ <button class="tab" ${HS.i<=0?'disabled':''} onclick="HS={i:HS.i-1,ans:false};drawHard()">ก่อนหน้า</button><button class="tab" ${HS.i>=HQ.length-1?'disabled':''} onclick="HS={i:HS.i+1,ans:false};drawHard()">ถัดไป</button>
+ <button class="tab" onclick="document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen().catch(()=>{})">เต็มจอ</button><button class="tab" onclick="$('#proj').remove()">ปิด</button></div>
+ <div style="display:flex;gap:20px;margin-top:18px;flex-wrap:wrap;align-items:flex-start">
+ <iframe src="index.html?show=${q.id}" style="flex:0 0 480px;max-width:100%;height:78vh;border:0;border-radius:16px;background:transparent"></iframe>
+ <div style="flex:1;min-width:300px">
+ <div class="card"><div class="hd" style="font-size:24px;font-weight:700">ห้องเราตอบว่า</div>${bar('จริง',h.t,'#0EA5E9')}${bar('หลอก',h.f,'#F97316')}${bar('หมดเวลา',h.n,'#94A3B8')}
+ <div class="hd" style="font-size:22px;margin-top:14px;color:#6D28D9">ถามห้อง: เลือกเพราะอะไร สังเกตจากตรงไหน</div></div>
+ ${HS.ans?`<div class="card" style="border:3px solid ${q.a?'#16A34A':'#E11D48'}"><div class="hd" style="font-size:30px;font-weight:700;color:${q.a?'#16A34A':'#E11D48'}">ข่าวนี้${q.a?'จริง':'หลอก'}</div>
+ <div style="font-size:20px;line-height:1.6;margin:8px 0">${esc(q.why)}</div>${(q.sig||[]).map(s=>`<span class="badge b-wait" style="font-size:16px;margin:3px">${SIG[s]}</span>`).join('')}${(q.good||[]).map(s=>`<span class="badge b-ok" style="font-size:16px;margin:3px">${esc(s)}</span>`).join('')}</div>`
+ :`<button class="red" style="width:100%;font-size:22px;padding:16px" onclick="HS.ans=true;drawHard()">เฉลย</button>`}
+ </div></div>`;
+}
 </script>
 </body>
 </html>

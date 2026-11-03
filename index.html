@@ -133,6 +133,7 @@ textarea{min-height:90px;resize:vertical;line-height:1.6}
 <div id="ws"></div>
 <div class="toast" id="toast"></div>
 <script>
+const SHOWQ=new URLSearchParams(location.search).get('show');
 /* ---------- state ---------- */
 let S;try{S=JSON.parse(localStorage.getItem('ckn1')||'null')}catch(e){}
 if(!S)S={me:null,cid:(crypto.randomUUID?crypto.randomUUID():String(Math.random()).slice(2)+Date.now()),a1:null,a2:null,a3:null,a4:null,a5:null,a6:null};
@@ -145,7 +146,7 @@ function drawState(){
  let t=$('#tbar');if(CS.timer_end){if(!t){t=document.createElement('div');t.id='tbar';document.body.appendChild(t)}const left=Math.round((CS.timer_end-(Date.now()-CS.skew))/1000);t.className=left<=60?'low':'';t.innerHTML=left>0?`<span>${esc(CS.label||'เวลาที่เหลือ')}</span><b>${Math.floor(left/60)}:${String(left%60).padStart(2,'0')}</b>`:`<span>${esc(CS.label||'')}</span><b>หมดเวลา</b>`}else if(t)t.remove();
 }
 setInterval(drawState,1000);
-setInterval(()=>{if(document.visibilityState==='visible'&&typeof rpc==='function')rpc('news_class_state',{}).then(applyState).catch(()=>{})},5000);
+setInterval(()=>{if(!SHOWQ&&document.visibilityState==='visible'&&typeof rpc==='function')rpc('news_class_state',{}).then(applyState).catch(()=>{})},5000);
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),2200)}
 function view(h){$('#v').innerHTML=h;scrollTo(0,0)}
@@ -475,7 +476,8 @@ async function drawSheet(){
  }catch(e){$('#st').textContent='สร้างรูปไม่สำเร็จ ให้จับภาพหน้าจอส่งแทน'}
  $('#ws').innerHTML='';
 }
-setWho();home();if(S.me)report();setInterval(()=>{if(S.me&&document.visibilityState==='visible')report()},60000);
+if(SHOWQ){const q=Q.find(x=>String(x.id)===SHOWQ);document.body.innerHTML=`<div style="max-width:460px;margin:0 auto;padding:12px">${q?mock(q,true):''}</div>`;document.body.style.background='transparent'}else{setWho();home();if(S.me)report();}
+if(!SHOWQ)setInterval(()=>{if(S.me&&document.visibilityState==='visible')report()},60000);
 </script>
 </body>
 </html>
