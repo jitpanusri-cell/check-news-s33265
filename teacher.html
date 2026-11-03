@@ -34,6 +34,19 @@ tr.row{cursor:pointer}tr.row:hover{background:#FAF5FF}
 .mute{color:var(--mute);font-size:14px}
 .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:12px;opacity:0;transition:.25s;pointer-events:none}.toast.on{opacity:1}
 #ws{position:fixed;left:-99999px;top:0}
+.ctl{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}
+.proj{position:fixed;inset:0;z-index:60;background:#F5F3FF;overflow:auto;padding:24px}
+.proj .bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--g1);color:#fff;border-radius:18px;padding:12px 16px}
+.proj .bar .alias{font-family:Anuphan;font-weight:700;font-size:24px;margin-right:auto}
+.proj .tab{background:rgba(255,255,255,.18);color:#fff;border-radius:10px;padding:8px 12px}.proj .tab.on{background:#fff;color:#6D28D9}
+.pw{max-width:980px;margin:18px auto;font-size:21px;line-height:1.6}
+.pw .c{background:#fff;border-radius:18px;padding:18px 20px;margin:12px 0;border:1px solid var(--line)}
+.pw .q{color:var(--mute);font-size:17px}.pw .a{color:#1D3FB8}
+.pw .ok{color:#16A34A;font-weight:700}.pw .no{color:#C8102E;font-weight:700}
+.pw .chat{background:#7494C0;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.pw .bub{background:#fff;border-radius:16px;border-top-left-radius:4px;padding:10px 14px;max-width:80%}.pw .bub.me{align-self:flex-end;background:#06C755;color:#fff;border-top-left-radius:16px;border-top-right-radius:4px}
+.pw .tag{display:inline-block;background:#FEF3C7;color:#78350F;border-radius:999px;padding:3px 12px;margin:4px 6px 0 0;font-size:16px}
+.bigtimer{font-family:Anuphan;font-weight:700;font-size:28px;color:#6D28D9}
 </style>
 </head>
 <body>
@@ -108,14 +121,14 @@ let MON=null;
 const ANAME=['เกม','สัญญาณเตือน','ตรวจข่าว','แต่งข่าว','ตอบไลน์','ใบงาน'];
 async function monitor(){
  clearInterval(MON);
- $('#v').innerHTML=`<div class="card"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="ghost" onclick="clearInterval(MON);list()">กลับรายชื่อ</button><b class="hd" style="font-size:18px">มอนิเตอร์ห้อง ม.6/17</b><span class="mute" id="mt"></span></div><div id="sum" style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:12px"></div></div><div class="card"><table><thead><tr><th>เลขที่</th><th>ชื่อ</th>${ANAME.map((a,i)=>`<th style="text-align:center">${i+1}<br><span style="font-weight:400">${a}</span></th>`).join('')}<th>กำลังทำ</th><th>คะแนน</th><th>ล่าสุด</th></tr></thead><tbody id="mb"></tbody></table></div>`;
+ $('#v').innerHTML=`<div class="card"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="ghost" onclick="clearInterval(MON);list()">กลับรายชื่อ</button><b class="hd" style="font-size:18px">มอนิเตอร์ห้อง ม.6/17</b><span class="mute" id="mt"></span></div><div class="ctl" id="ctl"></div><div id="sum" style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:12px"></div></div><div class="card"><table><thead><tr><th>เลขที่</th><th>ชื่อ</th>${ANAME.map((a,i)=>`<th style="text-align:center">${i+1}<br><span style="font-weight:400">${a}</span></th>`).join('')}<th>กำลังทำ</th><th>คะแนน</th><th>ล่าสุด</th></tr></thead><tbody id="mb"></tbody></table></div>`;
  const load=async()=>{let R;try{R=await rpc('news_teacher_progress',{p_pin:PIN,p_cls:'ม.6/17'})}catch(e){return}
   const now=Date.now();
   $('#sum').innerHTML=ANAME.map((a,i)=>{const k='a'+(i+1),n=R.filter(r=>r.done.includes(k)).length;return `<div style="background:#F5F3FF;border-radius:12px;padding:10px;text-align:center"><div class="mute">${i+1}. ${a}</div><div class="hd" style="font-size:26px;font-weight:700;color:#6D28D9">${n}/${R.length}</div></div>`}).join('');
-  $('#mb').innerHTML=R.map(r=>{const idle=(now-new Date(r.updated_at))/60000;return `<tr><td>${esc(r.no)}</td><td>${esc(r.name)}</td>${ANAME.map((a,i)=>`<td style="text-align:center;font-size:18px;color:${r.done.includes('a'+(i+1))?'#16A34A':'#CBD5E1'}">${r.done.includes('a'+(i+1))?'✓':'–'}</td>`).join('')}<td>${r.current?'กิจกรรมที่ '+r.current:'-'}</td><td><b>${r.score}</b>/${TOTAL}</td><td style="color:${idle>3?'#C8102E':'#6B7280'}">${idle<1?'เมื่อสักครู่':Math.round(idle)+' นาทีก่อน'}${r.checked?' <span class="badge b-ok">ตรวจแล้ว</span>':r.submitted?' <span class="badge b-wait">ส่งแล้ว</span>':''}</td></tr>`}).join('')||'<tr><td colspan="11" class="mute">ยังไม่มีนักเรียนเข้าเว็บ</td></tr>';
+  window._MON=R;$('#mb').innerHTML=R.map((r,ri)=>{const idle=(now-new Date(r.updated_at))/60000;return `<tr class="row" onclick="openWork(${ri})"><td>${esc(r.no)}</td><td>${esc(r.name)}</td>${ANAME.map((a,i)=>`<td style="text-align:center;font-size:18px;color:${r.done.includes('a'+(i+1))?'#16A34A':'#CBD5E1'}">${r.done.includes('a'+(i+1))?'✓':'–'}</td>`).join('')}<td>${r.current?'กิจกรรมที่ '+r.current:'-'}</td><td><b>${r.score}</b>/${TOTAL}</td><td style="color:${idle>3?'#C8102E':'#6B7280'}">${idle<1?'เมื่อสักครู่':Math.round(idle)+' นาทีก่อน'}${r.checked?' <span class="badge b-ok">ตรวจแล้ว</span>':r.submitted?' <span class="badge b-wait">ส่งแล้ว</span>':''}</td></tr>`}).join('')||'<tr><td colspan="11" class="mute">ยังไม่มีนักเรียนเข้าเว็บ</td></tr>';
   $('#mt').textContent=`เข้าเว็บแล้ว ${R.length} เครื่อง อัปเดต ${new Date().toLocaleTimeString('th-TH')} (รีเฟรชทุก 10 วินาที)`;
  };
- await load();MON=setInterval(()=>{if(!$('#mb'))return clearInterval(MON);load()},10000);
+ await load();await ctl();MON=setInterval(()=>{if(!$('#mb'))return clearInterval(MON);load()},10000);
 }
 let SHOWN=false;
 async function replies(){
@@ -123,6 +136,42 @@ async function replies(){
  $('#v').innerHTML=`<div class="card"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="ghost" onclick="list()">กลับรายชื่อ</button><b class="hd" style="font-size:18px">ข้อความตอบเพื่อนในกลุ่มไลน์ห้อง</b><button class="ghost" onclick="SHOWN=!SHOWN;replies()">${SHOWN?'ซ่อนชื่อ':'แสดงชื่อ'}</button><button class="ghost" onclick="replies()">รีเฟรช</button></div></div>
  ${R.map((p,i)=>`<div class="card"><div class="mute">ข่าวที่เพื่อนส่งเข้ากลุ่ม ${PL[p.platform]||''}</div><div class="hd" style="font-size:20px;font-weight:700;margin:4px 0 10px">${esc(p.headline)}</div>
  ${p.replies.map(r=>`<div style="display:flex;gap:10px;align-items:flex-start;margin:8px 0"><div style="background:#06C755;color:#fff;border-radius:16px;border-top-right-radius:4px;padding:10px 14px;font-size:18px;line-height:1.55;flex:1">${esc(r.text)}</div><div style="min-width:120px;text-align:right"><span class="badge ${r.score>=3?'b-ok':'b-wait'}">เกณฑ์ ${r.score}/4</span>${SHOWN?`<div class="mute" style="margin-top:4px">${esc(r.replier)}</div>`:''}</div></div>`).join('')}</div>`).join('')||'<div class="card">ยังไม่มีข้อความตอบ</div>'}`;
+}
+let CST=null,CTK=null;
+async function ctl(r){
+ if(!r){try{r=await rpc('news_class_state',{})}catch(e){return}}CST=r;CST.skew=Date.now()-new Date(r.now).getTime();
+ const el=$('#ctl');if(!el)return;
+ el.innerHTML=`<button class="${r.pause?'acc':'red'}" onclick="setState({p_pause:${!r.pause}})">${r.pause?'ให้นักเรียนทำต่อ':'หยุด ให้ทุกคนมองจอครู'}</button>
+ <select id="tl">${ANAME.map((a,i)=>`<option>กิจกรรมที่ ${i+1} ${a}</option>`).join('')}</select>
+ ${[3,5,8,12,15].map(m=>`<button class="ghost" onclick="setState({p_minutes:${m},p_label:$('#tl').value})">${m} นาที</button>`).join('')}
+ <button class="ghost" onclick="setState({p_clear_timer:true})">ล้างเวลา</button><span class="bigtimer" id="ttk"></span>`;
+ clearInterval(CTK);CTK=setInterval(tick,1000);tick();
+}
+function tick(){const e=$('#ttk');if(!e)return clearInterval(CTK);if(!CST||!CST.timer_end){e.textContent=CST&&CST.pause?'หยุดอยู่':'';return}
+ const left=Math.round((new Date(CST.timer_end).getTime()-(Date.now()-CST.skew))/1000);e.textContent=(CST.timer_label||'')+'  '+(left>0?`${Math.floor(left/60)}:${String(left%60).padStart(2,'0')}`:'หมดเวลา');}
+async function setState(o){try{const r=await rpc('news_teacher_set_state',Object.assign({p_pin:PIN,p_pause:null,p_minutes:null,p_label:null,p_clear_timer:false},o));ctl(r)}catch(e){toast('บันทึกไม่สำเร็จ')}}
+let PW={i:0,tab:1,show:false,data:null};
+async function openWork(i){const r=window._MON[i];PW={i,tab:r.current||1,show:false,data:null};
+ let d=null;try{d=await rpc('news_teacher_snapshot',{p_pin:PIN,p_client:r.client_id})}catch(e){}PW.data=d||{};drawWork()}
+function drawWork(){
+ const r=window._MON[PW.i],d=PW.data,ov=$('#proj')||document.body.appendChild(Object.assign(document.createElement('div'),{id:'proj',className:'proj'}));
+ const alias=PW.show?esc(r.name):`คู่ที่ ${PW.i+1}`;
+ ov.innerHTML=`<div class="bar"><span class="alias">${alias}</span>${ANAME.map((a,i)=>`<button class="tab ${PW.tab===i+1?'on':''}" onclick="PW.tab=${i+1};drawWork()">${i+1} ${a}</button>`).join('')}
+ <button class="tab" onclick="PW.show=!PW.show;drawWork()">${PW.show?'ซ่อนชื่อ':'แสดงชื่อ'}</button><button class="tab" onclick="document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen().catch(()=>{})">เต็มจอ</button>
+ <button class="tab" ${PW.i<=0?'disabled':''} onclick="openWork(${PW.i-1})">คู่ก่อน</button><button class="tab" ${PW.i>=window._MON.length-1?'disabled':''} onclick="openWork(${PW.i+1})">คู่ถัดไป</button><button class="tab" onclick="$('#proj').remove()">ปิด</button></div>
+ <div class="pw">${workTab(d,PW.tab)}</div>`;
+}
+function workTab(d,n){
+ const E=x=>esc(x||''),none='<div class="c q">ยังไม่ได้ทำกิจกรรมนี้</div>';
+ if(n===1){if(!d.a1)return none;return `<div class="c"><div class="q">เกมจริงหรือหลอก คะแนน</div><div style="font-size:44px;font-weight:700;color:#6D28D9">${d.a1.score}/8</div></div>`+d.a1.res.map(x=>{const q=Q.find(y=>y.id===x.id);return `<div class="c"><span class="${x.ok?'ok':'no'}">${x.ok?'ถูก':'ผิด'}</span> ${E(q.h)}<div class="q">ตอบ ${x.v===null?'หมดเวลา':x.v?'จริง':'หลอก'} เฉลย ${q.a?'จริง':'หลอก'}</div></div>`}).join('')}
+ if(n===2){if(!d.a2)return none;return CASES.map((c,i)=>`<div class="c"><div class="q">${i+1}) ${E(c.t)}</div><span class="${d.a2.ch[i]===c.a?'ok':'no'}">${TYPES[d.a2.ch[i]]||''}</span></div>`).join('')+A2Q.map((q,i)=>`<div class="c"><div class="q">${E(q)}</div><div class="a">${E(d.a2.w[i])}</div></div>`).join('')}
+ if(n===3){if(!d.a3)return d.a3case?`<div class="c q">ได้ข่าวที่ ${d.a3case} กำลังตรวจ</div>`:none;const q=Q.find(x=>x.id===d.a3.id);return `<div class="c"><div class="q">ข่าวที่ ${d.a3.id}</div><b>${E(q.h)}</b></div>`+STEPS.map((s,i)=>`<div class="c"><div class="q">${i+1}. ${s.t}</div><div class="a">${E(d.a3.st[i])}</div></div>`).join('')+`<div class="c"><div class="q">ข้อสรุป</div><b>${{real:'ข่าวจริง',fake:'ข่าวปลอม',unsure:'ยังสรุปไม่ได้'}[d.a3.v]}</b><div class="a">${E(d.a3.rs)}</div><div class="q">เฉลย ${q.a?'ข่าวจริง':'ข่าวปลอม'}</div></div>`}
+ if(n===4){const A=d.a4;if(!A||!A.mine)return none;const CH=A.checks||(A.check?[A.check]:[]);return `<div class="c"><div class="q">ข่าวปลอมที่แต่ง ${PLAT[A.mine.platform]} ${E(A.mine.sender)}</div><div style="font-size:26px;font-weight:700">${E(A.mine.headline)}</div><div>${E(A.mine.body)}</div><div>${A.mine.signals.map(s=>`<span class="tag">${SIG[s]}</span>`).join('')}<span class="tag">${TYPES[A.mine.type]}</span></div></div>`+CH.map((c,i)=>`<div class="c"><div class="q">ตรวจข่าวเพื่อน ${i+1} คะแนน ${c.score??A.score}/3</div><b>${E(c.post.headline)}</b><div class="a">พบ ${c.mySig.map(s=>SIG[s]).join(', ')} / ${TYPES[c.myType]}</div><div class="q">ผู้แต่งซ่อน ${c.key.signals.map(s=>SIG[s]).join(', ')} / ${TYPES[c.key.type]}</div></div>`).join('')}
+ if(n===5){let A=d.a5;if(!A)return none;if(A.text&&!A.fam)A={fam:{text:A.text,ck:A.ck}};const fk=d.a4&&d.a4.mine?d.a4.mine.headline:Q[7].h;
+  const ch=(g,who,msg,x,R)=>x&&x.text?`<div class="c"><div class="q">${g}</div><div class="chat"><div class="bub"><div class="q">${who}</div>${E(msg)}</div><div class="bub me">${E(x.text)}</div></div><div class="q" style="margin-top:8px">ผ่าน ${x.ck.filter(Boolean).length}/4 ${R.filter((r,i)=>x.ck[i]).map(r=>r.t).join(', ')}</div></div>`:'';
+  return ch('5.1 ไลน์ครอบครัว','ป้า',fk,A.fam,RUB)+ch('5.2 กลุ่มไลน์ห้อง','เพื่อนในห้อง',A.cls&&A.cls.post?A.cls.post.headline:'',A.cls,RUB2)||none}
+ if(n===6){if(!d.a6)return none;return `<div class="c"><div class="q">สัญญาณเตือนที่จำได้</div>${d.a6.sg.map(s=>`<span class="tag">${SIG[s]}</span>`).join('')}</div><div class="c"><div class="q">แหล่งตรวจสอบ</div><div class="a">${E(d.a6.so)}</div></div><div class="c"><div class="q">ครั้งหน้าฉันจะ</div><div class="a">${E(d.a6.w)}</div></div>`}
+ return none;
 }
 async function setReveal(on){try{await rpc('news_teacher_reveal',{p_pin:PIN,p_on:on});reveal()}catch(e){toast('บันทึกไม่สำเร็จ')}}
 window.addEventListener('resize',()=>{if(CUR&&CUR.full&&$('#sb'))renderCur()});

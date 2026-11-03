@@ -119,6 +119,10 @@ textarea{min-height:90px;resize:vertical;line-height:1.6}
 .modal .card{max-width:420px;width:100%}
 #ws{position:fixed;left:-99999px;top:0}
 .wsimg{width:100%;border:1px solid var(--line);border-radius:8px;margin-top:10px}
+#pauseOv{position:fixed;inset:0;z-index:50;display:grid;place-items:center;text-align:center;color:#fff;background:linear-gradient(135deg,#7C3AED,#DB2777);font-family:'Anuphan';padding:30px;animation:in .3s}
+#tbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom));z-index:40;display:flex;gap:12px;align-items:center;background:#1E1B4B;color:#fff;border-radius:999px;padding:8px 18px;font-family:'Anuphan';box-shadow:0 10px 24px -10px rgba(30,27,75,.6)}
+#tbar b{font-size:20px;font-variant-numeric:tabular-nums}#tbar.low{background:#DC2626;animation:pulse 1s infinite}
+@keyframes pulse{50%{transform:translateX(-50%) scale(1.05)}}
 </style>
 </head>
 <body>
@@ -133,7 +137,15 @@ textarea{min-height:90px;resize:vertical;line-height:1.6}
 let S;try{S=JSON.parse(localStorage.getItem('ckn1')||'null')}catch(e){}
 if(!S)S={me:null,cid:(crypto.randomUUID?crypto.randomUUID():String(Math.random()).slice(2)+Date.now()),a1:null,a2:null,a3:null,a4:null,a5:null,a6:null};
 const save=()=>{try{localStorage.setItem('ckn1',JSON.stringify(S))}catch(e){}report()};
-let RPT;function report(){clearTimeout(RPT);RPT=setTimeout(()=>{if(!S.me||typeof rpc!=='function')return;rpc('news_report_progress',{p_client:S.cid,p_name:S.me.name,p_cls:S.me.cls,p_no:S.me.no,p_done:ACTS.filter(a=>S[a.k]).map(a=>a.k),p_current:S.cur||null,p_score:totalSt(S)}).catch(()=>{})},800)}
+let RPT;function report(){clearTimeout(RPT);RPT=setTimeout(()=>{if(!S.me||typeof rpc!=='function')return;const d=Object.assign({},S);delete d.cid;rpc('news_report_progress2',{p_client:S.cid,p_name:S.me.name,p_cls:S.me.cls,p_no:S.me.no,p_done:ACTS.filter(a=>S[a.k]).map(a=>a.k),p_current:S.cur||null,p_score:totalSt(S),p_data:d}).then(applyState).catch(()=>{})},800)}
+let CS={pause:false,timer_end:null,skew:0};
+function applyState(r){if(!r)return;CS.pause=!!r.pause;CS.timer_end=r.timer_end?new Date(r.timer_end).getTime():null;CS.label=r.timer_label||'';CS.skew=Date.now()-new Date(r.now).getTime();drawState()}
+function drawState(){
+ let p=$('#pauseOv');if(CS.pause){if(!p){p=document.createElement('div');p.id='pauseOv';p.innerHTML='<div><div style="font-size:15px;opacity:.85;letter-spacing:2px">ครูขอเวลาสักครู่</div><div style="font-size:44px;font-weight:700;margin:10px 0">มองหน้าจอครู</div><div style="font-size:16px;opacity:.85">วางมือถือไว้ก่อน คำตอบยังอยู่ครบ</div></div>';document.body.appendChild(p)}}else if(p)p.remove();
+ let t=$('#tbar');if(CS.timer_end){if(!t){t=document.createElement('div');t.id='tbar';document.body.appendChild(t)}const left=Math.round((CS.timer_end-(Date.now()-CS.skew))/1000);t.className=left<=60?'low':'';t.innerHTML=left>0?`<span>${esc(CS.label||'เวลาที่เหลือ')}</span><b>${Math.floor(left/60)}:${String(left%60).padStart(2,'0')}</b>`:`<span>${esc(CS.label||'')}</span><b>หมดเวลา</b>`}else if(t)t.remove();
+}
+setInterval(drawState,1000);
+setInterval(()=>{if(document.visibilityState==='visible'&&typeof rpc==='function')rpc('news_class_state',{}).then(applyState).catch(()=>{})},5000);
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),2200)}
 function view(h){$('#v').innerHTML=h;scrollTo(0,0)}
