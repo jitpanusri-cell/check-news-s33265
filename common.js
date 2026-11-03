@@ -116,7 +116,7 @@ function renderSheet(st,chk){
   `<div><b>4.1</b> ช่องทาง ${fill(m?PLAT[m.platform]:'')} ผู้เผยแพร่ ${fill(m?cut(m.sender,30):'')}</div><div>พาดหัว ${fill(m?cut(m.headline,90):'')}</div><div>รายละเอียด ${fill(m?cut(m.body,120):'')}</div>
   <div>สัญญาณเตือนที่ซ่อนไว้</div>${sigs(m&&m.signals)}<div>ประเภท ${opts(TYPES,m&&m.type)}</div>
   <div style="margin-top:4px"><b>4.2</b> พาดหัวข่าวของเพื่อน ${fill(c?cut(c.post.headline,80):'')}</div><div>สัญญาณเตือนที่พบ</div>${sigs(c&&c.mySig)}<div>ประเภท ${opts(TYPES,c&&c.myType)}</div>
-  ${c?`<div style="font-size:15px;color:#444">ตรงกับผู้แต่ง ${c.key.hits} จาก ${c.key.signals.length} สัญญาณ ประเภทที่ผู้แต่งตั้งใจ ${TYPES[c.key.type]}</div>`:''}`;
+  ${c?`<div style="font-size:15px;color:#444">ตรงกับผู้แต่ง ${c.key.hits} จาก ${c.key.signals.length} สัญญาณ ประเภทที่ผู้แต่งตั้งใจ ${TYPES[c.key.type]}</div>`:''}${A.guess?`<div style="font-size:15px">เดาผู้แต่ง ${fill(A.guess.name)}${A.guess.author?` เฉลย ${esc(A.guess.author)} (${A.guess.correct?'ถูก':'ไม่ถูก'})`:''}</div>`:''}`;
  const r5=st.a5,fk=m?m.headline:Q[7].h;
  const c5=sec(5,'ตอบข้อความในไลน์ครอบครัว','a5','เขียนข้อความตอบป้าที่ส่งข่าวปลอมเข้ากลุ่มไลน์ครอบครัว')+
   `<div style="background:#F3F4F6;padding:2px 8px;border-left:3px solid #9CA3AF">ป้า: “${esc(cut(fk,90))}”</div>${line(r5?cut(r5.text,300):'',2)}`+

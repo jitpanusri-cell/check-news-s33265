@@ -338,7 +338,33 @@ function a4Result(){
  <p>ประเภทที่ผู้แต่งตั้งใจ: <b>${TYPES[k.type]}</b> คำตอบของนักเรียน: ${TYPES[c.myType]}</p>
  <h3>ข่าวที่นักเรียนแต่ง</h3>${userMock({platform:A.mine.platform,sender:A.mine.sender,headline:A.mine.headline,body:A.mine.body})}
  <div>${A.mine.signals.map(s=>`<span class="tag">${SIG[s]}</span>`).join('')}<span class="tag g">${TYPES[A.mine.type]}</span></div>
+ <h3>ใครแต่งข่าวนี้</h3><div id="guess"><p class="mute">กำลังโหลด</p></div>
  <button class="btn acc" onclick="go(5)">ไปกิจกรรมที่ 5</button></div>`);
+ guessBox();
+}
+const ROOM=()=>S.me.cls.replace('ม.','');
+async function guessBox(){
+ const el=$('#guess');if(!el)return;const G=S.a4.guess;
+ if(G){
+  el.innerHTML=`<div class="facts">นักเรียนเดาว่า <b>${esc(G.name)}</b><br>เหตุผล ${esc(G.reason)}</div><div id="rv" class="mute" style="margin-top:6px">ครูจะเฉลยต้นคาบหน้า</div><button class="btn ghost" onclick="checkReveal()">ดูเฉลย</button>`;return}
+ let names=[];try{names=await rpc('news_room_roster',{p_room:ROOM()})||[]}catch(e){}
+ const mine=(S.me.p||[]).map(x=>x.name);names=names.filter(n=>!mine.includes(n));
+ el.innerHTML=`<p>เดาว่าเพื่อนคนไหนแต่งข่าวที่นักเรียนตรวจ ระหว่างสัปดาห์สืบเพิ่มได้ แต่เจ้าของข่าวห้ามบอกตรง ๆ ครูจะเฉลยต้นคาบหน้า ไม่นับคะแนน</p>
+ <select id="gn"><option value="">เลือกชื่อ</option>${names.map(n=>`<option>${esc(n)}</option>`).join('')}</select>
+ <label class="f">เบาะแสที่ใช้เดา</label><textarea id="gr" placeholder="เช่น สำนวนการเขียน เรื่องที่เลือก ช่องทาง" style="min-height:70px"></textarea>
+ <button class="btn" onclick="sendGuess()">บันทึกคำเดา</button>${names.length?'':'<p class="mute">ยังไม่มีรายชื่อ รอเพื่อนส่งข่าวแล้วกลับมาที่หน้านี้</p>'}`;
+ counter('gr',200);
+}
+async function sendGuess(){
+ const n=$('#gn').value,r=$('#gr').value.trim();if(!n||r.length<5){toast('เลือกชื่อและเขียนเบาะแส');return}
+ try{await rpc('news_submit_guess',{p_client:S.cid,p_post:S.a4.check.post.id,p_guesser:S.me.name,p_guess:n,p_reason:r});S.a4.guess={name:n,reason:r};save();guessBox();toast('บันทึกคำเดาแล้ว')}
+ catch(e){toast(/revealed/.test(e.message)?'ครูเฉลยแล้ว เดาไม่ได้':'บันทึกไม่สำเร็จ')}
+}
+async function checkReveal(){
+ try{const r=await rpc('news_reveal_mine',{p_client:S.cid});
+  $('#rv').innerHTML=r.revealed&&r.author?`ผู้แต่งคือ <b>${esc(r.author)}</b> ${r.correct?'<b style="color:var(--ok)">นักเรียนเดาถูก</b>':'<b style="color:var(--bad)">นักเรียนเดาไม่ถูก</b>'}`:'ครูยังไม่เฉลย';
+  if(r.revealed&&r.author){S.a4.guess.author=r.author;S.a4.guess.correct=r.correct;save()}
+ }catch(e){toast('เชื่อมต่อไม่สำเร็จ')}
 }
 /* ---------- 5 line reply ---------- */
 function a5Fake(){return S.a4&&S.a4.mine?S.a4.mine.headline:Q[7].h}
