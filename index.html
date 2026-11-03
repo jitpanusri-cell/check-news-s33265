@@ -165,16 +165,17 @@ function userMock(q){
 const scoreOf=k=>S[k]?S[k].score:0;
 function setWho(){$('#who').innerHTML=S.me?(S.me.p?S.me.p.map(x=>`${esc(x.name.split(' ')[0].replace(/^(นาย|นางสาว|นาง|เด็กชาย|เด็กหญิง)/,''))} (${esc(x.no)})`).join('<br>'):esc(S.me.name)):''}
 function start(){
- const P=(i)=>`<div class="step"><div class="sh"><i>${i}</i>นักเรียนคนที่ ${i}</div><label class="f">ชื่อ-สกุล</label><input type="text" id="nm${i}" placeholder="เช่น นายสมชาย ใจดี" maxlength="60"><label class="f">เลขที่</label><input type="text" id="no${i}" inputmode="numeric" maxlength="3" placeholder="เช่น 12"></div>`;
- view(`<div class="hero"><h1>เริ่มต้น</h1><p>ทำเป็นคู่ ใช้มือถือเครื่องเดียว กรอกชื่อทั้ง 2 คน ข้อมูลนี้จะอยู่บนใบงานที่ส่งครู</p></div>
+ const P=(i)=>`<div class="step"><div class="sh"><i>${i}</i>นักเรียนคนที่ ${i}${i===2?' <span class="mute" style="font-weight:400">(ไม่มีคู่ เว้นว่างได้)</span>':''}</div><label class="f">ชื่อ-สกุล</label><input type="text" id="nm${i}" placeholder="เช่น นายสมชาย ใจดี" maxlength="60"><label class="f">เลขที่</label><input type="text" id="no${i}" inputmode="numeric" maxlength="3" placeholder="เช่น 12"></div>`;
+ view(`<div class="hero"><h1>เริ่มต้น</h1><p>ทำเป็นคู่ ใช้มือถือเครื่องเดียว กรอกชื่อทั้ง 2 คน ถ้าไม่มีคู่ทำคนเดียวได้ ข้อมูลนี้จะอยู่บนใบงานที่ส่งครู</p></div>
  <div class="card"><label class="f">ชั้น</label><select id="cl"><option>ม.6/17</option></select>${P(1)}${P(2)}
  <button class="btn acc" onclick="doStart()">เริ่มกิจกรรม</button>
  <p class="mute" style="margin-top:12px">คำตอบเก็บไว้ในมือถือเครื่องนี้ และส่งถึงครูเมื่อสร้างใบงานในกิจกรรมที่ 6</p></div>`);
 }
 function doStart(){
- const c=$('#cl').value,p=[1,2].map(i=>({name:$('#nm'+i).value.trim(),no:$('#no'+i).value.trim()}));
- if(p.some(x=>x.name.length<4||!x.no)){toast('กรอกชื่อ-สกุลและเลขที่ให้ครบทั้ง 2 คน');return}
- if(p[0].no===p[1].no){toast('เลขที่ของ 2 คนซ้ำกัน');return}
+ const c=$('#cl').value;let p=[1,2].map(i=>({name:$('#nm'+i).value.trim(),no:$('#no'+i).value.trim()}));
+ if(!p[1].name&&!p[1].no)p=[p[0]];
+ if(p.some(x=>x.name.length<4||!x.no)){toast('กรอกชื่อ-สกุลและเลขที่ให้ครบ');return}
+ if(p.length===2&&p[0].no===p[1].no){toast('เลขที่ของ 2 คนซ้ำกัน');return}
  p.sort((a,b)=>(+a.no||0)-(+b.no||0));
  S.me={p,cls:c,name:p.map(x=>x.name).join(' และ '),no:p.map(x=>x.no).join(', ')};save();setWho();home();
 }
@@ -240,9 +241,9 @@ function a2Result(){
 /* ---------- 3 investigate ---------- */
 async function a3(){
  if(S.a3&&S.a3.done)return a3Result();
- view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 3 งานคู่</span><h2>ตรวจสอบข่าว 5 ขั้น</h2><p>ระบบสุ่มข่าวให้แต่ละคู่ กระจายให้ทุกข่าวมีจำนวนคู่ใกล้เคียงกัน ช่วยกันค้นกับคู่ แล้วบันทึกในเครื่องนี้</p><p class="mute" id="cs">กำลังสุ่มข่าว</p><div id="case"></div></div>`);
+ view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 3 คู่หรือเดี่ยว</span><h2>ตรวจสอบข่าว 5 ขั้น</h2><p>ระบบสุ่มข่าวให้แต่ละเครื่อง กระจายให้ทุกข่าวมีจำนวนคู่ใกล้เคียงกัน ถ้าทำเป็นคู่ให้ช่วยกันค้น แล้วบันทึกในเครื่องนี้</p><p class="mute" id="cs">กำลังสุ่มข่าว</p><div id="case"></div></div>`);
  if(!S.a3case){try{S.a3case=await rpc('news_assign_case',{p_client:S.cid,p_room:S.me.cls})}catch(e){S.a3case=1+Math.floor(Math.random()*Q.length)}save()}
- $('#cs').textContent='คู่ของนักเรียนได้ข่าวที่ '+S.a3case;caseShow(S.a3case);
+ $('#cs').textContent='ได้ข่าวที่ '+S.a3case;caseShow(S.a3case);
 }
 function caseShow(id){
  if(!id){$('#case').innerHTML='';return}
@@ -285,7 +286,7 @@ function a4(){
  a4Result();
 }
 function a4Compose(){
- view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 4 งานคู่</span><h2>แต่งข่าวปลอม</h2><p>แต่งข่าวปลอมเรื่องในหาดใหญ่หรือในโรงเรียน ซ่อนสัญญาณเตือนอย่างน้อย 2 แบบ ส่งขึ้นระบบ แล้วระบบจะสุ่มข่าวของเพื่อนมาให้ตรวจ</p>
+ view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 4 คู่หรือเดี่ยว</span><h2>แต่งข่าวปลอม</h2><p>แต่งข่าวปลอมเรื่องในหาดใหญ่หรือในโรงเรียน ซ่อนสัญญาณเตือนอย่างน้อย 2 แบบ ส่งขึ้นระบบ แล้วระบบจะสุ่มข่าวของเพื่อนมาให้ตรวจ</p>
  <div class="note">ข่าวที่ส่งจะแสดงให้เพื่อนเห็นโดยไม่มีชื่อผู้แต่ง แต่ครูเห็นชื่อ ห้ามใช้ชื่อบุคคลจริง ห้ามใช้คำหยาบหรือเนื้อหาที่ทำร้ายผู้อื่น และห้ามนำไปโพสต์จริง</div>
  <label class="f">ช่องทาง</label>${optsHTML('pf',PLAT,'facebook')}
  <label class="f">ชื่อผู้เผยแพร่ (สมมติ)</label><input type="text" id="sd" placeholder="เช่น เพจข่าวหาดใหญ่ทันใจ">
@@ -343,7 +344,7 @@ function a4Result(){
 function a5Fake(){return S.a4&&S.a4.mine?S.a4.mine.headline:Q[7].h}
 function a5(){
  if(S.a5)return a5Result();
- view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 5 งานคู่</span><h2>ตอบข้อความในไลน์ครอบครัว</h2><p>ป้าส่งข่าวปลอมเข้ากลุ่มไลน์ครอบครัว เขียนข้อความตอบให้สุภาพและได้ผล</p>
+ view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 5 คู่หรือเดี่ยว</span><h2>ตอบข้อความในไลน์ครอบครัว</h2><p>ป้าส่งข่าวปลอมเข้ากลุ่มไลน์ครอบครัว เขียนข้อความตอบให้สุภาพและได้ผล</p>
  <div class="mock line"><div class="lb">‹  ครอบครัว (12)</div><div class="chat"><div class="bub"><div class="nm">ป้า</div>${esc(a5Fake())}</div><div class="bub"><div class="nm">ป้า</div>ส่งต่อให้ทุกคนนะ เผื่อเป็นประโยชน์</div><div id="mine"></div></div></div>
  <h3>เกณฑ์การให้คะแนน (ข้อละ 1 คะแนน)</h3>${RUB.map((r,i)=>`<div class="rub"><b>${i+1}. ${r.t}</b> ${r.d}</div>`).join('')}
  <label class="f">ข้อความตอบของนักเรียน</label><div class="hint">พิมพ์เอง อย่างน้อย 60 ตัวอักษร ระบบไม่อนุญาตให้วางข้อความ</div><textarea id="rp" style="min-height:120px"></textarea>
