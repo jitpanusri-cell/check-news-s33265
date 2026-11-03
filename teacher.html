@@ -53,7 +53,7 @@ function login(){
 async function tryLogin(){PIN=$('#pin').value.trim();try{await rpc('news_teacher_list',{p_pin:PIN,p_cls:''});sessionStorage.setItem('tpin',PIN);list()}catch(e){toast('รหัสไม่ถูกต้อง')}}
 async function list(){
  const cls=sessionStorage.getItem('tcls')||'';
- $('#v').innerHTML=`<div class="card"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><select id="cls"><option value="">ทุกห้อง</option><option ${cls==='ม.6/17'?'selected':''}>ม.6/17</option></select><button class="ghost" onclick="list()">รีเฟรช</button><button class="acc" onclick="reveal()">เฉลยผู้แต่งข่าว</button><span class="mute" id="cnt"></span><button class="ghost" style="margin-left:auto" onclick="sessionStorage.removeItem('tpin');login()">ออกจากระบบ</button></div>
+ $('#v').innerHTML=`<div class="card"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><select id="cls"><option value="">ทุกห้อง</option><option ${cls==='ม.6/17'?'selected':''}>ม.6/17</option></select><button class="ghost" onclick="list()">รีเฟรช</button><button class="acc" onclick="monitor()">มอนิเตอร์ห้องเรียน</button><button class="acc" onclick="reveal()">เฉลยผู้แต่งข่าว</button><span class="mute" id="cnt"></span><button class="ghost" style="margin-left:auto" onclick="sessionStorage.removeItem('tpin');login()">ออกจากระบบ</button></div>
  <table style="margin-top:10px"><thead><tr><th>ชั้น</th><th>เลขที่</th><th>ชื่อ-สกุล</th><th>คะแนน</th><th>สถานะ</th><th>ส่งล่าสุด</th></tr></thead><tbody id="tb"><tr><td colspan="6" class="mute">กำลังโหลด</td></tr></tbody></table></div>`;
  $('#cls').onchange=e=>{sessionStorage.setItem('tcls',e.target.value);list()};
  try{LIST=await rpc('news_teacher_list',{p_pin:PIN,p_cls:cls})}catch(e){return login()}
@@ -103,6 +103,19 @@ async function reveal(){
  <div class="rv" style="font-size:20px;margin-top:8px;${R.on?'':'filter:blur(9px)'}" onclick="this.style.filter=''">ผู้แต่ง <b style="color:#C8102E">${esc(p.author)}</b></div>
  <div class="mute" style="margin-top:6px">มีคนเดา ${p.guesses} คน เดาถูก ${p.correct.length} คน${p.correct.length?` (${p.correct.map(esc).join(', ')})`:''}</div></div>`).join('')||'<div class="card">ยังไม่มีข่าว</div>'}</div>
  <p class="mute">ชื่อผู้แต่งเบลอไว้จนกว่าจะเปิดเฉลย แตะที่ชื่อเพื่อเฉลยทีละข่าวบนจอได้</p>`;
+}
+let MON=null;
+const ANAME=['เกม','สัญญาณเตือน','ตรวจข่าว','แต่งข่าว','ตอบไลน์','ใบงาน'];
+async function monitor(){
+ clearInterval(MON);
+ $('#v').innerHTML=`<div class="card"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="ghost" onclick="clearInterval(MON);list()">กลับรายชื่อ</button><b class="hd" style="font-size:18px">มอนิเตอร์ห้อง ม.6/17</b><span class="mute" id="mt"></span></div><div id="sum" style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:12px"></div></div><div class="card"><table><thead><tr><th>เลขที่</th><th>ชื่อ</th>${ANAME.map((a,i)=>`<th style="text-align:center">${i+1}<br><span style="font-weight:400">${a}</span></th>`).join('')}<th>กำลังทำ</th><th>คะแนน</th><th>ล่าสุด</th></tr></thead><tbody id="mb"></tbody></table></div>`;
+ const load=async()=>{let R;try{R=await rpc('news_teacher_progress',{p_pin:PIN,p_cls:'ม.6/17'})}catch(e){return}
+  const now=Date.now();
+  $('#sum').innerHTML=ANAME.map((a,i)=>{const k='a'+(i+1),n=R.filter(r=>r.done.includes(k)).length;return `<div style="background:#F5F3FF;border-radius:12px;padding:10px;text-align:center"><div class="mute">${i+1}. ${a}</div><div class="hd" style="font-size:26px;font-weight:700;color:#6D28D9">${n}/${R.length}</div></div>`}).join('');
+  $('#mb').innerHTML=R.map(r=>{const idle=(now-new Date(r.updated_at))/60000;return `<tr><td>${esc(r.no)}</td><td>${esc(r.name)}</td>${ANAME.map((a,i)=>`<td style="text-align:center;font-size:18px;color:${r.done.includes('a'+(i+1))?'#16A34A':'#CBD5E1'}">${r.done.includes('a'+(i+1))?'✓':'–'}</td>`).join('')}<td>${r.current?'กิจกรรมที่ '+r.current:'-'}</td><td><b>${r.score}</b>/${TOTAL}</td><td style="color:${idle>3?'#C8102E':'#6B7280'}">${idle<1?'เมื่อสักครู่':Math.round(idle)+' นาทีก่อน'}${r.checked?' <span class="badge b-ok">ตรวจแล้ว</span>':r.submitted?' <span class="badge b-wait">ส่งแล้ว</span>':''}</td></tr>`}).join('')||'<tr><td colspan="11" class="mute">ยังไม่มีนักเรียนเข้าเว็บ</td></tr>';
+  $('#mt').textContent=`เข้าเว็บแล้ว ${R.length} เครื่อง อัปเดต ${new Date().toLocaleTimeString('th-TH')} (รีเฟรชทุก 10 วินาที)`;
+ };
+ await load();MON=setInterval(()=>{if(!$('#mb'))return clearInterval(MON);load()},10000);
 }
 async function setReveal(on){try{await rpc('news_teacher_reveal',{p_pin:PIN,p_on:on});reveal()}catch(e){toast('บันทึกไม่สำเร็จ')}}
 window.addEventListener('resize',()=>{if(CUR&&CUR.full&&$('#sb'))renderCur()});

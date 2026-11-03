@@ -132,7 +132,8 @@ textarea{min-height:90px;resize:vertical;line-height:1.6}
 /* ---------- state ---------- */
 let S;try{S=JSON.parse(localStorage.getItem('ckn1')||'null')}catch(e){}
 if(!S)S={me:null,cid:(crypto.randomUUID?crypto.randomUUID():String(Math.random()).slice(2)+Date.now()),a1:null,a2:null,a3:null,a4:null,a5:null,a6:null};
-const save=()=>{try{localStorage.setItem('ckn1',JSON.stringify(S))}catch(e){}};
+const save=()=>{try{localStorage.setItem('ckn1',JSON.stringify(S))}catch(e){}report()};
+let RPT;function report(){clearTimeout(RPT);RPT=setTimeout(()=>{if(!S.me||typeof rpc!=='function')return;rpc('news_report_progress',{p_client:S.cid,p_name:S.me.name,p_cls:S.me.cls,p_no:S.me.no,p_done:ACTS.filter(a=>S[a.k]).map(a=>a.k),p_current:S.cur||null,p_score:totalSt(S)}).catch(()=>{})},800)}
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),2200)}
 function view(h){$('#v').innerHTML=h;scrollTo(0,0)}
@@ -177,7 +178,7 @@ function doStart(){
  if(p.some(x=>x.name.length<4||!x.no)){toast('กรอกชื่อ-สกุลและเลขที่ให้ครบ');return}
  if(p.length===2&&p[0].no===p[1].no){toast('เลขที่ของ 2 คนซ้ำกัน');return}
  p.sort((a,b)=>(+a.no||0)-(+b.no||0));
- S.me={p,cls:c,name:p.map(x=>x.name).join(' และ '),no:p.map(x=>x.no).join(', ')};save();setWho();home();
+ S.me={p,cls:c,name:p.map(x=>x.name).join(' และ '),no:p.map(x=>x.no).join(', ')};save();setWho();home();if(S.me)report();setInterval(()=>{if(S.me&&document.visibilityState==='visible')report()},60000);
 }
 function home(){
  if(!S.me)return start();
@@ -186,7 +187,7 @@ function home(){
  ${ACTS.map((a,i)=>`<div class="act ${S[a.k]?'done':''}" style="--c:${['#7C3AED','#DB2777','#F59E0B','#10B981','#06B6D4','#6366F1'][i]}" onclick="go(${i+1})"><div class="n">${i+1}</div><div class="m"><b>${a.t}</b><span>${a.d}</span></div><div class="r">${S[a.k]?`${S[a.k].score}/${a.max}`:a.min+' นาที'}</div></div>`).join('')}
  <button class="btn ghost" style="margin-top:20px" onclick="confirmBox('ล้างคำตอบทั้งหมดในเครื่องนี้และเริ่มใหม่?',()=>{localStorage.removeItem('ckn1');location.reload()})">ล้างข้อมูลและเริ่มใหม่</button>`);
 }
-function go(n){[a1,a2,a3,a4,a5,a6][n-1]()}
+function go(n){S.cur=n;save();[a1,a2,a3,a4,a5,a6][n-1]()}
 /* ---------- 1 game ---------- */
 const T=25;let G;
 function a1(){
@@ -431,7 +432,7 @@ async function drawSheet(){
  }catch(e){$('#st').textContent='สร้างรูปไม่สำเร็จ ให้จับภาพหน้าจอส่งแทน'}
  $('#ws').innerHTML='';
 }
-setWho();home();
+setWho();home();if(S.me)report();setInterval(()=>{if(S.me&&document.visibilityState==='visible')report()},60000);
 </script>
 </body>
 </html>
