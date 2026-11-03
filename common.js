@@ -133,7 +133,7 @@ function renderSheet(st,chk){
   <div>รายวิชาเหตุการณ์ปัจจุบัน 2 รหัสวิชา ส33265 ชั้นมัธยมศึกษาปีที่ 6 สัปดาห์ที่ 1 ข่าวจริง ข่าวปลอม และภาพหรือคลิปจาก AI</div>
   <div>โรงเรียนมหาวชิราวุธ จังหวัดสงขลา ภาคเรียนที่ 2 ปีการศึกษา 2569</div></div>
   <div style="border:2px solid #111;padding:4px 16px;text-align:center;min-width:150px"><div style="font-weight:700">คะแนนรวม</div><div style="font-size:34px;font-weight:700;color:${chk&&chk.score_override!=null?'#C8102E':BL};line-height:1.1">${final}</div><div>เต็ม ${TOTAL}</div></div></div>
- <div style="display:flex;gap:30px;margin:6px 0 0;font-size:19px"><div><b>ชื่อ-สกุล</b> ${fill(me.name)}</div><div><b>ชั้น</b> ${fill(me.cls)}</div><div><b>เลขที่</b> ${fill(me.no)}</div><div><b>วันที่ส่ง</b> ${fill(st.a6?st.a6.at:'')}</div></div>
+ <div style="display:flex;gap:30px;margin:6px 0 0;font-size:19px">${me.p?me.p.map((x,i)=>`<div><b>${i+1}.</b> ${fill(x.name)} <b>เลขที่</b> ${fill(x.no)}</div>`).join(''):`<div><b>ชื่อ-สกุล</b> ${fill(me.name)}</div><div><b>เลขที่</b> ${fill(me.no)}</div>`}<div><b>ชั้น</b> ${fill(me.cls)}</div><div><b>วันที่ส่ง</b> ${fill(st.a6?st.a6.at:'')}</div></div>
  <div style="display:grid;grid-template-columns:1fr 1fr;gap:34px">
   <div>${c1}${c2}${c3}</div><div>${c4}${c5}${c6}${foot}</div></div>
  </div>`;

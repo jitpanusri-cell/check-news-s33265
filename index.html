@@ -163,15 +163,21 @@ function userMock(q){
 }
 /* ---------- start ---------- */
 const scoreOf=k=>S[k]?S[k].score:0;
-function setWho(){$('#who').innerHTML=S.me?`${esc(S.me.name)}<br>${esc(S.me.cls)} เลขที่ ${esc(S.me.no)}`:''}
+function setWho(){$('#who').innerHTML=S.me?(S.me.p?S.me.p.map(x=>`${esc(x.name.split(' ')[0].replace(/^(นาย|นางสาว|นาง|เด็กชาย|เด็กหญิง)/,''))} (${esc(x.no)})`).join('<br>'):esc(S.me.name)):''}
 function start(){
- view(`<div class="hero"><h1>เริ่มต้น</h1><p>กรอกข้อมูลให้ถูกต้อง ข้อมูลนี้จะอยู่บนใบงานที่ส่งครู</p></div>
- <div class="card"><label class="f">ชื่อ-สกุล</label><input type="text" id="nm" placeholder="เช่น นายสมชาย ใจดี" maxlength="60">
- <div class="row2"><div><label class="f">ชั้น</label><select id="cl"><option>ม.6/17</option></select></div><div><label class="f">เลขที่</label><input type="text" id="no" inputmode="numeric" maxlength="3" placeholder="เช่น 12"></div></div>
- <button class="btn" onclick="doStart()">เริ่มกิจกรรม</button>
- <p class="mute" style="margin-top:12px">คำตอบเก็บไว้ในมือถือเครื่องนี้ ยกเว้นข่าวที่แต่งในกิจกรรมที่ 4 ซึ่งส่งขึ้นระบบเพื่อให้เพื่อนตรวจ</p></div>`);
+ const P=(i)=>`<div class="step"><div class="sh"><i>${i}</i>นักเรียนคนที่ ${i}</div><label class="f">ชื่อ-สกุล</label><input type="text" id="nm${i}" placeholder="เช่น นายสมชาย ใจดี" maxlength="60"><label class="f">เลขที่</label><input type="text" id="no${i}" inputmode="numeric" maxlength="3" placeholder="เช่น 12"></div>`;
+ view(`<div class="hero"><h1>เริ่มต้น</h1><p>ทำเป็นคู่ ใช้มือถือเครื่องเดียว กรอกชื่อทั้ง 2 คน ข้อมูลนี้จะอยู่บนใบงานที่ส่งครู</p></div>
+ <div class="card"><label class="f">ชั้น</label><select id="cl"><option>ม.6/17</option></select>${P(1)}${P(2)}
+ <button class="btn acc" onclick="doStart()">เริ่มกิจกรรม</button>
+ <p class="mute" style="margin-top:12px">คำตอบเก็บไว้ในมือถือเครื่องนี้ และส่งถึงครูเมื่อสร้างใบงานในกิจกรรมที่ 6</p></div>`);
 }
-function doStart(){const n=$('#nm').value.trim(),c=$('#cl').value,no=$('#no').value.trim();if(n.length<4||!no){toast('กรอกชื่อ-สกุลและเลขที่');return}S.me={name:n,cls:c,no};save();setWho();home()}
+function doStart(){
+ const c=$('#cl').value,p=[1,2].map(i=>({name:$('#nm'+i).value.trim(),no:$('#no'+i).value.trim()}));
+ if(p.some(x=>x.name.length<4||!x.no)){toast('กรอกชื่อ-สกุลและเลขที่ให้ครบทั้ง 2 คน');return}
+ if(p[0].no===p[1].no){toast('เลขที่ของ 2 คนซ้ำกัน');return}
+ p.sort((a,b)=>(+a.no||0)-(+b.no||0));
+ S.me={p,cls:c,name:p.map(x=>x.name).join(' และ '),no:p.map(x=>x.no).join(', ')};save();setWho();home();
+}
 function home(){
  if(!S.me)return start();
  const done=ACTS.filter(a=>S[a.k]).length,sc=ACTS.reduce((s,a)=>s+scoreOf(a.k),0);
@@ -232,12 +238,11 @@ function a2Result(){
  <button class="btn acc" onclick="go(3)">ไปกิจกรรมที่ 3</button></div>`);
 }
 /* ---------- 3 investigate ---------- */
-function a3(){
+async function a3(){
  if(S.a3&&S.a3.done)return a3Result();
- view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 3 งานกลุ่ม 4 คน</span><h2>ตรวจสอบข่าว 5 ขั้น</h2><p>จับสลากหมายเลขข่าว แล้วเลือกข่าวที่ได้ ช่วยกันค้นในกลุ่ม แต่ทุกคนบันทึกในเครื่องของตัวเอง</p>
- <label class="f">หมายเลขข่าวที่จับสลากได้</label><select id="cs"><option value="">เลือกหมายเลข</option>${Q.map(q=>`<option value="${q.id}">ข่าวที่ ${q.id}</option>`).join('')}</select>
- <div id="case"></div></div>`);
- $('#cs').onchange=e=>caseShow(+e.target.value);
+ view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 3 งานคู่</span><h2>ตรวจสอบข่าว 5 ขั้น</h2><p>ระบบสุ่มข่าวให้แต่ละคู่ กระจายให้ทุกข่าวมีจำนวนคู่ใกล้เคียงกัน ช่วยกันค้นกับคู่ แล้วบันทึกในเครื่องนี้</p><p class="mute" id="cs">กำลังสุ่มข่าว</p><div id="case"></div></div>`);
+ if(!S.a3case){try{S.a3case=await rpc('news_assign_case',{p_client:S.cid,p_room:S.me.cls})}catch(e){S.a3case=1+Math.floor(Math.random()*Q.length)}save()}
+ $('#cs').textContent='คู่ของนักเรียนได้ข่าวที่ '+S.a3case;caseShow(S.a3case);
 }
 function caseShow(id){
  if(!id){$('#case').innerHTML='';return}
@@ -280,7 +285,7 @@ function a4(){
  a4Result();
 }
 function a4Compose(){
- view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 4 ทำคนเดียว</span><h2>แต่งข่าวปลอม</h2><p>แต่งข่าวปลอมเรื่องในหาดใหญ่หรือในโรงเรียน ซ่อนสัญญาณเตือนอย่างน้อย 2 แบบ ส่งขึ้นระบบ แล้วระบบจะสุ่มข่าวของเพื่อนมาให้ตรวจ</p>
+ view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 4 งานคู่</span><h2>แต่งข่าวปลอม</h2><p>แต่งข่าวปลอมเรื่องในหาดใหญ่หรือในโรงเรียน ซ่อนสัญญาณเตือนอย่างน้อย 2 แบบ ส่งขึ้นระบบ แล้วระบบจะสุ่มข่าวของเพื่อนมาให้ตรวจ</p>
  <div class="note">ข่าวที่ส่งจะแสดงให้เพื่อนเห็นโดยไม่มีชื่อผู้แต่ง แต่ครูเห็นชื่อ ห้ามใช้ชื่อบุคคลจริง ห้ามใช้คำหยาบหรือเนื้อหาที่ทำร้ายผู้อื่น และห้ามนำไปโพสต์จริง</div>
  <label class="f">ช่องทาง</label>${optsHTML('pf',PLAT,'facebook')}
  <label class="f">ชื่อผู้เผยแพร่ (สมมติ)</label><input type="text" id="sd" placeholder="เช่น เพจข่าวหาดใหญ่ทันใจ">
@@ -338,7 +343,7 @@ function a4Result(){
 function a5Fake(){return S.a4&&S.a4.mine?S.a4.mine.headline:Q[7].h}
 function a5(){
  if(S.a5)return a5Result();
- view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 5 ทำคนเดียว</span><h2>ตอบข้อความในไลน์ครอบครัว</h2><p>ป้าส่งข่าวปลอมเข้ากลุ่มไลน์ครอบครัว เขียนข้อความตอบให้สุภาพและได้ผล</p>
+ view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 5 งานคู่</span><h2>ตอบข้อความในไลน์ครอบครัว</h2><p>ป้าส่งข่าวปลอมเข้ากลุ่มไลน์ครอบครัว เขียนข้อความตอบให้สุภาพและได้ผล</p>
  <div class="mock line"><div class="lb">‹  ครอบครัว (12)</div><div class="chat"><div class="bub"><div class="nm">ป้า</div>${esc(a5Fake())}</div><div class="bub"><div class="nm">ป้า</div>ส่งต่อให้ทุกคนนะ เผื่อเป็นประโยชน์</div><div id="mine"></div></div></div>
  <h3>เกณฑ์การให้คะแนน (ข้อละ 1 คะแนน)</h3>${RUB.map((r,i)=>`<div class="rub"><b>${i+1}. ${r.t}</b> ${r.d}</div>`).join('')}
  <label class="f">ข้อความตอบของนักเรียน</label><div class="hint">พิมพ์เอง อย่างน้อย 60 ตัวอักษร ระบบไม่อนุญาตให้วางข้อความ</div><textarea id="rp" style="min-height:120px"></textarea>
