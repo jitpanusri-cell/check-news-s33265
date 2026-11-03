@@ -30,6 +30,11 @@ p{line-height:1.65;margin:6px 0;color:var(--ink2)}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .row2 .btn{margin-top:0}
 label.f{display:block;font-family:'Anuphan';font-weight:600;font-size:15px;margin:14px 0 6px}
+.sec{border:2px solid #E9D5FF;border-radius:16px;margin:16px 0;overflow:hidden;background:#fff}
+.sec>h3{margin:0;padding:11px 14px;background:linear-gradient(90deg,#F3E8FF,#FCE7F3);color:#6D28D9;font-size:17px;border-bottom:1px solid #E9D5FF}
+.sec>.sbody{padding:2px 14px 14px}
+.qbox{border:1px solid #E2E8F0;border-left:5px solid #A855F7;border-radius:12px;padding:12px;margin:12px 0;background:#FCFAFF}
+.qbox>label.f:first-child{margin-top:0}
 .hint{font-size:13px;color:var(--mute);margin:-2px 0 6px;line-height:1.5}
 input[type=text],textarea,select{width:100%;border:1px solid #CBD5E1;border-radius:12px;padding:12px;font:inherit;font-size:16px;background:#fff;color:var(--ink);outline:none}
 input[type=text]:focus,textarea:focus,select:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(37,99,235,.15)}
@@ -64,6 +69,7 @@ textarea{min-height:90px;resize:vertical;line-height:1.6}
 .tag.g{background:#E0F2FE;color:#0C4A6E}
 .note{font-size:13px;color:var(--mute);background:#F8FAFC;border:1px dashed var(--line);border-radius:12px;padding:10px 12px;margin-top:10px;line-height:1.55}
 /* mocks */
+.hardl{display:flex;flex-direction:column;gap:6px;margin-bottom:6px}.hardl .opt.on b{color:#fff!important}.hardl .opt{display:block;text-align:left;border-radius:12px;line-height:1.45}
 .mock{border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#fff;font-family:'IBM Plex Sans Thai'}
 .web .wbar{background:#111827;color:#fff;padding:10px 14px;font-family:'Anuphan';font-weight:700;display:flex;justify-content:space-between;font-size:15px}
 .web .wbar span{font-weight:400;color:#9CA3AF;font-size:13px}
@@ -149,7 +155,17 @@ setInterval(drawState,1000);
 setInterval(()=>{if(!SHOWQ&&document.visibilityState==='visible'&&typeof rpc==='function')rpc('news_class_state',{}).then(applyState).catch(()=>{})},5000);
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),2200)}
-function view(h){$('#v').innerHTML=h;scrollTo(0,0)}
+function view(h){$('#v').innerHTML=h;$$('#v .card').forEach(boxify);scrollTo(0,0)}
+function boxify(c){
+ if(!c.querySelector(':scope>h3,:scope>label.f'))return;
+ const kids=[...c.children];let sb=null,q=null;
+ for(const el of kids){
+  if(el.tagName==='H3'){const sec=document.createElement('div');sec.className='sec';c.insertBefore(sec,el);sec.appendChild(el);sb=document.createElement('div');sb.className='sbody';sec.appendChild(sb);q=null;continue}
+  if(el.matches('.btn,.secend')){sb=null;q=null;continue}
+  if(el.matches('label.f')&&!el.classList.contains('sub')){q=document.createElement('div');q.className='qbox';if(sb)sb.appendChild(q);else c.insertBefore(q,el);q.appendChild(el);continue}
+  if(q)q.appendChild(el);else if(sb)sb.appendChild(el);
+ }
+}
 const back=()=>`<button class="back" onclick="home()">‹ กลับหน้ารวมกิจกรรม</button>`;
 function confirmBox(msg,ok){const d=document.createElement('div');d.className='modal';d.innerHTML=`<div class="card"><p style="color:var(--ink)">${msg}</p><div class="row2"><button class="btn ghost" id="cn">ยกเลิก</button><button class="btn" id="cy">ยืนยัน</button></div></div>`;document.body.appendChild(d);d.querySelector('#cn').onclick=()=>d.remove();d.querySelector('#cy').onclick=()=>{d.remove();ok()}}
 function optsHTML(id,map,sel,multi){return `<div class="opts" id="${id}">${Object.entries(map).map(([k,v])=>`<span class="opt ${(multi?(sel||[]).includes(k):sel===k)?'on':''}" data-k="${k}" onclick="${multi?"this.classList.toggle('on')":`pickOne('${id}',this)`}">${v}</span>`).join('')}</div>`}
@@ -235,15 +251,19 @@ function a2(){
  <div class="facts"><b>ข้อมูลผิดพลาด</b> ข้อมูลเท็จ ผู้ส่งต่อไม่ได้ตั้งใจหลอก เพราะเข้าใจว่าจริง<br><b>ข้อมูลบิดเบือน</b> ข้อมูลเท็จที่สร้างขึ้นโดยตั้งใจหลอกลวง<br><b>ข้อมูลที่มุ่งร้าย</b> ข้อมูลจริงที่ถูกนำไปใช้ทำร้ายผู้อื่น</div>
  <h3>ตอนที่ 1 จำแนกประเภท (3 คะแนน)</h3>${CASES.map((c,i)=>`<label class="f">${i+1}. ${c.t}</label>${optsHTML('c'+i,TYPES)}`).join('')}
  <h3>ตอนที่ 2 ตอบคำถาม</h3><p class="mute">ตอบด้วยภาษาของตัวเอง อย่างน้อย 20 ตัวอักษร</p>
- ${A2Q.map((q,i)=>`<label class="f">${i+1}. ${q}</label><textarea id="w${i}"></textarea>`).join('')}
+ ${A2Q.map((q,i)=>i===0?`<label class="f">1. ข่าวใดในเกมที่ตัดสินยากที่สุด เลือก 1 ข่าว</label><div class="hardl">${Q.map(x=>{const m=(S.a1&&S.a1.res||[]).find(y=>y.id===x.id);return `<div class="opt hq" data-k="${x.id}" onclick="hqPick(this)">${esc(cut(x.h,80))}${m?` <b style="color:${m.ok?'var(--ok)':'var(--bad)'}">${m.ok?'ตอบถูก':m.v===null?'หมดเวลา':'ตอบผิด'}</b>`:''}</div>`}).join('')}</div><div id="hqv"></div><label class="f sub">เพราะอะไรจึงตัดสินยาก</label><textarea id="w0" placeholder="เพราะ…"></textarea>`:`<label class="f">${i+1}. ${q}</label><textarea id="w${i}"></textarea>`).join('')}
  <button class="btn acc" onclick="a2Done()">ส่งคำตอบ</button></div>`);
  A2Q.forEach((q,i)=>counter('w'+i,300));
 }
+function hqPick(el){$$('.hq').forEach(e=>e.classList.remove('on'));el.classList.add('on');const q=Q.find(x=>x.id===Number(el.dataset.k));$('#hqv').innerHTML=`<div class="mute" style="margin:8px 0 4px">ดูข่าวที่เลือกอีกครั้ง</div><div style="max-width:420px">${mock(q,true)}</div>`}
 function a2Done(){
  const ch=CASES.map((c,i)=>picked('c'+i)[0]),w=A2Q.map((q,i)=>$('#w'+i).value.trim());
  if(ch.some(x=>!x)){toast('เลือกประเภทให้ครบ 3 ข้อ');return}
+ const hk=$('.hq.on')?Number($('.hq.on').dataset.k):null;
+ if(!hk){toast('เลือกข่าวที่ตัดสินยากที่สุด 1 ข่าว');return}
  if(w.some(x=>x.length<20)){toast('ตอบคำถามทุกข้อ อย่างน้อย 20 ตัวอักษร');return}
- S.a2={ch,w,score:ch.filter((x,i)=>x===CASES[i].a).length};save();a2Result();
+ w[0]=`ข่าว "${cut(Q.find(x=>x.id===hk).h,60)}" ${w[0]}`;
+ S.a2={ch,w,hard:hk,score:ch.filter((x,i)=>x===CASES[i].a).length};save();a2Result();
 }
 function a2Result(){
  const r=S.a2;
@@ -268,8 +288,8 @@ function caseShow(id){
   ${i===3?`<a href="https://www.google.com/search?q=${gq}" target="_blank" rel="noopener">ค้นใน Google</a><a href="https://www.google.com/search?q=${gq}&tbm=nws" target="_blank" rel="noopener">ค้นในหมวดข่าว</a><a href="https://www.antifakenewscenter.com/" target="_blank" rel="noopener">ศูนย์ต่อต้านข่าวปลอม</a>`:''}
   ${i===4?`<a href="https://lens.google.com/" target="_blank" rel="noopener">Google Lens</a>`:''}
   <textarea id="s${i}" placeholder="${s.ph}" style="min-height:70px"></textarea></div>`).join('')}
- <label class="f">ข้อสรุป</label>${optsHTML('vd',{real:'ข่าวจริง',fake:'ข่าวปลอม',unsure:'ยังสรุปไม่ได้'})}
- <label class="f">เหตุผลประกอบข้อสรุป (อ้างหลักฐานจากขั้นตอนข้างบน)</label><textarea id="rs"></textarea>
+ <div class="qbox" style="border-left-color:#DB2777"><div class="sh" style="font-family:Anuphan;font-weight:700;font-size:16px">สรุปผลการตรวจสอบ</div><label class="f">ข้อสรุป</label>${optsHTML('vd',{real:'ข่าวจริง',fake:'ข่าวปลอม',unsure:'ยังสรุปไม่ได้'})}
+ <label class="f">เหตุผลประกอบข้อสรุป (อ้างหลักฐานจากขั้นตอนข้างบน)</label><textarea id="rs"></textarea></div>
  <button class="btn acc" onclick="a3Done(${id})">ส่งผลการตรวจสอบ</button>`;
  STEPS.forEach((s,i)=>counter('s'+i,250));counter('rs',300);
 }
@@ -399,7 +419,7 @@ function chatMock(group,who,msg,mine){return `<div class="mock line"><div class=
 function a5Fam(){
  view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 5.1 คู่หรือเดี่ยว</span><h2>ตอบป้าในไลน์ครอบครัว</h2><p>ป้าส่งข่าวปลอมเข้ากลุ่มไลน์ครอบครัว เขียนข้อความตอบให้สุภาพและได้ผล</p>
  ${chatMock('ครอบครัว (12)','ป้า',a5Fake()+'\nส่งต่อให้ทุกคนนะ เผื่อเป็นประโยชน์')}
- <h3>เกณฑ์ (ข้อละ 0.5 คะแนน)</h3>${RUB.map((r,i)=>`<div class="rub"><b>${i+1}. ${r.t}</b> ${r.d}</div>`).join('')}
+ <h3>เกณฑ์ (ข้อละ 0.5 คะแนน)</h3>${RUB.map((r,i)=>`<div class="rub"><b>${i+1}. ${r.t}</b> ${r.d}</div>`).join('')}<div class="secend"></div>
  <label class="f">ข้อความตอบป้า</label><div class="hint">พิมพ์เอง อย่างน้อย 60 ตัวอักษร วางข้อความไม่ได้</div><textarea id="rp" style="min-height:110px"></textarea>
  <button class="btn acc" onclick="a5FamDone()">ส่ง แล้วไปตอบกลุ่มไลน์ห้อง</button></div>`);
  counter('rp',400);noPaste('rp');
@@ -417,7 +437,7 @@ async function a5Cls(){
   S.a5.cls={post:p};save();}
  view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 5.2 คู่หรือเดี่ยว</span><h2>ตอบเพื่อนในกลุ่มไลน์ห้อง</h2><p>เพื่อนคนหนึ่งส่งข่าวนี้เข้ากลุ่มไลน์ห้อง ม.6/17 (ข่าวที่เพื่อนแต่งในกิจกรรมที่ 4) เขียนข้อความตอบในกลุ่ม</p>
  ${chatMock('ม.6/17 (32)','เพื่อนในห้อง',p.headline+(p.body?'\n'+p.body:''))}
- <h3>เกณฑ์ (ข้อละ 0.5 คะแนน)</h3>${RUB2.map((r,i)=>`<div class="rub"><b>${i+1}. ${r.t}</b> ${r.d}</div>`).join('')}
+ <h3>เกณฑ์ (ข้อละ 0.5 คะแนน)</h3>${RUB2.map((r,i)=>`<div class="rub"><b>${i+1}. ${r.t}</b> ${r.d}</div>`).join('')}<div class="secend"></div>
  <label class="f">ข้อความตอบในกลุ่มห้อง</label><div class="hint">พิมพ์เอง อย่างน้อย 60 ตัวอักษร ข้อความนี้ส่งถึงครู ครูอาจนำไปฉายบนจอโดยไม่แสดงชื่อ</div><textarea id="rc" style="min-height:110px"></textarea>
  <button class="btn acc" id="rcb" onclick="a5ClsDone()">ส่งข้อความ</button></div>`);
  counter('rc',400);noPaste('rc');

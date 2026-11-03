@@ -179,15 +179,15 @@ PIN?list():login();
 
 let HQ=null;
 async function hard(){
- let R;try{R=await rpc('news_teacher_a1_stats',{p_pin:PIN,p_cls:'ม.6/17'})}catch(e){return}
- HQ=Q.map(q=>{let t=0,f=0,n=0,ok=0;R.forEach(res=>{const x=(res||[]).find(y=>y.id===q.id);if(!x)return;x.v===true?t++:x.v===false?f++:n++;if(x.ok)ok++});const all=t+f+n;return {q,t,f,n,all,ok,pc:all?ok/all:1}}).sort((a,b)=>a.pc-b.pc||b.n-a.n);
+ let R,V=[];try{R=await rpc('news_teacher_a1_stats',{p_pin:PIN,p_cls:'ม.6/17'});V=await rpc('news_teacher_hard_votes',{p_pin:PIN,p_cls:'ม.6/17'})||[]}catch(e){return}
+ HQ=Q.map(q=>{let t=0,f=0,n=0,ok=0;R.forEach(res=>{const x=(res||[]).find(y=>y.id===q.id);if(!x)return;x.v===true?t++:x.v===false?f++:n++;if(x.ok)ok++});const all=t+f+n,vw=V.filter(v=>v.id===q.id).map(v=>v.why);return {q,t,f,n,all,ok,vw,pc:all?ok/all:1}}).sort((a,b)=>b.vw.length-a.vw.length||a.pc-b.pc||b.n-a.n);
  const pairs=R.length;
- $('#v').innerHTML=`<div class="card"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="ghost" onclick="monitor()">กลับมอนิเตอร์</button><b class="hd" style="font-size:18px">ข่าวในเกมที่ตัดสินยากสุด</b><span class="mute">เล่นเกมจบแล้ว ${pairs} คู่ เรียงจากตอบถูกน้อยที่สุด คลิกข่าวเพื่อขึ้นจอ</span><button class="ghost" style="margin-left:auto" onclick="hard()">รีเฟรช</button></div></div>
+ $('#v').innerHTML=`<div class="card"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="ghost" onclick="monitor()">กลับมอนิเตอร์</button><b class="hd" style="font-size:18px">ข่าวในเกมที่ตัดสินยากสุด</b><span class="mute">เล่นเกมจบแล้ว ${pairs} คู่ เรียงจากข่าวที่นักเรียนเลือกว่ายากมากสุด (กิจกรรมที่ 2) แล้วตามตอบถูกน้อย คลิกข่าวเพื่อขึ้นจอ</span><button class="ghost" style="margin-left:auto" onclick="hard()">รีเฟรช</button></div></div>
  <div class="card">${HQ.map((h,i)=>{const w=v=>h.all?(v/h.all*100):0;return `<div class="row" onclick="hardShow(${i})" style="display:flex;gap:14px;align-items:center;padding:12px 6px;border-bottom:1px solid #EEE;cursor:pointer">
  <b class="hd" style="font-size:22px;color:#6D28D9;min-width:28px">${i+1}</b>
  <div style="flex:1"><div style="font-weight:600">${esc(cut(h.q.h,90))}</div><div class="mute" style="font-size:13px">${PLAT[h.q.p==='fblink'?'facebook':h.q.p]||''}</div>
  <div style="display:flex;height:10px;border-radius:6px;overflow:hidden;background:#EEE;margin-top:6px"><div style="width:${w(h.ok)}%;background:#16A34A"></div><div style="width:${w(h.all-h.ok-h.n)}%;background:#E11D48"></div><div style="width:${w(h.n)}%;background:#94A3B8"></div></div></div>
- <div style="min-width:150px;text-align:right"><b style="font-size:20px">${h.all?Math.round(h.pc*100):'-'}%</b> <span class="mute">ตอบถูก</span><div class="mute" style="font-size:13px">ถูก ${h.ok} ผิด ${h.all-h.ok-h.n} หมดเวลา ${h.n}</div></div></div>`}).join('')}
+ <div style="min-width:150px;text-align:right"><div><b style="font-size:20px;color:#C026D3">${h.vw.length}</b> <span class="mute">คู่เลือกว่ายาก</span></div><b style="font-size:16px">${h.all?Math.round(h.pc*100):'-'}%</b> <span class="mute">ตอบถูก</span><div class="mute" style="font-size:13px">ถูก ${h.ok} ผิด ${h.all-h.ok-h.n} หมดเวลา ${h.n}</div></div></div>`}).join('')}
  <div class="mute" style="margin-top:10px;font-size:13px">เขียว ตอบถูก แดง ตอบผิด เทา หมดเวลา (นับเป็นคู่)</div></div>`;
 }
 let HS={i:0,ans:false};
@@ -203,6 +203,7 @@ function drawHard(){
  <div style="flex:1;min-width:300px">
  <div class="card"><div class="hd" style="font-size:24px;font-weight:700">ห้องเราตอบว่า</div>${bar('จริง',h.t,'#0EA5E9')}${bar('หลอก',h.f,'#F97316')}${bar('หมดเวลา',h.n,'#94A3B8')}
  <div class="hd" style="font-size:22px;margin-top:14px;color:#6D28D9">ถามห้อง: เลือกเพราะอะไร สังเกตจากตรงไหน</div></div>
+ ${h.vw.length?`<div class="card"><div class="hd" style="font-size:22px;font-weight:700">เหตุผลที่ตัดสินยาก (${h.vw.length} คู่)</div>${h.vw.map(w=>`<div style="font-size:19px;line-height:1.55;padding:8px 0;border-bottom:1px solid #EEE">${esc(String(w||'').replace(/^ข่าว "[^"]*" /,''))}</div>`).join('')}</div>`:''}
  ${HS.ans?`<div class="card" style="border:3px solid ${q.a?'#16A34A':'#E11D48'}"><div class="hd" style="font-size:30px;font-weight:700;color:${q.a?'#16A34A':'#E11D48'}">ข่าวนี้${q.a?'จริง':'หลอก'}</div>
  <div style="font-size:20px;line-height:1.6;margin:8px 0">${esc(q.why)}</div>${(q.sig||[]).map(s=>`<span class="badge b-wait" style="font-size:16px;margin:3px">${SIG[s]}</span>`).join('')}${(q.good||[]).map(s=>`<span class="badge b-ok" style="font-size:16px;margin:3px">${esc(s)}</span>`).join('')}</div>`
  :`<button class="red" style="width:100%;font-size:22px;padding:16px" onclick="HS.ans=true;drawHard()">เฉลย</button>`}
