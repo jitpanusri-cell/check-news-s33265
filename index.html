@@ -280,10 +280,12 @@ function a3Result(){
  <button class="btn acc" onclick="go(4)">ไปกิจกรรมที่ 4</button></div>`);
 }
 /* ---------- 4 compose & check ---------- */
+const MAXC=3;
+function a4mig(){const A=S.a4;if(A&&!A.checks){A.checks=A.check?[Object.assign({},A.check,{score:A.score,guess:A.guess})]:[];delete A.check;delete A.guess}}
 function a4(){
- const A=S.a4||{};
+ a4mig();const A=S.a4||{};
  if(!A.postId)return a4Compose();
- if(!A.check)return a4Fetch();
+ if(!A.checks.length)return a4Fetch();
  a4Result();
 }
 function a4Compose(){
@@ -304,93 +306,122 @@ async function a4Submit(){
  if(d.signals.length<2||!d.type){toast('เลือกสัญญาณเตือนอย่างน้อย 2 แบบ และประเภท');return}
  $('#sb').disabled=true;$('#sb').textContent='กำลังส่ง…';
  try{const id=await rpc('news_submit_post',{p_room:S.me.cls.replace('ม.',''),p_client:S.cid,p_name:`${S.me.name} (${S.me.cls} เลขที่ ${S.me.no})`,p_platform:d.platform,p_sender:d.sender,p_headline:d.headline,p_body:d.body,p_signals:d.signals,p_type:d.type});
-  S.a4={postId:id,mine:d,seen:[]};save();a4Fetch();
+  S.a4={postId:id,mine:d,seen:[],checks:[]};save();a4Fetch();
  }catch(e){$('#sb').disabled=false;$('#sb').textContent='ส่งข่าวขึ้นระบบ';toast(/limit/.test(e.message)?'ส่งได้ไม่เกิน 3 ข่าวต่อเครื่อง':'ส่งไม่สำเร็จ ตรวจสอบอินเทอร์เน็ตแล้วลองใหม่')}
 }
 async function a4Fetch(){
- view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 4</span><h2>ตรวจข่าวของเพื่อน</h2><p class="mute">กำลังสุ่มข่าวของเพื่อน…</p></div>`);
- try{const r=await rpc('news_random_post',{p_room:S.me.cls.replace('ม.',''),p_client:S.cid,p_exclude:S.a4.seen||[]});
-  if(!r||!r.length){view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 4</span><h2>ยังไม่มีข่าวของเพื่อน</h2><p>รอให้เพื่อนส่งข่าวขึ้นระบบสักครู่ แล้วกดสุ่มใหม่</p><button class="btn acc" onclick="a4Fetch()">สุ่มใหม่</button></div>`);return}
+ view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 4</span><h2>ตรวจข่าวของเพื่อน</h2><p class="mute">กำลังสุ่มข่าวของเพื่อน</p></div>`);
+ const ex=(S.a4.seen||[]).concat(S.a4.checks.map(c=>c.post.id));
+ try{const r=await rpc('news_random_post',{p_room:ROOM(),p_client:S.cid,p_exclude:ex});
+  if(!r||!r.length){view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 4</span><h2>ยังไม่มีข่าวของเพื่อนให้ตรวจ</h2><p>รอให้เพื่อนส่งข่าวขึ้นระบบสักครู่ แล้วกดสุ่มใหม่</p><button class="btn acc" onclick="a4Fetch()">สุ่มใหม่</button>${S.a4.checks.length?'<button class="btn ghost" onclick="a4Result()">ดูผลที่ตรวจแล้ว</button>':''}</div>`);return}
   S.a4.cur=r[0];save();a4Check();
  }catch(e){view(back()+`<div class="card"><h2>เชื่อมต่อไม่สำเร็จ</h2><p>ตรวจสอบอินเทอร์เน็ตแล้วลองใหม่</p><button class="btn acc" onclick="a4Fetch()">ลองใหม่</button></div>`)}
 }
 function a4Check(){
- const p=S.a4.cur;
- view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 4</span><h2>ตรวจข่าวของเพื่อน</h2><p class="mute">ข่าวที่เพื่อนแต่ง (ข้อความสมมติ) ${PLAT[p.platform]}</p>
+ const p=S.a4.cur,n=S.a4.checks.length+1;
+ view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 4 ข่าวของเพื่อน ${n}/${MAXC}</span><h2>ตรวจข่าวของเพื่อน</h2><p class="mute">ข่าวที่เพื่อนแต่ง (ข้อความสมมติ) ${PLAT[p.platform]}</p>
  ${userMock(p)}
  <label class="f">พบสัญญาณเตือนอะไรบ้าง</label>${optsHTML('gs',SIG,[],true)}
  <label class="f">เป็นข่าวปลอมประเภทใด</label>${optsHTML('gt',TYPES)}
  <button class="btn acc" id="ck" onclick="a4Send()">ตรวจคำตอบ</button>
- ${(S.a4.seen||[]).length<2?`<button class="btn ghost" onclick="S.a4.seen=(S.a4.seen||[]).concat([S.a4.cur.id]);save();a4Fetch()">ข่าวนี้อ่านไม่เข้าใจ สุ่มข่าวอื่น</button>`:''}</div>`);
+ ${(S.a4.seen||[]).length<3?`<button class="btn ghost" onclick="S.a4.seen=(S.a4.seen||[]).concat([S.a4.cur.id]);save();a4Fetch()">ข่าวนี้อ่านไม่เข้าใจ สุ่มข่าวอื่น</button>`:''}</div>`);
 }
 async function a4Send(){
  const sg=picked('gs'),ty=picked('gt')[0];if(!sg.length||!ty){toast('เลือกสัญญาณเตือนและประเภท');return}
  $('#ck').disabled=true;
  try{const r=await rpc('news_check_answer',{p_post:S.a4.cur.id,p_client:S.cid,p_signals:sg,p_type:ty});
-  S.a4.check={post:S.a4.cur,mySig:sg,myType:ty,key:r};S.a4.score=Number(r.score);save();a4Result();
+  S.a4.checks.push({post:S.a4.cur,mySig:sg,myType:ty,key:r,score:Number(r.score)});S.a4.cur=null;
+  S.a4.score=Math.round(S.a4.checks.reduce((t,c)=>t+c.score,0)/S.a4.checks.length*10)/10;save();a4Result(S.a4.checks.length-1);
  }catch(e){$('#ck').disabled=false;toast('ส่งไม่สำเร็จ ลองใหม่')}
 }
-function a4Result(){
- const A=S.a4,c=A.check,k=c.key;
+function a4Result(open){
+ a4mig();const A=S.a4,L=A.checks;if(open===undefined)open=L.length-1;
  view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 4</span><h2>ผลการตรวจข่าวของเพื่อน</h2><div class="score">${A.score}/3</div>
- <p class="mute">สัญญาณเตือนที่ตรงกับผู้แต่ง 2 คะแนน (เลือกเกินหักข้อละ 0.5) ประเภทถูก 1 คะแนน</p>
- ${userMock(c.post)}
- <label class="f">สัญญาณเตือน</label><div class="opts">${Object.keys(SIG).map(s=>{const a=k.signals.includes(s),m=c.mySig.includes(s);if(!a&&!m)return'';return `<span class="opt ${a&&m?'hit':m?'wrong':'missed'}">${SIG[s]} ${a&&m?'(พบ)':m?'(ไม่ได้ซ่อนไว้)':'(ยังไม่พบ)'}</span>`}).join('')}</div>
- <p>ประเภทที่ผู้แต่งตั้งใจ: <b>${TYPES[k.type]}</b> คำตอบของนักเรียน: ${TYPES[c.myType]}</p>
+ <p class="mute">คะแนนเฉลี่ยจากข่าวที่ตรวจ ${L.length} ข่าว ข่าวละ 3 คะแนน (สัญญาณเตือนตรงกับผู้แต่ง 2 ประเภทถูก 1)</p>
+ ${L.map((c,i)=>`<div class="step"><div class="sh" style="cursor:pointer" onclick="a4Result(${i})"><i>${i+1}</i><span style="flex:1">${esc(cut(c.post.headline,60))}</span><span>${c.score}/3</span></div>${i===open?a4Detail(c,i):''}</div>`).join('')}
+ ${L.length<MAXC?`<button class="btn" onclick="a4Fetch()">ตรวจข่าวของเพื่อนต่อ (${L.length}/${MAXC})</button>`:''}
  <h3>ข่าวที่นักเรียนแต่ง</h3>${userMock({platform:A.mine.platform,sender:A.mine.sender,headline:A.mine.headline,body:A.mine.body})}
  <div>${A.mine.signals.map(s=>`<span class="tag">${SIG[s]}</span>`).join('')}<span class="tag g">${TYPES[A.mine.type]}</span></div>
- <h3>ใครแต่งข่าวนี้</h3><div id="guess"><p class="mute">กำลังโหลด</p></div>
  <button class="btn acc" onclick="go(5)">ไปกิจกรรมที่ 5</button></div>`);
- guessBox();
+ guessBox(open);
 }
+function a4Detail(c,i){const k=c.key;return `${userMock(c.post)}
+ <label class="f">สัญญาณเตือน</label><div class="opts">${Object.keys(SIG).map(s=>{const a=k.signals.includes(s),m=c.mySig.includes(s);if(!a&&!m)return'';return `<span class="opt ${a&&m?'hit':m?'wrong':'missed'}">${SIG[s]} ${a&&m?'(พบ)':m?'(ไม่ได้ซ่อนไว้)':'(ยังไม่พบ)'}</span>`}).join('')}</div>
+ <p>ประเภทที่ผู้แต่งตั้งใจ: <b>${TYPES[k.type]}</b> คำตอบของนักเรียน: ${TYPES[c.myType]}</p>
+ <label class="f">ใครแต่งข่าวนี้</label><div id="guess"><p class="mute">กำลังโหลด</p></div>`}
 const ROOM=()=>S.me.cls.replace('ม.','');
-async function guessBox(){
- const el=$('#guess');if(!el)return;const G=S.a4.guess;
- if(G){
-  el.innerHTML=`<div class="facts">นักเรียนเดาว่า <b>${esc(G.name)}</b><br>เหตุผล ${esc(G.reason)}</div><div id="rv" class="mute" style="margin-top:6px">ครูจะเฉลยต้นคาบหน้า</div><button class="btn ghost" onclick="checkReveal()">ดูเฉลย</button>`;return}
+async function guessBox(i){
+ const el=$('#guess');if(!el)return;const c=S.a4.checks[i],G=c.guess;
+ if(G){el.innerHTML=`<div class="facts">นักเรียนเดาว่า <b>${esc(G.name)}</b><br>เบาะแส ${esc(G.reason)}${G.author?`<br>เฉลย ผู้แต่งคือ <b>${esc(G.author)}</b> ${G.correct?'<b style="color:var(--ok)">เดาถูก</b>':'<b style="color:var(--bad)">เดาไม่ถูก</b>'}`:''}</div>${G.author?'':'<p class="mute">ครูจะเฉลยต้นคาบหน้า</p><button class="btn ghost" onclick="checkReveal('+i+')">ดูเฉลย</button>'}`;return}
  let names=[];try{names=await rpc('news_room_roster',{p_room:ROOM()})||[]}catch(e){}
  const mine=(S.me.p||[]).map(x=>x.name);names=names.filter(n=>!mine.includes(n));
- el.innerHTML=`<p>เดาว่าเพื่อนคนไหนแต่งข่าวที่นักเรียนตรวจ ระหว่างสัปดาห์สืบเพิ่มได้ แต่เจ้าของข่าวห้ามบอกตรง ๆ ครูจะเฉลยต้นคาบหน้า ไม่นับคะแนน</p>
+ el.innerHTML=`<p class="mute">เดาว่าเพื่อนคนไหนแต่ง ระหว่างสัปดาห์สืบเพิ่มได้ แต่เจ้าของข่าวห้ามบอกตรง ๆ ครูเฉลยต้นคาบหน้า ไม่นับคะแนน</p>
  <select id="gn"><option value="">เลือกชื่อ</option>${names.map(n=>`<option>${esc(n)}</option>`).join('')}</select>
- <label class="f">เบาะแสที่ใช้เดา</label><textarea id="gr" placeholder="เช่น สำนวนการเขียน เรื่องที่เลือก ช่องทาง" style="min-height:70px"></textarea>
- <button class="btn" onclick="sendGuess()">บันทึกคำเดา</button>${names.length?'':'<p class="mute">ยังไม่มีรายชื่อ รอเพื่อนส่งข่าวแล้วกลับมาที่หน้านี้</p>'}`;
- counter('gr',200);
+ <textarea id="gr" placeholder="เบาะแสที่ใช้เดา เช่น สำนวน เรื่องที่เลือก ช่องทาง" style="min-height:60px;margin-top:8px"></textarea>
+ <button class="btn ghost" onclick="sendGuess(${i})">บันทึกคำเดา</button>`;counter('gr',200);
 }
-async function sendGuess(){
- const n=$('#gn').value,r=$('#gr').value.trim();if(!n||r.length<5){toast('เลือกชื่อและเขียนเบาะแส');return}
- try{await rpc('news_submit_guess',{p_client:S.cid,p_post:S.a4.check.post.id,p_guesser:S.me.name,p_guess:n,p_reason:r});S.a4.guess={name:n,reason:r};save();guessBox();toast('บันทึกคำเดาแล้ว')}
+async function sendGuess(i){
+ const n=$('#gn').value,r=$('#gr').value.trim(),c=S.a4.checks[i];if(!n||r.length<5){toast('เลือกชื่อและเขียนเบาะแส');return}
+ try{await rpc('news_submit_guess',{p_client:S.cid,p_post:c.post.id,p_guesser:S.me.name,p_guess:n,p_reason:r});c.guess={name:n,reason:r};save();guessBox(i);toast('บันทึกคำเดาแล้ว')}
  catch(e){toast(/revealed/.test(e.message)?'ครูเฉลยแล้ว เดาไม่ได้':'บันทึกไม่สำเร็จ')}
 }
-async function checkReveal(){
- try{const r=await rpc('news_reveal_mine',{p_client:S.cid});
-  $('#rv').innerHTML=r.revealed&&r.author?`ผู้แต่งคือ <b>${esc(r.author)}</b> ${r.correct?'<b style="color:var(--ok)">นักเรียนเดาถูก</b>':'<b style="color:var(--bad)">นักเรียนเดาไม่ถูก</b>'}`:'ครูยังไม่เฉลย';
-  if(r.revealed&&r.author){S.a4.guess.author=r.author;S.a4.guess.correct=r.correct;save()}
+async function checkReveal(i){
+ try{const r=await rpc('news_reveal_mine',{p_client:S.cid});if(!r.revealed){toast('ครูยังไม่เฉลย');return}
+  (r.items||[]).forEach(it=>{const c=S.a4.checks.find(x=>x.post.id===it.post_id);if(c&&c.guess){c.guess.author=it.author;c.guess.correct=it.correct}});save();a4Result(i);
  }catch(e){toast('เชื่อมต่อไม่สำเร็จ')}
 }
-/* ---------- 5 line reply ---------- */
+/* ---------- 5 line replies ---------- */
+
 function a5Fake(){return S.a4&&S.a4.mine?S.a4.mine.headline:Q[7].h}
+function a5mig(){if(S.a5&&S.a5.text&&!S.a5.fam){S.a5={fam:{text:S.a5.text,ck:S.a5.ck},score:S.a5.score}}}
+function a5Score(){const f=S.a5.fam,c=S.a5.cls;S.a5.score=((f?f.ck.filter(Boolean).length:0)+(c&&c.ck?c.ck.filter(Boolean).length:0))/2}
+function noPaste(id){const t=$('#'+id);t.addEventListener('paste',e=>{e.preventDefault();toast('กรุณาพิมพ์ข้อความเอง')});t.addEventListener('drop',e=>e.preventDefault())}
 function a5(){
- if(S.a5)return a5Result();
- view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 5 คู่หรือเดี่ยว</span><h2>ตอบข้อความในไลน์ครอบครัว</h2><p>ป้าส่งข่าวปลอมเข้ากลุ่มไลน์ครอบครัว เขียนข้อความตอบให้สุภาพและได้ผล</p>
- <div class="mock line"><div class="lb">‹  ครอบครัว (12)</div><div class="chat"><div class="bub"><div class="nm">ป้า</div>${esc(a5Fake())}</div><div class="bub"><div class="nm">ป้า</div>ส่งต่อให้ทุกคนนะ เผื่อเป็นประโยชน์</div><div id="mine"></div></div></div>
- <h3>เกณฑ์การให้คะแนน (ข้อละ 1 คะแนน)</h3>${RUB.map((r,i)=>`<div class="rub"><b>${i+1}. ${r.t}</b> ${r.d}</div>`).join('')}
- <label class="f">ข้อความตอบของนักเรียน</label><div class="hint">พิมพ์เอง อย่างน้อย 60 ตัวอักษร ระบบไม่อนุญาตให้วางข้อความ</div><textarea id="rp" style="min-height:120px"></textarea>
- <button class="btn acc" onclick="a5Done()">ส่งข้อความ</button></div>`);
- counter('rp',400);
- const t=$('#rp');t.addEventListener('paste',e=>{e.preventDefault();toast('กรุณาพิมพ์ข้อความเอง')});t.addEventListener('drop',e=>e.preventDefault());
+ a5mig();
+ if(!S.a5||!S.a5.fam)return a5Fam();
+ if(!S.a5.cls||!S.a5.cls.text)return a5Cls();
+ a5Result();
 }
-function a5Done(){
+function chatMock(group,who,msg,mine){return `<div class="mock line"><div class="lb">‹  ${group}</div><div class="chat"><div class="bub"><div class="nm">${who}</div>${esc(msg)}</div>${mine?`<div class="bub me">${esc(mine)}</div>`:''}</div></div>`}
+function a5Fam(){
+ view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 5.1 คู่หรือเดี่ยว</span><h2>ตอบป้าในไลน์ครอบครัว</h2><p>ป้าส่งข่าวปลอมเข้ากลุ่มไลน์ครอบครัว เขียนข้อความตอบให้สุภาพและได้ผล</p>
+ ${chatMock('ครอบครัว (12)','ป้า',a5Fake()+'\nส่งต่อให้ทุกคนนะ เผื่อเป็นประโยชน์')}
+ <h3>เกณฑ์ (ข้อละ 0.5 คะแนน)</h3>${RUB.map((r,i)=>`<div class="rub"><b>${i+1}. ${r.t}</b> ${r.d}</div>`).join('')}
+ <label class="f">ข้อความตอบป้า</label><div class="hint">พิมพ์เอง อย่างน้อย 60 ตัวอักษร วางข้อความไม่ได้</div><textarea id="rp" style="min-height:110px"></textarea>
+ <button class="btn acc" onclick="a5FamDone()">ส่ง แล้วไปตอบกลุ่มไลน์ห้อง</button></div>`);
+ counter('rp',400);noPaste('rp');
+}
+function a5FamDone(){
  const v=$('#rp').value.trim();if(v.length<60){toast('เขียนอย่างน้อย 60 ตัวอักษร');return}
- const ck=RUB.map(r=>r.re.test(v)&&!(r.bad&&r.bad.test(v)));
- S.a5={text:v,ck,score:ck.filter(Boolean).length};save();a5Result();
+ S.a5={fam:{text:v,ck:RUB.map(r=>r.re.test(v)&&!(r.bad&&r.bad.test(v)))}};a5Score();save();a5Cls();
+}
+async function a5Cls(){
+ view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 5.2</span><h2>ตอบเพื่อนในกลุ่มไลน์ห้อง</h2><p class="mute">กำลังโหลดข้อความในกลุ่ม</p></div>`);
+ let p=S.a5.cls&&S.a5.cls.post;
+ if(!p){const ex=[S.a4&&S.a4.postId].concat(S.a4&&S.a4.checks?S.a4.checks.map(c=>c.post.id):[]).filter(Boolean);
+  try{const r=await rpc('news_random_post',{p_room:ROOM(),p_client:S.cid,p_exclude:ex});p=r&&r[0]}catch(e){}
+  if(!p)p={id:null,headline:'ด่วน พรุ่งนี้โรงเรียนหยุดเรียนทั้งวัน ผอ.ประกาศแล้ว ส่งต่อให้ทุกคนด้วย',body:'',platform:'line',sender:'เพื่อนในห้อง'};
+  S.a5.cls={post:p};save();}
+ view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 5.2 คู่หรือเดี่ยว</span><h2>ตอบเพื่อนในกลุ่มไลน์ห้อง</h2><p>เพื่อนคนหนึ่งส่งข่าวนี้เข้ากลุ่มไลน์ห้อง ม.6/17 (ข่าวที่เพื่อนแต่งในกิจกรรมที่ 4) เขียนข้อความตอบในกลุ่ม</p>
+ ${chatMock('ม.6/17 (32)','เพื่อนในห้อง',p.headline+(p.body?'\n'+p.body:''))}
+ <h3>เกณฑ์ (ข้อละ 0.5 คะแนน)</h3>${RUB2.map((r,i)=>`<div class="rub"><b>${i+1}. ${r.t}</b> ${r.d}</div>`).join('')}
+ <label class="f">ข้อความตอบในกลุ่มห้อง</label><div class="hint">พิมพ์เอง อย่างน้อย 60 ตัวอักษร ข้อความนี้ส่งถึงครู ครูอาจนำไปฉายบนจอโดยไม่แสดงชื่อ</div><textarea id="rc" style="min-height:110px"></textarea>
+ <button class="btn acc" id="rcb" onclick="a5ClsDone()">ส่งข้อความ</button></div>`);
+ counter('rc',400);noPaste('rc');
+}
+async function a5ClsDone(){
+ const v=$('#rc').value.trim();if(v.length<60){toast('เขียนอย่างน้อย 60 ตัวอักษร');return}
+ const ck=RUB2.map(r=>r.re.test(v)&&!(r.bad&&r.bad.test(v)));S.a5.cls.text=v;S.a5.cls.ck=ck;a5Score();save();
+ if(S.a5.cls.post.id){try{await rpc('news_submit_reply',{p_client:S.cid,p_post:S.a5.cls.post.id,p_replier:S.me.name,p_text:v,p_ck:ck})}catch(e){}}
+ a5Result();
 }
 function a5Result(){
- const r=S.a5;
- view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 5</span><h2>ผลการตอบข้อความ</h2><div class="score">${r.score}/4</div>
- <div class="mock line"><div class="lb">‹  ครอบครัว (12)</div><div class="chat"><div class="bub"><div class="nm">ป้า</div>${esc(a5Fake())}</div><div class="bub me">${esc(r.text)}</div><div class="bub"><div class="nm">ป้า</div>${r.score>=3?'จริงเหรอลูก ขอบใจนะ เดี๋ยวป้าลบให้':'หมายความว่ายังไงลูก ป้าไม่เข้าใจ'}</div></div></div>
- ${RUB.map((x,i)=>`<div class="rub ${r.ck[i]?'ok':'no'}"><b>${r.ck[i]?'ผ่าน':'ยังไม่ผ่าน'} ${x.t}</b><br>${x.d}</div>`).join('')}
- <p class="mute">คะแนนจากระบบตรวจจากคำในข้อความ ครูจะตรวจทานอีกครั้ง</p>
- <div class="facts"><b>ตัวอย่างข้อความที่ดี</b><br>ขอบคุณป้าที่ส่งมาเตือนนะครับ ผมลองตรวจสอบแล้ว ศูนย์ต่อต้านข่าวปลอมชี้แจงว่าเรื่องนี้ไม่เป็นความจริงครับ ป้าช่วยลบข้อความเดิม หรือแจ้งในกลุ่มว่าไม่จริงได้ไหมครับ จะได้ไม่มีใครหลงเชื่อ</div>
+ a5mig();const f=S.a5.fam,c=S.a5.cls;
+ const blk=(title,rub,x,chat)=>`<h3>${title}</h3>${chat}${rub.map((r,i)=>`<div class="rub ${x.ck[i]?'ok':'no'}"><b>${x.ck[i]?'ผ่าน':'ยังไม่ผ่าน'} ${r.t}</b> ${r.d}</div>`).join('')}`;
+ view(back()+`<div class="card"><span class="pill">กิจกรรมที่ 5</span><h2>ผลการตอบข้อความ</h2><div class="score">${S.a5.score}/4</div><p class="mute">คะแนนจากระบบตรวจจากคำในข้อความ ครูตรวจทานอีกครั้ง</p>
+ ${blk('5.1 ไลน์ครอบครัว',RUB,f,chatMock('ครอบครัว (12)','ป้า',a5Fake(),f.text))}
+ ${blk('5.2 กลุ่มไลน์ห้อง',RUB2,c,chatMock('ม.6/17 (32)','เพื่อนในห้อง',c.post.headline,c.text))}
+ <div class="facts"><b>ตัวอย่างข้อความตอบเพื่อนในกลุ่มห้อง</b><br>เราลองเช็กกับเพจทางการของโรงเรียนแล้ว ยังไม่มีประกาศเรื่องนี้นะ ทุกคนอย่าเพิ่งแชร์ต่อนะ เดี๋ยวเราทักไปหาเพื่อนส่วนตัว ช่วยลบหรือแก้ข้อความให้หน่อยนะ</div>
  <button class="btn acc" onclick="go(6)">ไปกิจกรรมที่ 6</button></div>`);
 }
 /* ---------- 6 summary & worksheet ---------- */

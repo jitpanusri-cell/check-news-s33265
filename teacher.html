@@ -53,7 +53,7 @@ function login(){
 async function tryLogin(){PIN=$('#pin').value.trim();try{await rpc('news_teacher_list',{p_pin:PIN,p_cls:''});sessionStorage.setItem('tpin',PIN);list()}catch(e){toast('รหัสไม่ถูกต้อง')}}
 async function list(){
  const cls=sessionStorage.getItem('tcls')||'';
- $('#v').innerHTML=`<div class="card"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><select id="cls"><option value="">ทุกห้อง</option><option ${cls==='ม.6/17'?'selected':''}>ม.6/17</option></select><button class="ghost" onclick="list()">รีเฟรช</button><button class="acc" onclick="monitor()">มอนิเตอร์ห้องเรียน</button><button class="acc" onclick="reveal()">เฉลยผู้แต่งข่าว</button><span class="mute" id="cnt"></span><button class="ghost" style="margin-left:auto" onclick="sessionStorage.removeItem('tpin');login()">ออกจากระบบ</button></div>
+ $('#v').innerHTML=`<div class="card"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><select id="cls"><option value="">ทุกห้อง</option><option ${cls==='ม.6/17'?'selected':''}>ม.6/17</option></select><button class="ghost" onclick="list()">รีเฟรช</button><button class="acc" onclick="monitor()">มอนิเตอร์ห้องเรียน</button><button class="acc" onclick="replies()">ข้อความตอบในกลุ่มห้อง</button><button class="acc" onclick="reveal()">เฉลยผู้แต่งข่าว</button><span class="mute" id="cnt"></span><button class="ghost" style="margin-left:auto" onclick="sessionStorage.removeItem('tpin');login()">ออกจากระบบ</button></div>
  <table style="margin-top:10px"><thead><tr><th>ชั้น</th><th>เลขที่</th><th>ชื่อ-สกุล</th><th>คะแนน</th><th>สถานะ</th><th>ส่งล่าสุด</th></tr></thead><tbody id="tb"><tr><td colspan="6" class="mute">กำลังโหลด</td></tr></tbody></table></div>`;
  $('#cls').onchange=e=>{sessionStorage.setItem('tcls',e.target.value);list()};
  try{LIST=await rpc('news_teacher_list',{p_pin:PIN,p_cls:cls})}catch(e){return login()}
@@ -116,6 +116,13 @@ async function monitor(){
   $('#mt').textContent=`เข้าเว็บแล้ว ${R.length} เครื่อง อัปเดต ${new Date().toLocaleTimeString('th-TH')} (รีเฟรชทุก 10 วินาที)`;
  };
  await load();MON=setInterval(()=>{if(!$('#mb'))return clearInterval(MON);load()},10000);
+}
+let SHOWN=false;
+async function replies(){
+ let R;try{R=await rpc('news_teacher_replies',{p_pin:PIN,p_room:'6/17'})}catch(e){return login()}
+ $('#v').innerHTML=`<div class="card"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="ghost" onclick="list()">กลับรายชื่อ</button><b class="hd" style="font-size:18px">ข้อความตอบเพื่อนในกลุ่มไลน์ห้อง</b><button class="ghost" onclick="SHOWN=!SHOWN;replies()">${SHOWN?'ซ่อนชื่อ':'แสดงชื่อ'}</button><button class="ghost" onclick="replies()">รีเฟรช</button></div></div>
+ ${R.map((p,i)=>`<div class="card"><div class="mute">ข่าวที่เพื่อนส่งเข้ากลุ่ม ${PL[p.platform]||''}</div><div class="hd" style="font-size:20px;font-weight:700;margin:4px 0 10px">${esc(p.headline)}</div>
+ ${p.replies.map(r=>`<div style="display:flex;gap:10px;align-items:flex-start;margin:8px 0"><div style="background:#06C755;color:#fff;border-radius:16px;border-top-right-radius:4px;padding:10px 14px;font-size:18px;line-height:1.55;flex:1">${esc(r.text)}</div><div style="min-width:120px;text-align:right"><span class="badge ${r.score>=3?'b-ok':'b-wait'}">เกณฑ์ ${r.score}/4</span>${SHOWN?`<div class="mute" style="margin-top:4px">${esc(r.replier)}</div>`:''}</div></div>`).join('')}</div>`).join('')||'<div class="card">ยังไม่มีข้อความตอบ</div>'}`;
 }
 async function setReveal(on){try{await rpc('news_teacher_reveal',{p_pin:PIN,p_on:on});reveal()}catch(e){toast('บันทึกไม่สำเร็จ')}}
 window.addEventListener('resize',()=>{if(CUR&&CUR.full&&$('#sb'))renderCur()});

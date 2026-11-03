@@ -71,6 +71,12 @@ const RUB=[
  {t:'ชวนทำสิ่งที่ถูกต้อง',d:'ชวนลบข้อความ แจ้งในกลุ่มว่าไม่จริง หรือไม่ส่งต่อ',re:/ลบ|แก้|แจ้ง|บอกในกลุ่ม|อย่าส่งต่อ|ไม่ส่งต่อ|ไม่แชร์|อย่าแชร์|ระวัง/}
 ];
 const SRC=['ศูนย์ต่อต้านข่าวปลอมประเทศไทย','ชัวร์ก่อนแชร์','สำนักข่าวหลักหลายแห่ง','เว็บไซต์หรือเพจทางการของหน่วยงาน','การค้นหาด้วยภาพ (Google Lens)'];
+const RUB2=[
+ {t:'ไม่ประจานเพื่อน',d:'สุภาพ ไม่ตำหนิหรือทำให้เพื่อนอายในกลุ่ม',re:/ครับ|ค่ะ|คะ|นะ|จ้า|จ้ะ|เพื่อน/,bad:/โง่|บ้า|มั่ว|โกหก|ไร้สาระ|ปลอมชัด|ตลก/},
+ {t:'บอกหลักฐาน',d:'บอกว่าตรวจกับใคร เช่น ศูนย์ต่อต้านข่าวปลอม สำนักข่าว หน่วยงาน หรือลิงก์',re:/ศูนย์ต่อต้านข่าวปลอม|ชัวร์ก่อนแชร์|สำนักข่าว|หน่วยงาน|เพจทางการ|โรงเรียน|ประกาศ|ตรวจสอบ|ลิงก์|http|ข่าว/},
+ {t:'ชวนเพื่อนลบหรือแก้',d:'ชวนลบหรือแก้ข้อความ อาจทักส่วนตัว',re:/ลบ|แก้|ทักส่วนตัว|ทักแชท|ทักไป/},
+ {t:'เตือนคนอื่นในกลุ่ม',d:'บอกทุกคนว่าอย่าเพิ่งเชื่อหรือแชร์ต่อ',re:/ทุกคน|เพื่อน ?ๆ|อย่าเพิ่ง|อย่าแชร์|ไม่แชร์|ไม่ส่งต่อ|อย่าส่งต่อ|ระวัง/}
+];
 const TEACHER='ครูจิตรภาณุ ศรีหวัง';
 const cut=(s,n)=>{s=String(s||'');return s.length>n?s.slice(0,n)+'…':s};
 const scoreSt=(st,k)=>st&&st[k]?Number(st[k].score)||0:0;
@@ -111,16 +117,17 @@ function renderSheet(st,chk){
   `<div>ข่าวที่ ${fill(r3?r3.id:'')} ${fill(q3?cut(q3.h,70):'')}</div>`+
   tbl(['ขั้นการตรวจสอบ','ผลการตรวจสอบ'],STEPS.map((s,i)=>`<tr><td style="${TD};width:170px">${i+1}. ${s.t}</td><td style="${TD};color:${BL}">${r3?esc(cut(r3.st[i],80)):''}</td></tr>`).join(''))+
   `<div style="margin-top:3px">ข้อสรุป ${opts({real:'ข่าวจริง',fake:'ข่าวปลอม',unsure:'ยังสรุปไม่ได้'},r3&&r3.v)}</div><div>เหตุผล</div>${line(r3?cut(r3.rs,110):'')}`;
- const A=st.a4||{},m=A.mine,c=A.check;
- const c4=sec(4,'แต่งข่าวปลอมและตรวจข่าวของเพื่อน','a4','4.1 แต่งข่าวปลอมโดยซ่อนสัญญาณเตือน 4.2 ตรวจข่าวของเพื่อนที่ระบบสุ่มให้')+
-  `<div><b>4.1</b> ช่องทาง ${fill(m?PLAT[m.platform]:'')} ผู้เผยแพร่ ${fill(m?cut(m.sender,30):'')}</div><div>พาดหัว ${fill(m?cut(m.headline,90):'')}</div><div>รายละเอียด ${fill(m?cut(m.body,120):'')}</div>
+ const A=st.a4||{},m=A.mine,CH=A.checks||(A.check?[Object.assign({},A.check,{score:A.score,guess:A.guess})]:[]);
+ const c4=sec(4,'แต่งข่าวปลอมและตรวจข่าวของเพื่อน','a4','4.1 แต่งข่าวปลอมโดยซ่อนสัญญาณเตือน 4.2 ตรวจข่าวของเพื่อนที่ระบบสุ่มให้ (สูงสุด 3 ข่าว)')+
+  `<div><b>4.1</b> ช่องทาง ${fill(m?PLAT[m.platform]:'')} ผู้เผยแพร่ ${fill(m?cut(m.sender,30):'')}</div><div>พาดหัว ${fill(m?cut(m.headline,90):'')}</div><div>รายละเอียด ${fill(m?cut(m.body,110):'')}</div>
   <div>สัญญาณเตือนที่ซ่อนไว้</div>${sigs(m&&m.signals)}<div>ประเภท ${opts(TYPES,m&&m.type)}</div>
-  <div style="margin-top:4px"><b>4.2</b> พาดหัวข่าวของเพื่อน ${fill(c?cut(c.post.headline,80):'')}</div><div>สัญญาณเตือนที่พบ</div>${sigs(c&&c.mySig)}<div>ประเภท ${opts(TYPES,c&&c.myType)}</div>
-  ${c?`<div style="font-size:15px;color:#444">ตรงกับผู้แต่ง ${c.key.hits} จาก ${c.key.signals.length} สัญญาณ ประเภทที่ผู้แต่งตั้งใจ ${TYPES[c.key.type]}</div>`:''}${A.guess?`<div style="font-size:15px">เดาผู้แต่ง ${fill(A.guess.name)}${A.guess.author?` เฉลย ${esc(A.guess.author)} (${A.guess.correct?'ถูก':'ไม่ถูก'})`:''}</div>`:''}`;
- const r5=st.a5,fk=m?m.headline:Q[7].h;
- const c5=sec(5,'ตอบข้อความในไลน์ครอบครัว','a5','เขียนข้อความตอบป้าที่ส่งข่าวปลอมเข้ากลุ่มไลน์ครอบครัว')+
-  `<div style="background:#F3F4F6;padding:2px 8px;border-left:3px solid #9CA3AF">ป้า: “${esc(cut(fk,90))}”</div>${line(r5?cut(r5.text,300):'',2)}`+
-  tbl(['เกณฑ์','ผ่าน','ไม่ผ่าน'],RUB.map((x,i)=>`<tr><td style="${TD}">${i+1}. ${x.t}</td><td style="${TD};text-align:center;width:60px">${box(r5&&r5.ck[i])}</td><td style="${TD};text-align:center;width:60px">${box(r5&&!r5.ck[i])}</td></tr>`).join(''));
+  <div style="margin-top:3px"><b>4.2</b> ข่าวของเพื่อนที่ตรวจ</div>`+tbl(['ที่','พาดหัว','สัญญาณเตือนที่พบ / ประเภท','คะแนน','เดาผู้แต่ง'],
+   (CH.length?CH:[null]).map((x,i)=>`<tr><td style="${TD};text-align:center">${x?i+1:''}</td><td style="${TD};color:${BL}">${x?esc(cut(x.post.headline,40)):''}</td><td style="${TD};color:${BL};font-size:14px">${x?x.mySig.map(s=>SIG[s]).join(', ')+' / '+TYPES[x.myType]:''}</td><td style="${TD};text-align:center">${x?x.score+'/3':''}</td><td style="${TD};color:${BL};font-size:14px">${x&&x.guess?esc(x.guess.name)+(x.guess.author?(x.guess.correct?' (ถูก)':' (ไม่ถูก)'):''):''}</td></tr>`).join(''));
+ let A5=st.a5;if(A5&&A5.text&&!A5.fam)A5={fam:{text:A5.text,ck:A5.ck},score:A5.score};
+ const fk=m?m.headline:Q[7].h,pass=(R,x)=>x&&x.ck?`<div style="font-size:14.5px;color:#444">ผ่าน ${x.ck.filter(Boolean).length}/4: ${R.filter((r,i)=>x.ck[i]).map(r=>r.t).join(', ')||'-'}</div>`:'';
+ const c5=sec(5,'ตอบข้อความในไลน์','a5','5.1 ตอบป้าในไลน์ครอบครัว 5.2 ตอบเพื่อนในกลุ่มไลน์ห้อง')+
+  `<div style="background:#F3F4F6;padding:1px 8px;border-left:3px solid #9CA3AF">ป้า: “${esc(cut(fk,80))}”</div>${line(A5&&A5.fam?cut(A5.fam.text,190):'',2)}${pass(RUB,A5&&A5.fam)}
+  <div style="background:#F3F4F6;padding:1px 8px;border-left:3px solid #9CA3AF;margin-top:3px">เพื่อนในห้อง: “${esc(cut(A5&&A5.cls&&A5.cls.post?A5.cls.post.headline:'',80))}”</div>${line(A5&&A5.cls?cut(A5.cls.text,190):'',2)}${pass(RUB2,A5&&A5.cls)}`;
  const r6=st.a6;
  const c6=sec(6,'สรุปท้ายคาบ','a6')+`<div>1. สัญญาณเตือนที่จำได้ 3 แบบ</div>${line(r6?r6.sg.map(x=>SIG[x]).join(', '):'')}<div>2. แหล่งตรวจสอบข่าวที่จะใช้</div>${line(r6?r6.so:'')}<div>3. ครั้งหน้าเมื่อเห็นข่าวน่าสงสัย ฉันจะ</div>${line(r6?cut(r6.w,110):'')}`;
  const foot=`<table style="width:100%;border-collapse:collapse;font-size:16px;margin-top:10px"><tr>${ACTS.map((a,i)=>`<th style="${TH}">ตอนที่ ${i+1}</th>`).join('')}<th style="${TH}">รวม</th></tr><tr>${ACTS.map(a=>`<td style="${TD};text-align:center;color:${BL}">${scoreSt(st,a.k)}/${a.max}</td>`).join('')}<td style="${TD};text-align:center;color:${BL};font-weight:700">${total}/${TOTAL}</td></tr></table>
