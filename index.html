@@ -186,7 +186,7 @@ function mock(q,big){
 function userMock(q){
  const P=q.platform;
  if(P==='web')return mock({p:'web',outlet:q.sender,cat:'ข่าว',date:'วันนี้',h:q.headline,lead:q.body},true);
- if(P==='facebook')return `<div class="mock fbp"><div class="hd"><div class="av" style="background:#64748B">${esc((q.sender||'?')[0])}</div><div><b>${esc(q.sender)}</b><span>เมื่อสักครู่ สาธารณะ</span></div></div><div class="tx"><b>${esc(q.headline)}</b>${q.body?'\n'+esc(q.body):''}</div><div class="acts"><span>ถูกใจ</span><span>แสดงความคิดเห็น</span><span>แชร์</span></div></div>`;
+ if(P==='facebook')return `<div class="mock fbp"><div class="hd"><div class="av" style="background:#64748B">${esc((q.sender||'?').replace(/^[เแโใไ]/,'')[0]||'?')}</div><div><b>${esc(q.sender)}</b><span>เมื่อสักครู่ สาธารณะ</span></div></div><div class="tx"><b>${esc(q.headline)}</b>${q.body?'\n'+esc(q.body):''}</div><div class="acts"><span>ถูกใจ</span><span>แสดงความคิดเห็น</span><span>แชร์</span></div></div>`;
  if(P==='tiktok')return `<div class="mock"><div class="tt" style="aspect-ratio:9/11;background:linear-gradient(160deg,#334155,#0F172A)"><div class="top">สำหรับคุณ</div><div class="cap" style="right:14px"><b>${esc(q.sender)}</b>${esc(q.headline)}${q.body?'<br><span style="opacity:.8">'+esc(q.body)+'</span>':''}</div></div></div>`;
  if(P==='line')return `<div class="mock line"><div class="lb">‹  กลุ่มไลน์</div><div class="chat"><div class="bub"><div class="nm">${esc(q.sender)}</div><b>${esc(q.headline)}</b>${q.body?'\n'+esc(q.body):''}</div></div></div>`;
  return `<div class="mock sms"><div class="from">${esc(q.sender)}</div><div class="bub"><b>${esc(q.headline)}</b>${q.body?'\n'+esc(q.body):''}</div></div>`;
@@ -328,15 +328,22 @@ function a4Compose(){
  <label class="f">ชื่อผู้เผยแพร่ (สมมติ)</label><input type="text" id="sd" placeholder="เช่น เพจข่าวหาดใหญ่ทันใจ">
  <label class="f">พาดหัว</label><input type="text" id="hl" placeholder="พาดหัวข่าวปลอม">
  <label class="f">รายละเอียด</label><div class="hint">เขียนเนื้อหาข่าวเหมือนโพสต์จริง 1–3 ประโยค</div><textarea id="bd"></textarea>
+ <h3>ตัวอย่างโพสต์ที่เพื่อนจะเห็น</h3><div class="hint">เปลี่ยนตามช่องทางและข้อความที่พิมพ์</div><div id="pv" style="max-width:420px;margin:0 auto"></div><div class="secend"></div>
  <label class="f">สัญญาณเตือนที่ซ่อนไว้ (เลือกอย่างน้อย 2)</label>${optsHTML('sg',SIG,[],true)}
  <label class="f">ประเภทข่าวปลอมที่ตั้งใจ</label>${optsHTML('ty',TYPES)}
  <button class="btn acc" id="sb" onclick="a4Submit()">ส่งข่าวขึ้นระบบ</button></div>`);
  counter('sd',40);counter('hl',150);counter('bd',400);
+ ['sd','hl','bd'].forEach(k=>$('#'+k).addEventListener('input',a4Prev));$('#pf').addEventListener('click',()=>setTimeout(a4Prev,0));a4Prev();
 }
+function a4Prev(){const e=$('#pv');if(!e)return;e.innerHTML=userMock({platform:picked('pf')[0]||'facebook',sender:$('#sd').value.trim()||'ชื่อผู้เผยแพร่',headline:$('#hl').value.trim()||'พาดหัวข่าวจะแสดงตรงนี้',body:$('#bd').value.trim()})}
 async function a4Submit(){
  const d={platform:picked('pf')[0],sender:$('#sd').value.trim(),headline:$('#hl').value.trim(),body:$('#bd').value.trim(),signals:picked('sg'),type:picked('ty')[0]};
  if(!d.platform||d.sender.length<3||d.headline.length<10||d.body.length<20){toast('กรอกชื่อผู้เผยแพร่ พาดหัว (10 ตัวอักษรขึ้นไป) และรายละเอียด (20 ตัวอักษรขึ้นไป)');return}
  if(d.signals.length<2||!d.type){toast('เลือกสัญญาณเตือนอย่างน้อย 2 แบบ และประเภท');return}
+ const m=document.createElement('div');m.className='modal';m.innerHTML=`<div class="card" style="max-height:90vh;overflow:auto"><h3 style="margin-top:0">ตรวจตัวอย่างก่อนส่ง</h3><div class="mute" style="margin-bottom:8px">เพื่อนจะเห็นโพสต์หน้าตาแบบนี้ ส่งแล้วแก้ไม่ได้</div>${userMock(d)}<div class="row2" style="margin-top:12px"><button class="btn ghost" id="cn">กลับไปแก้</button><button class="btn acc" id="cy">ยืนยันส่ง</button></div></div>`;document.body.appendChild(m);
+ m.querySelector('#cn').onclick=()=>m.remove();m.querySelector('#cy').onclick=()=>{m.remove();a4Post(d)};
+}
+async function a4Post(d){
  $('#sb').disabled=true;$('#sb').textContent='กำลังส่ง…';
  try{const id=await rpc('news_submit_post',{p_room:S.me.cls.replace('ม.',''),p_client:S.cid,p_name:`${S.me.name} (${S.me.cls} เลขที่ ${S.me.no})`,p_platform:d.platform,p_sender:d.sender,p_headline:d.headline,p_body:d.body,p_signals:d.signals,p_type:d.type});
   S.a4={postId:id,mine:d,seen:[],checks:[]};save();a4Fetch();
