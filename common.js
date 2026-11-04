@@ -145,3 +145,22 @@ function renderSheet(st,chk){
   <div>${c1}${c2}${c3}</div><div>${c4}${c5}${c6}${foot}</div></div>
  </div>`;
 }
+
+function mock(q,big){
+ const sim='<div class="sim">หน้าจอจำลองเพื่อการเรียน</div>';
+ if(q.p==='web')return `<div class="mock web"><div class="wbar">${esc(q.outlet)}<span>ข่าว</span></div><div class="wbody"><div class="cat">${esc(q.cat)}</div><div class="ttl">${esc(q.h)}</div><div class="meta">${esc(q.date)}</div>${big?`<div class="lead">${esc(q.lead)}</div>`:''}</div>${sim}</div>`;
+ if(q.p==='facebook')return `<div class="mock fbp"><div class="hd"><div class="av" style="background:${q.av}">${esc(q.page[0])}</div><div><b>${esc(q.page)}</b><span>${esc(q.time)}</span></div></div><div class="tx">${esc(q.text)}</div><div class="img" style="background:linear-gradient(135deg,${q.img[0]},${q.img[1]})">${esc(q.img[2]).replace(/\n/g,'<br>')}</div><div class="stat"><span>ถูกใจ ${q.stat[0]}</span><span>${q.stat[1]} ${q.stat[2]}</span></div><div class="acts"><span>ถูกใจ</span><span>แสดงความคิดเห็น</span><span>แชร์</span></div>${sim}</div>`;
+ if(q.p==='fblink')return `<div class="mock fbp"><div class="hd"><div class="av" style="background:${q.av}">${esc(q.page[0])}</div><div><b>${esc(q.page)}</b><span>${esc(q.time)}</span></div></div><div class="tx">${esc(q.text)}</div><div class="link"><div class="d">${esc(q.domain)}</div><div class="h">${esc(q.h)}</div></div><div class="stat"><span>ถูกใจ ${q.stat[0]}</span><span>${q.stat[1]} ${q.stat[2]}</span></div>${sim}</div>`;
+ if(q.p==='line')return `<div class="mock line"><div class="lb">‹  ${esc(q.group)}</div><div class="chat"><div class="bub"><div class="nm">${esc(q.from)}</div>${esc(q.text)}</div><div class="tm">${esc(q.time)}</div></div>${sim}</div>`;
+ if(q.p==='tiktok')return `<div class="mock"><div class="tt" style="background-image:url('${q.img}')"><div class="top">สำหรับคุณ</div><div class="side"><div><i></i>${q.stat[0]}</div><div><i></i>${q.stat[1]}</div><div><i></i>${q.stat[2]}</div></div><div class="cap"><b>${esc(q.acc)}</b>${esc(q.text)}</div></div>${sim}</div>`;
+ if(q.p==='sms')return `<div class="mock sms"><div class="from">${esc(q.from)}<br>${esc(q.time)}</div><div class="bub">${esc(q.text)}</div></div>`;
+ if(q.p==='user')return userMock(q);
+}
+function userMock(q){
+ const P=q.platform;
+ if(P==='web')return mock({p:'web',outlet:q.sender,cat:'ข่าว',date:'วันนี้',h:q.headline,lead:q.body},true);
+ if(P==='facebook')return `<div class="mock fbp"><div class="hd"><div class="av" style="background:#64748B">${esc((q.sender||'?').replace(/^[เแโใไ]/,'')[0]||'?')}</div><div><b>${esc(q.sender)}</b><span>เมื่อสักครู่ สาธารณะ</span></div></div><div class="tx"><b>${esc(q.headline)}</b>${q.body?'\n'+esc(q.body):''}</div><div class="acts"><span>ถูกใจ</span><span>แสดงความคิดเห็น</span><span>แชร์</span></div></div>`;
+ if(P==='tiktok')return `<div class="mock"><div class="tt" style="aspect-ratio:9/11;background:linear-gradient(160deg,#334155,#0F172A)"><div class="top">สำหรับคุณ</div><div class="cap" style="right:14px"><b>${esc(q.sender)}</b>${esc(q.headline)}${q.body?'<br><span style="opacity:.8">'+esc(q.body)+'</span>':''}</div></div></div>`;
+ if(P==='line')return `<div class="mock line"><div class="lb">‹  กลุ่มไลน์</div><div class="chat"><div class="bub"><div class="nm">${esc(q.sender)}</div><b>${esc(q.headline)}</b>${q.body?'\n'+esc(q.body):''}</div></div></div>`;
+ return `<div class="mock sms"><div class="from">${esc(q.sender)}</div><div class="bub"><b>${esc(q.headline)}</b>${q.body?'\n'+esc(q.body):''}</div></div>`;
+}

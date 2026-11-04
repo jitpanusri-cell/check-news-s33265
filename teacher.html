@@ -7,9 +7,10 @@
 <meta name="robots" content="noindex">
 <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<link rel="stylesheet" href="mock.css">
 <script src="common.js"></script>
 <style>
-:root{--ink:#1E1B4B;--mute:#6B7280;--line:#E5E7EB;--acc:#6D28D9;--g1:linear-gradient(135deg,#7C3AED,#DB2777);--red:#C8102E}
+:root{--ink:#1E1B4B;--ink2:#3F3F5F;--mute:#6B7280;--line:#E5E7EB;--acc:#6D28D9;--g1:linear-gradient(135deg,#7C3AED,#DB2777);--red:#C8102E}
 *{box-sizing:border-box}body{margin:0;background:#F5F3FF;color:var(--ink);font-family:'IBM Plex Sans Thai',sans-serif}
 h1,h2,button,.hd{font-family:'Anuphan',sans-serif}
 .wrap{max-width:1400px;margin:0 auto;padding:18px}
@@ -47,6 +48,10 @@ tr.row{cursor:pointer}tr.row:hover{background:#FAF5FF}
 .pw .bub{background:#fff;border-radius:16px;border-top-left-radius:4px;padding:10px 14px;max-width:80%}.pw .bub.me{align-self:flex-end;background:#06C755;color:#fff;border-top-left-radius:16px;border-top-right-radius:4px}
 .pw .tag{display:inline-block;background:#FEF3C7;color:#78350F;border-radius:999px;padding:3px 12px;margin:4px 6px 0 0;font-size:16px}
 .bigtimer{font-family:Anuphan;font-weight:700;font-size:28px;color:#6D28D9}
+.tt .top{display:block;background:none;border-radius:0;padding:0;gap:0}.card .tt{aspect-ratio:9/11}
+.rvb{margin-top:12px;border-radius:14px;cursor:pointer;user-select:none;border:2px dashed #C4B5FD;background:#F5F3FF;padding:14px;min-height:64px}
+.rvb .rvo{display:none}.rvb .rvc{text-align:center;font-family:Anuphan;font-weight:700;font-size:18px;color:#6D28D9;padding:6px}
+.rvb.open{border:2px solid #FCA5A5;background:#FFF5F5}.rvb.open .rvo{display:block}.rvb.open .rvc{display:none}
 </style>
 </head>
 <body>
@@ -109,14 +114,20 @@ async function saveImg(){
 const PL={web:'เว็บไซต์ข่าว',facebook:'เฟซบุ๊ก',tiktok:'ติ๊กต็อก',line:'ไลน์',sms:'SMS'};
 async function reveal(){
  let R;try{R=await rpc('news_teacher_reveal_list',{p_pin:PIN,p_room:'6/17'})}catch(e){return login()}
- const ps=R.posts.filter(p=>!p.hidden);
+ const ps=R.posts.filter(p=>!p.hidden);window._RV=ps;
  $('#v').innerHTML=`<div class="card"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="ghost" onclick="list()">กลับรายชื่อ</button>
- <button class="${R.on?'ghost':'red'}" onclick="setReveal(${!R.on})">${R.on?'ปิดเฉลย':'เปิดเฉลยให้นักเรียนเห็น'}</button><span class="mute">${R.on?'นักเรียนกด ดูเฉลย ในกิจกรรมที่ 4 ได้แล้ว':'ยังไม่เปิดเฉลย เปิดแล้วนักเรียนเดาเพิ่มไม่ได้'}</span></div></div>
- <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:14px;margin-top:14px">${ps.map((p,i)=>`<div class="card" style="margin:0"><div class="mute">ข่าวที่ ${i+1} ${PL[p.platform]||''} ${esc(p.sender)}</div>
- <div class="hd" style="font-size:20px;font-weight:700;margin:6px 0">${esc(p.headline)}</div>
- <div class="rv" style="font-size:20px;margin-top:8px;${R.on?'':'filter:blur(9px)'}" onclick="this.style.filter=''">ผู้แต่ง <b style="color:#C8102E">${esc(p.author)}</b></div>
- <div class="mute" style="margin-top:6px">มีคนเดา ${p.guesses} คน เดาถูก ${p.correct.length} คน${p.correct.length?` (${p.correct.map(esc).join(', ')})`:''}</div></div>`).join('')||'<div class="card">ยังไม่มีข่าว</div>'}</div>
- <p class="mute">ชื่อผู้แต่งเบลอไว้จนกว่าจะเปิดเฉลย แตะที่ชื่อเพื่อเฉลยทีละข่าวบนจอได้</p>`;
+ <button class="${R.on?'ghost':'red'}" onclick="setReveal(${!R.on})">${R.on?'ปิดเฉลยในเครื่องนักเรียน':'เปิดเฉลยในเครื่องนักเรียน'}</button><span class="mute">${R.on?'นักเรียนกด ดูเฉลย ในกิจกรรมที่ 4 ได้แล้ว':'เครื่องนักเรียนยังไม่เห็นเฉลย'}</span>
+ <button class="ghost" style="margin-left:auto" onclick="$$('.rvb').forEach(e=>e.classList.add('open'))">เฉลยทุกกล่อง</button><button class="ghost" onclick="$$('.rvb').forEach(e=>e.classList.remove('open'))">ปิดทุกกล่อง</button></div></div>
+ <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;margin-top:14px;align-items:start">${ps.map((p,i)=>`<div class="card" style="margin:0">
+ <div class="hd" style="font-size:18px;font-weight:700;color:#6D28D9;margin-bottom:8px">ข่าวที่ ${i+1}</div>
+ ${userMock(p)}
+ <div class="rvb" onclick="this.classList.toggle('open')"><div class="rvc">แตะเพื่อเฉลย</div><div class="rvo">
+ <div style="font-size:15px;color:var(--mute)">ผู้แต่ง</div><div class="hd" style="font-size:22px;font-weight:700;color:#C8102E">${esc(p.author)}</div>
+ ${(p.signals||[]).length?`<div style="margin-top:6px">${p.signals.map(s=>`<span class="badge b-wait" style="margin:2px">${SIG[s]||esc(s)}</span>`).join('')}</div>`:''}
+ ${p.fake_type?`<div class="mute" style="margin-top:4px">ประเภท ${TYPES[p.fake_type]||''}</div>`:''}
+ <div class="mute" style="margin-top:6px">มีคนเดา ${p.guesses} คน เดาถูก ${p.correct.length} คน${p.correct.length?` (${p.correct.map(esc).join(', ')})`:''}</div></div></div>
+ </div>`).join('')||'<div class="card">ยังไม่มีข่าว</div>'}</div>
+ <p class="mute">ทุกกล่องปิดไว้ แตะกล่องใต้ข่าวเพื่อเฉลยทีละข่าว แตะอีกครั้งเพื่อปิด</p>`;
 }
 let MON=null;
 const ANAME=['เกม','สัญญาณเตือน','ตรวจข่าว','แต่งข่าว','ตอบไลน์','ใบงาน'];
