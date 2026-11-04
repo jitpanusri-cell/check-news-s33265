@@ -207,7 +207,22 @@ function doStart(){
  if(p.some(x=>x.name.length<4||!x.no)){toast('กรอกชื่อ-สกุลและเลขที่ให้ครบ');return}
  if(p.length===2&&p[0].no===p[1].no){toast('เลขที่ของ 2 คนซ้ำกัน');return}
  p.sort((a,b)=>(+a.no||0)-(+b.no||0));
- S.me={p,cls:c,name:p.map(x=>x.name).join(' และ '),no:p.map(x=>x.no).join(', ')};save();setWho();home();if(S.me)report();setInterval(()=>{if(S.me&&document.visibilityState==='visible')report()},60000);
+ const me={p,cls:c,name:p.map(x=>x.name).join(' และ '),no:p.map(x=>x.no).join(', ')};
+ const go1=()=>{S.me=me;save();setWho();home()};
+ if(S.a1||typeof rpc!=='function')return go1();
+ rpc('news_find_progress',{p_cls:c,p_nos:p.map(x=>x.no)}).then(R=>{
+  R=(R||[]).filter(r=>r.client_id!==S.cid&&r.done&&r.done.length);if(!R.length)return go1();
+  const m=document.createElement('div');m.className='modal';
+  m.innerHTML=`<div class="card" style="max-height:90vh;overflow:auto"><h3 style="margin-top:0">พบงานที่เคยทำไว้</h3><p class="mute">ถ้าเป็นงานของเรา กดทำต่อ คำตอบเดิมจะกลับมา</p>
+  ${R.map((r,i)=>`<div class="qbox"><b>${esc(r.name)}</b><div class="mute">เลขที่ ${esc(r.no)} ทำแล้ว ${r.done.length} กิจกรรม ล่าสุด ${new Date(r.updated_at).toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'})}</div><button class="btn acc" data-i="${i}">ทำต่อจากงานนี้</button></div>`).join('')}
+  <button class="btn ghost" id="nw">ไม่ใช่ เริ่มใหม่</button></div>`;
+  document.body.appendChild(m);
+  m.querySelector('#nw').onclick=()=>{m.remove();go1()};
+  m.querySelectorAll('[data-i]').forEach(b=>b.onclick=async()=>{b.disabled=true;b.textContent='กำลังดึงงาน…';
+   try{const d=await rpc('news_resume_progress',{p_client:R[+b.dataset.i].client_id});if(!d)throw 0;
+    S=Object.assign({a1:null,a2:null,a3:null,a4:null,a5:null,a6:null},d,{cid:R[+b.dataset.i].client_id,me:d.me||me});m.remove();save();setWho();home();toast('ดึงงานเดิมกลับมาแล้ว')}
+   catch(e){b.disabled=false;b.textContent='ทำต่อจากงานนี้';toast('ดึงงานไม่สำเร็จ ลองอีกครั้ง')}});
+ }).catch(go1);
 }
 function home(){
  if(!S.me)return start();
