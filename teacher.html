@@ -90,6 +90,7 @@ function renderCur(anim){
  <label>ปรับคะแนนรวม (เว้นว่างถ้าใช้คะแนนจากระบบ)</label><input id="ov" type="number" step="0.5" min="0" max="${TOTAL}" value="${r.score_override??''}">
  <label>ความคิดเห็นของครู</label><textarea id="cm" rows="3" maxlength="200">${esc(r.comment||'')}</textarea>
  ${r.checked_at?`<button class="ghost" style="width:100%;margin-top:12px" onclick="doCheck(false)">บันทึกการแก้ไข</button><button class="ghost" style="width:100%;margin-top:8px" onclick="doCheck(true)">ยกเลิกการตรวจ</button>`:`<button class="red" style="width:100%;margin-top:12px;font-size:17px" onclick="doCheck(false,true)">ตรวจแล้ว ปั๊มตรา</button>`}
+ <button class="ghost" style="width:100%;margin-top:18px;color:#C8102E;border-color:#FCA5A5" onclick="delWork('sheet',CUR.row.id,CUR.row.name)">ลบงานของคู่นี้</button>
  <button class="ghost" style="width:100%;margin-top:8px" onclick="saveImg()">บันทึกใบงานเป็นรูป</button>
  <div style="display:flex;gap:8px;margin-top:8px"><button class="ghost" style="flex:1" ${CUR.i<=0?'disabled':''} onclick="openSheet(${CUR.i-1})">คนก่อนหน้า</button><button class="acc" style="flex:1" ${CUR.i>=LIST.length-1?'disabled':''} onclick="openSheet(${CUR.i+1})">คนถัดไป</button></div>`;
 }
@@ -121,11 +122,11 @@ let MON=null;
 const ANAME=['เกม','สัญญาณเตือน','ตรวจข่าว','แต่งข่าว','ตอบไลน์','ใบงาน'];
 async function monitor(){
  clearInterval(MON);
- $('#v').innerHTML=`<div class="card"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="ghost" onclick="clearInterval(MON);list()">กลับรายชื่อ</button><b class="hd" style="font-size:18px">มอนิเตอร์ห้อง ม.6/17</b><span class="mute" id="mt"></span><button class="ghost" style="margin-left:auto" onclick="hard()">ข่าวในเกมที่ตัดสินยากสุด</button></div><div class="ctl" id="ctl"></div><div id="sum" style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:12px"></div></div><div class="card"><table><thead><tr><th>เลขที่</th><th>ชื่อ</th>${ANAME.map((a,i)=>`<th style="text-align:center">${i+1}<br><span style="font-weight:400">${a}</span></th>`).join('')}<th>กำลังทำ</th><th>คะแนน</th><th>ล่าสุด</th></tr></thead><tbody id="mb"></tbody></table></div>`;
+ $('#v').innerHTML=`<div class="card"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="ghost" onclick="clearInterval(MON);list()">กลับรายชื่อ</button><b class="hd" style="font-size:18px">มอนิเตอร์ห้อง ม.6/17</b><span class="mute" id="mt"></span><button class="ghost" style="margin-left:auto" onclick="hard()">ข่าวในเกมที่ตัดสินยากสุด</button></div><div class="ctl" id="ctl"></div><div id="sum" style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:12px"></div></div><div class="card"><table><thead><tr><th>เลขที่</th><th>ชื่อ</th>${ANAME.map((a,i)=>`<th style="text-align:center">${i+1}<br><span style="font-weight:400">${a}</span></th>`).join('')}<th>กำลังทำ</th><th>คะแนน</th><th>ล่าสุด</th><th></th></tr></thead><tbody id="mb"></tbody></table></div>`;
  const load=async()=>{let R;try{R=await rpc('news_teacher_progress',{p_pin:PIN,p_cls:'ม.6/17'})}catch(e){return}
   const now=Date.now();
   $('#sum').innerHTML=ANAME.map((a,i)=>{const k='a'+(i+1),n=R.filter(r=>r.done.includes(k)).length;return `<div style="background:#F5F3FF;border-radius:12px;padding:10px;text-align:center"><div class="mute">${i+1}. ${a}</div><div class="hd" style="font-size:26px;font-weight:700;color:#6D28D9">${n}/${R.length}</div></div>`}).join('');
-  window._MON=R;$('#mb').innerHTML=R.map((r,ri)=>{const idle=(now-new Date(r.updated_at))/60000;return `<tr class="row" onclick="openWork(${ri})"><td>${esc(r.no)}</td><td>${esc(r.name)}</td>${ANAME.map((a,i)=>`<td style="text-align:center;font-size:18px;color:${r.done.includes('a'+(i+1))?'#16A34A':'#CBD5E1'}">${r.done.includes('a'+(i+1))?'✓':'–'}</td>`).join('')}<td>${r.current?'กิจกรรมที่ '+r.current:'-'}</td><td><b>${r.score}</b>/${TOTAL}</td><td style="color:${idle>3?'#C8102E':'#6B7280'}">${idle<1?'เมื่อสักครู่':Math.round(idle)+' นาทีก่อน'}${r.checked?' <span class="badge b-ok">ตรวจแล้ว</span>':r.submitted?' <span class="badge b-wait">ส่งแล้ว</span>':''}</td></tr>`}).join('')||'<tr><td colspan="11" class="mute">ยังไม่มีนักเรียนเข้าเว็บ</td></tr>';
+  window._MON=R;$('#mb').innerHTML=R.map((r,ri)=>{const idle=(now-new Date(r.updated_at))/60000;return `<tr class="row" onclick="openWork(${ri})"><td>${esc(r.no)}</td><td>${esc(r.name)}</td>${ANAME.map((a,i)=>`<td style="text-align:center;font-size:18px;color:${r.done.includes('a'+(i+1))?'#16A34A':'#CBD5E1'}">${r.done.includes('a'+(i+1))?'✓':'–'}</td>`).join('')}<td>${r.current?'กิจกรรมที่ '+r.current:'-'}</td><td><b>${r.score}</b>/${TOTAL}</td><td style="color:${idle>3?'#C8102E':'#6B7280'}">${idle<1?'เมื่อสักครู่':Math.round(idle)+' นาทีก่อน'}${r.checked?' <span class="badge b-ok">ตรวจแล้ว</span>':r.submitted?' <span class="badge b-wait">ส่งแล้ว</span>':''}</td><td><button class="ghost" style="padding:4px 10px;color:#C8102E;border-color:#FCA5A5" onclick="event.stopPropagation();delWork('client','${esc(r.client_id)}','${esc(r.name).replace(/'/g,'')}')">ลบ</button></td></tr>`}).join('')||'<tr><td colspan="12" class="mute">ยังไม่มีนักเรียนเข้าเว็บ</td></tr>';
   $('#mt').textContent=`เข้าเว็บแล้ว ${R.length} เครื่อง อัปเดต ${new Date().toLocaleTimeString('th-TH')} (รีเฟรชทุก 10 วินาที)`;
  };
  await load();await ctl();MON=setInterval(()=>{if(!$('#mb'))return clearInterval(MON);load()},10000);
@@ -208,6 +209,17 @@ function drawHard(){
  <div style="font-size:20px;line-height:1.6;margin:8px 0">${esc(q.why)}</div>${(q.sig||[]).map(s=>`<span class="badge b-wait" style="font-size:16px;margin:3px">${SIG[s]}</span>`).join('')}${(q.good||[]).map(s=>`<span class="badge b-ok" style="font-size:16px;margin:3px">${esc(s)}</span>`).join('')}</div>`
  :`<button class="red" style="width:100%;font-size:22px;padding:16px" onclick="HS.ans=true;drawHard()">เฉลย</button>`}
  </div></div>`;
+}
+
+function delWork(kind,id,name){
+ const d=document.createElement('div');d.className='modal';d.style.cssText='position:fixed;inset:0;z-index:80;background:rgba(15,23,42,.5);display:flex;align-items:center;justify-content:center;padding:16px';
+ d.innerHTML=`<div class="card" style="max-width:440px;width:100%"><div class="hd" style="font-size:20px;font-weight:700;color:#C8102E">ลบงานของ ${esc(name)}</div>
+ <p style="line-height:1.6">คำตอบทุกกิจกรรม ใบงาน ข่าวที่แต่ง ข้อความตอบไลน์ และการเดาของคู่นี้จะถูกลบ กู้คืนไม่ได้ ถ้าเครื่องนักเรียนยังเปิดเว็บอยู่ จะกลับไปหน้าเริ่มต้นให้ทำใหม่</p>
+ <div style="display:flex;gap:8px;margin-top:12px"><button class="ghost" style="flex:1" id="dn">ยกเลิก</button><button class="red" style="flex:1" id="dy">ลบ</button></div></div>`;
+ document.body.appendChild(d);d.querySelector('#dn').onclick=()=>d.remove();
+ d.querySelector('#dy').onclick=async()=>{d.querySelector('#dy').disabled=true;
+  try{await rpc(kind==='sheet'?'news_teacher_remove_sheet':'news_teacher_remove',kind==='sheet'?{p_pin:PIN,p_id:String(id)}:{p_pin:PIN,p_client:id});d.remove();toast('ลบแล้ว');if(kind==='sheet')list();else monitor()}
+  catch(e){d.remove();toast('ลบไม่สำเร็จ')}};
 }
 </script>
 </body>
