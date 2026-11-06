@@ -452,7 +452,7 @@ async function a6Sheet(){
 async function checkStatus(){try{const r=await rpc('news_sheet_status',{p_client:S.cid});CHK=r&&r.checked_at?r:null;await drawSheet();toast(CHK?'ครูตรวจแล้ว':'ครูยังไม่ได้ตรวจ')}catch(e){toast('เชื่อมต่อไม่สำเร็จ')}}
 async function drawSheet(){
  $('#st').textContent='กำลังสร้างใบงาน';
- try{await document.fonts.ready;$('#ws').innerHTML=renderSheet(S,CHK);
+ try{await document.fonts.ready;$('#ws').innerHTML=renderSheet(S,CHK);fitSheet($('#ws'));
   await Promise.all($$('#ws img').map(i=>i.complete?0:new Promise(r=>{i.onload=i.onerror=r})));
   const c=await html2canvas($('#ws .pg'),{scale:1,backgroundColor:'#fff'});const u=c.toDataURL('image/png');
   const fn=`ใบงานสัปดาห์1_${S.me.cls.replace('ม.','ม')}_เลขที่${S.me.no}.png`.replace(/\//g,'-');

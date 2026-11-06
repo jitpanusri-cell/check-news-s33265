@@ -132,7 +132,8 @@ function renderSheet(st,chk){
  const c6=sec(6,'สรุปท้ายคาบ','a6')+`<div>1. สัญญาณเตือนที่จำได้ 3 แบบ</div>${line(r6?r6.sg.map(x=>SIG[x]).join(', '):'')}<div>2. แหล่งตรวจสอบข่าวที่จะใช้</div>${line(r6?r6.so:'')}<div>3. ครั้งหน้าเมื่อเห็นข่าวน่าสงสัย ฉันจะ</div>${line(r6?cut(r6.w,110):'')}`;
  const foot=`<table style="width:100%;border-collapse:collapse;font-size:16px;margin-top:10px"><tr>${ACTS.map((a,i)=>`<th style="${TH}">ตอนที่ ${i+1}</th>`).join('')}<th style="${TH}">รวม</th></tr><tr>${ACTS.map(a=>`<td style="${TD};text-align:center;color:${BL}">${scoreSt(st,a.k)}/${a.max}</td>`).join('')}<td style="${TD};text-align:center;color:${BL};font-weight:700">${total}/${TOTAL}</td></tr></table>
   <div style="margin-top:6px">ความคิดเห็นของครู <span style="color:#C8102E">${chk&&chk.comment?esc(chk.comment):''}</span></div>${chk&&chk.comment?'':line('')}
-  <div style="text-align:right;margin-top:4px">${chk&&chk.checked_at?`<span class="stamp" style="display:inline-block;transform:rotate(-5deg);text-align:center"><span style="display:block;font-weight:700;font-size:58px;line-height:1;color:#D7141A;letter-spacing:3px;text-shadow:0 0 1px #D7141A">ตรวจแล้ว</span><span style="display:block;font-size:14px;color:#D7141A">${thDate(chk.checked_at)}</span></span>`:'ผู้ตรวจ ...............................'}</div>`;
+  <div style="text-align:right;margin-top:4px">${chk&&chk.checked_at?'':'ผู้ตรวจ ...............................'}</div>`;
+ const stamp=chk&&chk.checked_at?`<div style="position:absolute;right:70px;bottom:46px;z-index:5;pointer-events:none"><span class="stamp" style="display:inline-block;transform:rotate(-6deg);text-align:center;opacity:.92"><span style="display:block;font-weight:700;font-size:72px;line-height:1;color:#D7141A;letter-spacing:3px;text-shadow:0 0 1px #D7141A">ตรวจแล้ว</span><span style="display:block;font-size:30px;font-weight:700;line-height:1.2;color:#D7141A;margin-top:4px">${thDate(chk.checked_at)}</span></span></div>`:'';
  return `<div class="pg" style="${F}font-size:16.5px;line-height:1.45;color:#111;width:1754px;height:1240px;background:#fff;padding:34px 44px;box-sizing:border-box;position:relative;overflow:hidden">
  <div style="display:flex;align-items:center;gap:18px;border-bottom:3px double #111;padding-bottom:8px">
   <img src="emblem.png" style="width:78px;height:auto">
@@ -141,11 +142,17 @@ function renderSheet(st,chk){
   <div>โรงเรียนมหาวชิราวุธ จังหวัดสงขลา ภาคเรียนที่ 2 ปีการศึกษา 2569</div></div>
   <div style="border:2px solid #111;padding:4px 16px;text-align:center;min-width:150px"><div style="font-weight:700">คะแนนรวม</div><div style="font-size:34px;font-weight:700;color:${chk&&chk.score_override!=null?'#C8102E':BL};line-height:1.1">${final}</div><div>เต็ม ${TOTAL}</div></div></div>
  <div style="display:flex;gap:30px;margin:6px 0 0;font-size:19px">${me.p?me.p.map((x,i)=>`<div><b>${i+1}.</b> ${fill(x.name)} <b>เลขที่</b> ${fill(x.no)}</div>`).join(''):`<div><b>ชื่อ-สกุล</b> ${fill(me.name)}</div><div><b>เลขที่</b> ${fill(me.no)}</div>`}<div><b>ชั้น</b> ${fill(me.cls)}</div><div><b>วันที่ส่ง</b> ${fill(st.a6?st.a6.at:'')}</div></div>
- <div style="display:grid;grid-template-columns:1fr 1fr;gap:34px">
-  <div>${c1}${c2}${c3}</div><div>${c4}${c5}${c6}${foot}</div></div>
+ <div class="bd" style="display:grid;grid-template-columns:1fr 1fr;gap:34px;transform-origin:0 0">
+  <div>${c1}${c2}${c3}</div><div>${c4}${c5}${c6}${foot}</div></div>${stamp}
  </div>`;
 }
 
+function fitSheet(root){
+ (root||document).querySelectorAll('.pg').forEach(pg=>{const bd=pg.querySelector('.bd');if(!bd)return;
+  bd.style.transform='';bd.style.width='';
+  const avail=1240-34-bd.offsetTop,h=bd.scrollHeight;
+  if(h>avail){const k=Math.max(.55,avail/h);bd.style.transform=`scale(${k})`;bd.style.width=(100/k)+'%'}});
+}
 function mock(q,big){
  const sim='<div class="sim">หน้าจอจำลองเพื่อการเรียน</div>';
  if(q.p==='web')return `<div class="mock web"><div class="wbar">${esc(q.outlet)}<span>ข่าว</span></div><div class="wbody"><div class="cat">${esc(q.cat)}</div><div class="ttl">${esc(q.h)}</div><div class="meta">${esc(q.date)}</div>${big?`<div class="lead">${esc(q.lead)}</div>`:''}</div>${sim}</div>`;

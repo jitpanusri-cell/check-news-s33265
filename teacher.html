@@ -87,7 +87,7 @@ async function openSheet(i){
 function chkOf(r){return r.checked_at?{checked_at:r.checked_at,comment:r.comment,score_override:r.score_override}:(r.comment||r.score_override!=null?{comment:r.comment,score_override:r.score_override}:null)}
 function renderCur(anim){
  const r=CUR.full,sb=$('#sb');
- sb.innerHTML=renderSheet(r.data,chkOf(r));
+ sb.innerHTML=renderSheet(r.data,chkOf(r));fitSheet(sb);
  const pg=sb.querySelector('.pg'),sc=sb.clientWidth/1754;pg.style.transform=`scale(${sc})`;sb.style.height=(1240*sc)+'px';
  if(anim){const st=pg.querySelector('.stamp');if(st)st.firstElementChild.classList.add('stampdrop')}
  $('#side').innerHTML=`<div class="hd" style="font-size:18px;font-weight:700">${esc(r.name)}</div><div class="mute">${esc(r.cls)} เลขที่ ${esc(r.no)}</div>
@@ -106,7 +106,7 @@ async function doCheck(undo,anim){
  }catch(e){toast('บันทึกไม่สำเร็จ')}
 }
 async function saveImg(){
- const r=CUR.full;$('#ws').innerHTML=renderSheet(r.data,chkOf(r));
+ const r=CUR.full;$('#ws').innerHTML=renderSheet(r.data,chkOf(r));fitSheet($('#ws'));
  await Promise.all($$('#ws img').map(i=>i.complete?0:new Promise(z=>{i.onload=i.onerror=z})));
  const c=await html2canvas($('#ws .pg'),{scale:1,backgroundColor:'#fff'});$('#ws').innerHTML='';
  const a=document.createElement('a');a.href=c.toDataURL('image/png');a.download=`ใบงาน_${r.cls}_เลขที่${r.no}.png`.replace(/\//g,'-');a.click();
