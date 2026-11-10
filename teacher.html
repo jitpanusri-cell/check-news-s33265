@@ -117,7 +117,7 @@ async function reveal(){
  const ps=R.posts.filter(p=>!p.hidden);window._RV=ps;
  $('#v').innerHTML=`<div class="card"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="ghost" onclick="list()">กลับรายชื่อ</button>
  <button class="${R.on?'ghost':'red'}" onclick="setReveal(${!R.on})">${R.on?'ปิดเฉลยในเครื่องนักเรียน':'เปิดเฉลยในเครื่องนักเรียน'}</button><span class="mute">${R.on?'นักเรียนกด ดูเฉลย ในกิจกรรมที่ 4 ได้แล้ว':'เครื่องนักเรียนยังไม่เห็นเฉลย'}</span>
- <button class="ghost" style="margin-left:auto" onclick="$$('.rvb').forEach(e=>e.classList.add('open'))">เฉลยทุกกล่อง</button><button class="ghost" onclick="$$('.rvb').forEach(e=>e.classList.remove('open'))">ปิดทุกกล่อง</button></div></div>
+ <button class="red" style="margin-left:auto" onclick="show(0)">เฉลยบนจอแบบเกมโชว์</button><button class="ghost" style="" onclick="$$('.rvb').forEach(e=>e.classList.add('open'))">เฉลยทุกกล่อง</button><button class="ghost" onclick="$$('.rvb').forEach(e=>e.classList.remove('open'))">ปิดทุกกล่อง</button></div></div>
  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;margin-top:14px;align-items:start">${ps.map((p,i)=>`<div class="card" style="margin:0">
  <div class="hd" style="font-size:18px;font-weight:700;color:#6D28D9;margin-bottom:8px">ข่าวที่ ${i+1}</div>
  ${userMock(p)}
@@ -231,6 +231,45 @@ function delWork(kind,id,name){
  d.querySelector('#dy').onclick=async()=>{d.querySelector('#dy').disabled=true;
   try{await rpc(kind==='sheet'?'news_teacher_remove_sheet':'news_teacher_remove',kind==='sheet'?{p_pin:PIN,p_id:String(id)}:{p_pin:PIN,p_client:id});d.remove();toast('ลบแล้ว');if(kind==='sheet')list();else monitor()}
   catch(e){d.remove();toast('ลบไม่สำเร็จ')}};
+}
+
+let SH={i:0,st:0};
+function show(i){SH={i,st:0};drawShow()}
+function beep(f,d,v){try{const a=window._ac||(window._ac=new (window.AudioContext||window.webkitAudioContext)());const o=a.createOscillator(),g=a.createGain();o.frequency.value=f;o.type='triangle';g.gain.value=v||.15;o.connect(g);g.connect(a.destination);o.start();g.gain.exponentialRampToValueAtTime(.001,a.currentTime+d);o.stop(a.currentTime+d)}catch(e){}}
+function confetti(){const c=document.createElement('canvas');c.style.cssText='position:fixed;inset:0;z-index:90;pointer-events:none';c.width=innerWidth;c.height=innerHeight;document.body.appendChild(c);const x=c.getContext('2d');const C=['#7C3AED','#DB2777','#F59E0B','#10B981','#3B82F6','#EF4444'];const P=Array.from({length:160},()=>({x:innerWidth/2+(Math.random()-.5)*300,y:innerHeight*.45,vx:(Math.random()-.5)*16,vy:-Math.random()*16-4,s:6+Math.random()*8,c:C[Math.random()*6|0],r:Math.random()*6}));let n=0;(function f(){x.clearRect(0,0,c.width,c.height);P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.45;p.r+=.2;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);x.restore()});if(++n<150)requestAnimationFrame(f);else c.remove()})()}
+function showReveal(){if(SH.st!==0)return;SH.st=1;let k=3;const cd=$('#cd');const tick=()=>{if(k>0){cd.textContent=k;cd.classList.remove('pop');void cd.offsetWidth;cd.classList.add('pop');beep(440,.25);k--;setTimeout(tick,800)}else{SH.st=2;drawShow();beep(523,.15,.2);setTimeout(()=>beep(659,.15,.2),130);setTimeout(()=>beep(784,.45,.22),260);confetti()}};tick()}
+function drawShow(){
+ const ps=window._RV||[],ov=$('#proj')||document.body.appendChild(Object.assign(document.createElement('div'),{id:'proj',className:'proj'}));
+ const last=SH.i>=ps.length;
+ const bar=`<div class="bar"><span class="alias">${last?'สรุปผล':`ข่าวที่ ${SH.i+1} จาก ${ps.length}`}</span>
+ <button class="tab" ${SH.i<=0?'disabled':''} onclick="show(SH.i-1)">ก่อนหน้า</button><button class="tab" ${last?'disabled':''} onclick="show(SH.i+1)">${SH.i===ps.length-1?'ดูสรุปผล':'ถัดไป'}</button>
+ <button class="tab" onclick="document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen().catch(()=>{})">เต็มจอ</button><button class="tab" onclick="$('#proj').remove();reveal()">ปิด</button></div>`;
+ if(last){
+  const cnt={};ps.forEach(p=>p.correct.forEach(g=>{cnt[g]=(cnt[g]||0)+1}));
+  const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const sneaky=ps.filter(p=>p.guesses>0&&!p.correct.length).sort((a,b)=>b.guesses-a.guesses).slice(0,3);
+  const all=ps.reduce((a,p)=>a+p.guesses,0),ok=ps.reduce((a,p)=>a+p.correct.length,0);
+  ov.innerHTML=bar+`<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px">
+  <div class="card"><div class="hd" style="font-size:30px;font-weight:700;color:#6D28D9">เดาถูกมากที่สุด</div>${top.length?top.map(([n,c],i)=>`<div style="display:flex;align-items:center;gap:14px;font-size:26px;padding:10px 0;border-bottom:1px solid #EEE"><b style="width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:#fff;background:${['#F59E0B','#94A3B8','#B45309','#7C3AED','#7C3AED'][i]}">${i+1}</b><span style="flex:1">${esc(n)}</span><b>${c} ข่าว</b></div>`).join(''):'<p style="font-size:22px">ยังไม่มีใครเดาถูก</p>'}</div>
+  <div class="card"><div class="hd" style="font-size:30px;font-weight:700;color:#DB2777">ข่าวที่เนียนที่สุด ไม่มีใครเดาถูก</div>${sneaky.length?sneaky.map(p=>`<div style="padding:10px 0;border-bottom:1px solid #EEE"><div style="font-size:22px;font-weight:600">${esc(cut(p.headline,70))}</div><div style="font-size:20px;color:#C8102E">${esc(p.author)} <span class="mute">มีคนเดา ${p.guesses} คน</span></div></div>`).join(''):'<p style="font-size:22px">ทุกข่าวมีคนเดาถูก</p>'}</div></div>
+  <div class="card" style="text-align:center;font-size:26px;margin-top:20px">ทั้งห้องเดา ${all} ครั้ง เดาถูก ${ok} ครั้ง<div class="hd" style="font-size:24px;color:#6D28D9;margin-top:8px">คำถามท้ายเกม: ข่าวที่เนียน เนียนเพราะอะไร และเราจะจับได้จากตรงไหน</div></div>`;
+  confetti();return;
+ }
+ const p=ps[SH.i];
+ ov.innerHTML=bar+`<style>#cd{font-family:Anuphan;font-weight:800;font-size:160px;color:#DB2777;text-align:center;line-height:1}#cd.pop{animation:pp .7s ease}@keyframes pp{0%{transform:scale(2.2);opacity:0}40%{transform:scale(1);opacity:1}100%{transform:scale(.9);opacity:.2}}@keyframes au{0%{transform:scale(.3) rotate(-8deg);opacity:0}70%{transform:scale(1.12)}100%{transform:scale(1)}}</style>
+ <div style="display:flex;gap:28px;margin-top:20px;flex-wrap:wrap;align-items:flex-start;justify-content:center">
+ <div style="flex:0 0 460px;max-width:100%;zoom:1.3">${userMock(p)}</div>
+ <div style="flex:1;min-width:340px;max-width:640px">
+ ${SH.st<2?`<div class="card" style="text-align:center"><div class="hd" style="font-size:40px;font-weight:700;color:#6D28D9">ข่าวนี้ใครแต่ง</div>
+  <div style="font-size:24px;margin:10px 0">มีคนเดาไว้ ${p.guesses} คน</div><div style="font-size:22px" class="mute">ให้ห้องช่วยกันเดา ก่อนกดเฉลย</div>
+  <div id="cd" style="height:170px"></div>
+  ${SH.st===0?`<button class="red" style="font-size:28px;padding:18px 40px" onclick="showReveal()">เฉลย</button>`:''}</div>`
+ :`<div class="card" style="text-align:center;border:4px solid #DB2777"><div style="font-size:24px" class="mute">ผู้แต่งคือ</div>
+  <div class="hd" style="font-size:52px;font-weight:800;color:#C8102E;line-height:1.25;animation:au .7s ease">${esc(p.author)}</div></div>
+  <div class="card"><div class="hd" style="font-size:24px;font-weight:700">สัญญาณเตือนที่ซ่อนไว้</div><div style="margin-top:6px">${(p.signals||[]).map(s=>`<span class="badge b-wait" style="font-size:20px;margin:4px;padding:6px 12px">${SIG[s]||esc(s)}</span>`).join('')||'-'}</div>
+  ${p.fake_type?`<div style="font-size:20px;margin-top:8px">ประเภท ${TYPES[p.fake_type]||''}</div>`:''}</div>
+  <div class="card"><div class="hd" style="font-size:24px;font-weight:700;color:#16A34A">เดาถูก ${p.correct.length} จาก ${p.guesses} คน</div><div style="font-size:22px;margin-top:6px">${p.correct.map(esc).join(', ')||'ไม่มีใครเดาถูก ข่าวนี้เนียน'}</div></div>`}
+ </div></div>`;
 }
 </script>
 </body>
