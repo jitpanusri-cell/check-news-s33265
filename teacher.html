@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <link rel="stylesheet" href="mock.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="common.js"></script>
 <style>
 :root{--ink:#1E1B4B;--ink2:#3F3F5F;--mute:#6B7280;--line:#E5E7EB;--acc:#6D28D9;--g1:linear-gradient(135deg,#7C3AED,#DB2777);--red:#C8102E}
@@ -71,7 +72,7 @@ function login(){
 async function tryLogin(){PIN=$('#pin').value.trim();try{await rpc('news_teacher_list',{p_pin:PIN,p_cls:''});sessionStorage.setItem('tpin',PIN);list()}catch(e){toast('รหัสไม่ถูกต้อง')}}
 async function list(){
  const cls=sessionStorage.getItem('tcls')||'';
- $('#v').innerHTML=`<div class="card"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><select id="cls"><option value="">ทุกห้อง</option><option ${cls==='ม.6/17'?'selected':''}>ม.6/17</option></select><button class="ghost" onclick="list()">รีเฟรช</button><button class="acc" onclick="monitor()">มอนิเตอร์ห้องเรียน</button><button class="acc" onclick="replies()">ข้อความตอบในกลุ่มห้อง</button><button class="acc" onclick="reveal()">เฉลยผู้แต่งข่าว</button><span class="mute" id="cnt"></span><button class="ghost" style="margin-left:auto" onclick="sessionStorage.removeItem('tpin');login()">ออกจากระบบ</button></div>
+ $('#v').innerHTML=`<div class="card"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><select id="cls"><option value="">ทุกห้อง</option><option ${cls==='ม.6/17'?'selected':''}>ม.6/17</option></select><button class="ghost" onclick="list()">รีเฟรช</button><button class="acc" id="zipb" onclick="zipAll()">ดาวน์โหลดใบงานทั้งหมด (zip)</button><button class="acc" onclick="monitor()">มอนิเตอร์ห้องเรียน</button><button class="acc" onclick="replies()">ข้อความตอบในกลุ่มห้อง</button><button class="acc" onclick="reveal()">เฉลยผู้แต่งข่าว</button><span class="mute" id="cnt"></span><button class="ghost" style="margin-left:auto" onclick="sessionStorage.removeItem('tpin');login()">ออกจากระบบ</button></div>
  <table style="margin-top:10px"><thead><tr><th>ชั้น</th><th>เลขที่</th><th>ชื่อ-สกุล</th><th>คะแนน</th><th>สถานะ</th><th>ส่งล่าสุด</th></tr></thead><tbody id="tb"><tr><td colspan="6" class="mute">กำลังโหลด</td></tr></tbody></table></div>`;
  $('#cls').onchange=e=>{sessionStorage.setItem('tcls',e.target.value);list()};
  try{LIST=await rpc('news_teacher_list',{p_pin:PIN,p_cls:cls})}catch(e){return login()}
@@ -270,6 +271,29 @@ function drawShow(){
   ${p.fake_type?`<div style="font-size:20px;margin-top:8px">ประเภท ${TYPES[p.fake_type]||''}</div>`:''}</div>
   <div class="card"><div class="hd" style="font-size:24px;font-weight:700;color:#16A34A">เดาถูก ${p.correct.length} จาก ${p.guesses} คน</div><div style="font-size:22px;margin-top:6px">${p.correct.map(esc).join(', ')||'ไม่มีใครเดาถูก ข่าวนี้เนียน'}</div></div>`}
  </div></div>`;
+}
+
+async function zipAll(){
+ if(!LIST.length){toast('ยังไม่มีใบงาน');return}
+ if(typeof JSZip==='undefined'){toast('โหลดตัวทำ zip ไม่สำเร็จ ลองรีเฟรช');return}
+ const b=$('#zipb'),zip=new JSZip(),used={};let ok=0;b.disabled=true;
+ const box=document.createElement('div');box.style.cssText='position:fixed;left:-99999px;top:0';document.body.appendChild(box);
+ try{await document.fonts.ready;
+  for(let i=0;i<LIST.length;i++){const row=LIST[i];b.textContent=`กำลังทำ ${i+1}/${LIST.length}`;
+   try{const r=await rpc('news_teacher_get',{p_pin:PIN,p_id:row.id});
+    box.innerHTML=renderSheet(r.data,chkOf(r));fitSheet(box);
+    await Promise.all([...box.querySelectorAll('img')].map(im=>im.complete?0:new Promise(z=>{im.onload=im.onerror=z})));
+    const c=await html2canvas(box.querySelector('.pg'),{scale:1,backgroundColor:'#fff'});
+    const blob=await new Promise(z=>c.toBlob(z,'image/png'));
+    let nm=`เลขที่${r.no||''}_${cut(r.name||'',60)}`.replace(/[\/\\:*?"<>|]/g,'-').replace(/\s+/g,'');
+    used[nm]=(used[nm]||0)+1;if(used[nm]>1)nm+=`_${used[nm]}`;
+    zip.file(nm+'.png',blob);ok++}catch(e){}
+  }
+  b.textContent='กำลังรวมไฟล์';
+  const z=await zip.generateAsync({type:'blob'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(z);a.download=`ใบงาน_ตรวจข่าวก่อนแชร์_${new Date().toLocaleDateString('th-TH').replace(/\//g,'-')}.zip`;a.click();
+  toast(`ได้ใบงาน ${ok} ไฟล์`);
+ }finally{box.remove();b.disabled=false;b.textContent='ดาวน์โหลดใบงานทั้งหมด (zip)'}
 }
 </script>
 </body>
