@@ -301,7 +301,7 @@ async function doReveal() {
   } else {
     const mx = Math.max(1, ...Q.opts.map((_, k) => s.counts[k] || 0));
     main = '<div class="rows">' + Q.opts.map((t, k) => {
-      const v = s.counts[k] || 0, ok = hasAns && k === Q.ans, dim = hasAns && !ok;
+      const v = s.counts[k] || 0, ok = hasAns && (Q.ans === -1 || k === Q.ans), dim = hasAns && !ok;
       return `<div class="rrow ${ok ? "ok" : ""} ${dim ? "dim" : ""}"><span class="let" style="background:${COLORS[k]};width:3vw;height:3vw;font-size:1.6vw">${LETTERS[k]}</span><span class="txt">${esc(t)}</span><span class="bw"><i data-w="${v / mx * 100}" style="background:${COLORS[k]}"></i></span><span class="n">${v}</span>${ok ? '<span class="mark">ถูก</span>' : ""}</div>`;
     }).join("") + "</div>";
     if (Q.sil) { main = `<div style="display:grid;grid-template-columns:24vw 1fr;gap:1.4vw;align-items:center"><div class="card qimg flip"><img class="s" src="${Q.sil}" alt=""><img class="r" src="${Q.img}" alt=""></div>${main}</div>`; setTimeout(() => { Music.sting(true); Music.meow(1.3); }, 950); }
