@@ -88,12 +88,12 @@ function sheetHtml(p, rank) {
   <div style="display:flex;align-items:center;gap:14px;border-bottom:3px solid #2b2540;padding-bottom:10px">
    <img src="../emblem.png" style="width:56px;height:56px;object-fit:contain">
    <div style="flex:1"><div style="font-size:14px;font-weight:600">ใบบันทึกผลกิจกรรม ${esc(D.course)}</div><div style="font:700 21px Mali">${esc(D.title)}</div></div>
-   <div style="border:2px solid #2b2540;border-radius:14px;padding:6px 14px;font-size:15px;line-height:1.6"><b>ชื่อ</b> ${esc(p.name)} &nbsp; <b>เลขที่</b> ${p.no || "-"}<br><b>วันที่เล่น</b> ${new Date().toLocaleDateString("th-TH", { dateStyle: "medium" })}</div>
+   <div style="border:2px solid #2b2540;border-radius:14px;padding:6px 14px;font-size:15px;line-height:1.6"><b>ชื่อ</b> ${esc(p.name)} &nbsp; <b>เลขที่</b> ${p.no || "-"}<br><b>วันที่เล่น</b> ${(g => g ? new Date(g.at) : new Date())(data.games.find(x => x.pin === pin)).toLocaleDateString("th-TH", { dateStyle: "medium" })}</div>
   </div>
   <div style="display:grid;grid-template-columns:1.25fr 1fr;gap:20px;margin-top:12px">
    <div><table style="width:100%;border-collapse:collapse;font-size:12px">
     <tr style="background:#ffe3e8"><th style="padding:4px;border-bottom:2px solid #2b2540;width:30px">ข้อ</th><th style="padding:4px;border-bottom:2px solid #2b2540;text-align:left">คำถาม</th><th style="padding:4px;border-bottom:2px solid #2b2540;text-align:left;width:150px">คำตอบ</th><th style="padding:4px;border-bottom:2px solid #2b2540;width:58px">ผล</th></tr>
-    ${rows.map(([q, i]) => `<tr><td style="padding:3px 4px;border-bottom:1px solid #eee;text-align:center">${i + 1}</td><td style="padding:3px 4px;border-bottom:1px solid #eee">${esc(q.q.length > 58 ? q.q.slice(0, 56) + "…" : q.q)}</td><td style="padding:3px 4px;border-bottom:1px solid #eee">${ansTxt(q, p.ans[i])}</td><td style="padding:3px 4px;border-bottom:1px solid #eee;text-align:center">${res(q, p.ans[i])}</td></tr>`).join("")}
+    ${rows.map(([q, i]) => `<tr><td style="padding:3px 4px;border-bottom:1px solid #eee;text-align:center">${i + 1}</td><td style="padding:3px 4px;border-bottom:1px solid #eee;text-align:left">${esc(q.q.length > 58 ? q.q.slice(0, 56) + "…" : q.q)}</td><td style="padding:3px 4px;border-bottom:1px solid #eee;text-align:left">${ansTxt(q, p.ans[i])}</td><td style="padding:3px 4px;border-bottom:1px solid #eee;text-align:center">${res(q, p.ans[i])}</td></tr>`).join("")}
    </table></div>
    <div style="display:flex;flex-direction:column;gap:10px">
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center">
