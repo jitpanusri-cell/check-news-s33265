@@ -36,7 +36,7 @@ window.K3 = {
       q: "ผักชนิดนี้คืออะไร", opts: ["มันเทศ", "เผือก", "ฟักทอง", "มันฝรั่ง"], ans: 3 },
     { kind: "practice", t: 20, cat: "หมวดสัตว์ทะเล", sil: SIMG + "mermaid-sil.png", img: SIMG + "mermaid.jpg",
       q: "สัตว์ทะเลตัวนี้คืออะไร", opts: ["ปลาโลมา", "แมวน้ำ", "ปลาหมึก", "กุ้ง"], ans: 3 },
-    { kind: "practice", t: 20, cat: "หมวดของกิน", sil: SIMG + "khrok-sil.png", img: SIMG + "khrok.jpg",
+    { kind: "practice", t: 20, cat: "หมวดของกิน", sil: SIMG + "khrok2-sil.png", img: SIMG + "khrok2.jpg",
       q: "ของกินชนิดนี้คืออะไร", opts: ["โดนัท", "เบเกิล", "ขนมถ้วย", "ขนมครก"], ans: 3 },
     { kind: "practice", t: 20, cat: "หมวดคนสำคัญ", sil: "img/boss-sil.jpg", img: "img/boss.jpg", frame: true,
       q: "คนในกรอบรูปคือใคร", opts: ["ณเดชน์ คูกิมิยะ", "มาริโอ้ เมาเร่อ", "เจมส์ จิรายุ", "ไบร์ท วชิรวิชญ์"], ans: -1,
