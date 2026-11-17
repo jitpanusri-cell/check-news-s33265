@@ -81,7 +81,12 @@ const CATS = [
   { fur: "#c99a6b", earIn: "#f0c6a4", eye: "#a6e36d", mc: INK, wc: INK, pat: `<path d="M43 26 V35 M50 24 V34 M57 26 V35" stroke="#7a5536" stroke-width="3.2" stroke-linecap="round"/><path d="M21 44 H30 M21 51 H29 M79 44 H70 M79 51 H71" stroke="#7a5536" stroke-width="3" stroke-linecap="round"/>`, body: `<path d="M33 76 H43 M57 76 H67 M36 84 H44 M56 84 H64" stroke="#7a5536" stroke-width="3" stroke-linecap="round"/>` },
   { fur: "#3a3646", earIn: "#7a6688", eye: "#ffd84d", mc: INK, wc: "#fff", pat: `<ellipse cx="50" cy="61" rx="15" ry="11" fill="#fff"/><path d="M50 26 L45 50 H55 Z" fill="#fff"/>`, body: `<ellipse cx="50" cy="86" rx="10" ry="11" fill="#fff"/>`, paw: "#fff" }
 ];
+const CAT_BASE = SB + "/storage/v1/object/public/k3img/cat";
 function avatar(id, mood) {
+  id = ((id | 0) % 8 + 8) % 8;
+  return `<img class="catimg ${mood || ""}" src="${CAT_BASE}${id}.png" alt="" draggable="false">`;
+}
+function avatarSvg(id, mood) {
   id = ((id | 0) % 8 + 8) % 8; const c = CATS[id], ear = c.ear || c.fur, tail = c.tail || c.fur, paw = c.paw || c.fur;
   const eye = (x) => c.eye
     ? `<ellipse cx="${x}" cy="49" rx="5.2" ry="6.2" fill="${c.eye}" stroke="${INK}" stroke-width="1.2"/><ellipse cx="${x}" cy="49.5" rx="2.2" ry="4.4" fill="${INK}"/><circle cx="${x + 1.6}" cy="46.5" r="1.4" fill="#fff"/>`
@@ -112,7 +117,8 @@ ${mouth}
 (function () {
   const st = document.createElement("style");
   st.textContent = `
-.av{display:inline-block;position:relative}.av svg{width:100%;height:100%;overflow:visible;display:block}
+.av{display:inline-block;position:relative}.av .catimg{width:100%;height:100%;object-fit:contain;object-position:center bottom;display:block;filter:drop-shadow(0 .3em .25em rgba(43,37,64,.18))}.av .catimg.sad{filter:saturate(.45) brightness(.92)}
+.av.walk .catimg{animation:k3sway .35s ease-in-out infinite alternate;transform-origin:50% 100%}.av svg{width:100%;height:100%;overflow:visible;display:block}
 .av .eyes{transform-box:fill-box;transform-origin:center;animation:k3blink 4.5s infinite}
 .av:nth-child(3n) .eyes{animation-delay:1.6s}.av:nth-child(3n+1) .eyes{animation-delay:3.1s}
 @keyframes k3blink{0%,93%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
