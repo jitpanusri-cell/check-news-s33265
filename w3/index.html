@@ -119,9 +119,9 @@ function waitMsg(a, b, cls) { clearInterval(cdIv); $("wAv").innerHTML = avEl(me.
 function showQ(i) {
   const Q = D.Q[i]; clearInterval(cdIv); curQ = i;
   if (answered[i]) { waitMsg("ส่งคำตอบแล้ว", "รอครูเฉลยบนจอทีวี"); return; }
-  $("qRound").textContent = Q.kind === "poll" ? "โพล" : Q.kind === "type" ? "พิมพ์คำตอบ" : Q.dbl ? "คะแนนสองเท่า" : "เลือกคำตอบ";
+  $("qRound").textContent = Q.cat ? Q.cat : Q.kind === "poll" ? "โพล" : Q.kind === "type" ? "พิมพ์คำตอบ" : Q.dbl ? "คะแนนสองเท่า" : "เลือกคำตอบ";
   $("qText").innerHTML = esc(Q.q).replace("______", '<span class="blank">&nbsp;</span>');
-  $("qImg").innerHTML = Q.img ? `<div class="qimg">${Q.img}</div>` : "";
+  $("qImg").innerHTML = Q.sil ? `<div class="qimg"><img src="${Q.sil}" alt="" style="width:100%;max-height:30vh;object-fit:contain;display:block"></div>` : "";
   if (Q.kind === "type") { $("qOpts").style.display = "none"; $("qType").style.display = "flex"; $("txt").value = ""; setTimeout(() => $("txt").focus(), 100); }
   else {
     $("qType").style.display = "none"; $("qOpts").style.display = "grid";
