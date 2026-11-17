@@ -1,175 +1,234 @@
 <!DOCTYPE html>
 <html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>หน้าครู เกมสัปดาห์ที่ 3</title>
-<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;800&display=swap" rel="stylesheet">
+<title>จอทีวี เกมสัปดาห์ที่ 3</title>
+<link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Sarabun:wght@400;600;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <style>
+:root{--ink:#1d2340;--cream:#fff7ec;--c0:#ff6b4a;--c1:#14a89a;--c2:#f5a524;--c3:#5b6cff}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Sarabun,sans-serif;background:linear-gradient(135deg,#2b0f54,#46178f 55%,#1b4d9c);color:#fff;min-height:100vh;overflow:hidden}
-.scr{display:none;min-height:100vh;flex-direction:column;padding:2.2vw 3vw}
+body{font-family:Sarabun,sans-serif;color:var(--ink);background:var(--cream);background-image:radial-gradient(#f1dfc6 1.2px,transparent 1.2px);background-size:1.6vw 1.6vw;min-height:100vh;overflow:hidden}
+h1,h2,.mitr{font-family:Mitr,Sarabun,sans-serif;font-weight:600}
+.scr{display:none;height:100vh;flex-direction:column;padding:1.6vw 2.6vw}
 .scr.on{display:flex}
-.top{display:flex;align-items:center;gap:1.5vw;font-size:1.3vw;opacity:.9}
-.top .sp{flex:1}
-.btn{background:#fff;color:#2b0f54;border:none;border-radius:.6vw;font:800 1.5vw Sarabun;padding:.8vw 2.2vw;cursor:pointer;box-shadow:0 .35vw 0 rgba(0,0,0,.25)}
-.btn:active{transform:translateY(.2vw);box-shadow:none}
-.btn.g{background:#26890c;color:#fff}.btn.s{font-size:1.1vw;padding:.5vw 1.2vw;background:rgba(255,255,255,.15);color:#fff;box-shadow:none}
-.card{background:#fff;color:#222;border-radius:1vw;padding:2vw}
-input{font:600 1.6vw Sarabun;padding:.8vw 1.2vw;border-radius:.6vw;border:2px solid #ccc;width:22vw;text-align:center}
-/* lobby */
-.lob{display:grid;grid-template-columns:1fr auto;gap:3vw;align-items:center;margin-top:1.5vw}
-.pinbox{background:#fff;color:#222;border-radius:1vw;padding:1.5vw 2.5vw}
-.pinbox small{font-size:1.4vw;color:#555}.pinbox .url{font-size:2vw;font-weight:800;color:#46178f}
-.pin{font-size:7vw;font-weight:800;letter-spacing:.6vw;line-height:1.05}
-#qr{background:#fff;padding:1vw;border-radius:1vw}#qr img{width:15vw;height:15vw;display:block;image-rendering:pixelated}
-.names{display:flex;flex-wrap:wrap;gap:.8vw;margin-top:2vw;align-content:flex-start;flex:1;overflow:hidden}
-.names span{background:rgba(255,255,255,.18);padding:.5vw 1.3vw;border-radius:2vw;font-size:1.6vw;font-weight:600;animation:pop .35s}
-@keyframes pop{from{transform:scale(.4);opacity:0}}
-.cnt{font-size:2vw;font-weight:800}
-/* question */
-.round{font-size:1.5vw;font-weight:600;background:rgba(0,0,0,.25);padding:.3vw 1.2vw;border-radius:2vw}
-.qtext{background:#fff;color:#1d1d1d;border-radius:1vw;font-size:3vw;font-weight:800;text-align:center;padding:2vw 3vw;margin:1.5vw 0;line-height:1.3}
-.qtext .blank{display:inline-block;min-width:10vw;border-bottom:.35vw solid #46178f;color:#46178f}
-.mid{display:flex;align-items:center;justify-content:space-between;flex:1}
-.timer{width:9vw;height:9vw;border-radius:50%;background:#864cbf;display:flex;align-items:center;justify-content:center;font-size:4vw;font-weight:800}
-.ansn{text-align:center;font-size:1.5vw}.ansn b{display:block;font-size:4vw}
-.opts{display:grid;grid-template-columns:1fr 1fr;gap:1vw;margin-top:1vw}
-.opt{display:flex;align-items:center;gap:1.2vw;border-radius:.6vw;padding:1.2vw 1.5vw;font-size:2vw;font-weight:800;min-height:7vw;transition:opacity .3s}
-.opt svg{width:3vw;height:3vw;flex:none}
-.opt.dim{opacity:.25}.opt .ok{margin-left:auto;font-size:2.6vw}
-.typehint{text-align:center;font-size:2.2vw;font-weight:600;background:rgba(0,0,0,.2);border-radius:1vw;padding:1.5vw}
-/* reveal */
-.bars{display:flex;gap:2vw;align-items:flex-end;justify-content:center;height:16vw;margin:1vw 0}
-.bar{width:8vw;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
-.bar .b{width:100%;border-radius:.5vw .5vw 0 0;min-height:.6vw;transition:height .8s}
-.bar .v{font-size:2vw;font-weight:800;margin-bottom:.3vw}
-.bar .ic{width:100%;padding:.4vw 0;display:flex;justify-content:center;border-radius:0 0 .5vw .5vw}.bar .ic svg{width:2vw;height:2vw}
-.exp{background:#fff;color:#222;border-radius:1vw;padding:1.3vw 2vw;font-size:1.65vw;line-height:1.45}
-.exp b{color:#46178f}.exp .src{font-size:1.1vw;color:#777;margin-top:.5vw}
-.talk{background:#ffd84d;color:#222;border-radius:1vw;padding:1vw 2vw;font-size:1.7vw;font-weight:600;margin-top:1vw}
-.words{display:flex;flex-wrap:wrap;gap:.8vw;justify-content:center;margin:1vw 0}
-.words span{background:rgba(255,255,255,.15);padding:.5vw 1.3vw;border-radius:.6vw;font-size:1.7vw;font-weight:600}
-.words span.y{background:#26890c}
-.answord{text-align:center;font-size:4vw;font-weight:800;margin-top:.5vw}
-.answord small{font-size:1.6vw;font-weight:600;display:block;opacity:.85}
-/* board */
-.lb{display:flex;flex-direction:column;gap:1vw;width:60vw;margin:2vw auto}
-.lb div{display:flex;justify-content:space-between;background:#fff;color:#222;border-radius:.6vw;padding:1vw 2vw;font-size:2.2vw;font-weight:800;animation:pop .4s backwards}
-.lb div:first-child{background:#ffd84d}
-h2{font-size:3.4vw;text-align:center;font-weight:800}
-.pod{display:flex;align-items:flex-end;justify-content:center;gap:1.5vw;margin-top:3vw;flex:1}
-.pod div{width:18vw;text-align:center;font-weight:800}
-.pod .st{background:#fff;color:#46178f;border-radius:.8vw .8vw 0 0;display:flex;align-items:flex-start;justify-content:center;padding-top:1vw;font-size:4vw}
-.pod .nm{font-size:2.2vw;margin-bottom:.5vw}.pod .sc{font-size:1.4vw;opacity:.85;margin-bottom:.6vw}
-.foot{display:flex;justify-content:flex-end;gap:1vw;margin-top:1vw}
-.err{color:#ffb4b4;font-size:1.3vw;margin-top:.8vw;min-height:1.6vw}
+.card{background:#fff;border:.22vw solid var(--ink);border-radius:1.2vw;box-shadow:.45vw .45vw 0 var(--ink)}
+.top{display:flex;align-items:center;gap:1vw;font-size:1.25vw;font-weight:600}
+.top img{width:3vw;height:3vw;object-fit:contain}
+.chip{background:var(--ink);color:var(--cream);padding:.3vw 1.1vw;border-radius:2vw;font-family:Mitr;font-weight:500}
+.chip.alt{background:#fff;color:var(--ink);border:.15vw solid var(--ink)}
+.sp{flex:1}
+.btn{font:500 1.5vw Mitr;background:var(--c0);color:#fff;border:.22vw solid var(--ink);border-radius:.9vw;padding:.6vw 2.2vw;box-shadow:.35vw .35vw 0 var(--ink);cursor:pointer}
+.btn:active{transform:translate(.25vw,.25vw);box-shadow:none}
+.btn.s{font-size:1vw;padding:.3vw 1vw;background:#fff;color:var(--ink);box-shadow:.2vw .2vw 0 var(--ink)}
+input{font:600 1.6vw Sarabun;padding:.7vw 1.2vw;border-radius:.8vw;border:.2vw solid var(--ink);width:22vw;text-align:center}
+#sLogin{align-items:center;justify-content:center;text-align:center;gap:1.2vw}
+.parade{display:flex;gap:1vw;justify-content:center;margin-bottom:.5vw}
+.lob{display:grid;grid-template-columns:auto 1fr;gap:2vw;margin-top:1.2vw;align-items:stretch}
+.join{display:flex;gap:1.6vw;align-items:center;padding:1.3vw 2vw}
+.join small{font-size:1.25vw;font-weight:600;color:#666}
+.join .url{font:600 1.9vw Mitr;color:var(--c3)}
+.pin{font:600 6.4vw Mitr;letter-spacing:.5vw;line-height:1}
+#qr img{width:13vw;height:13vw;display:block;image-rendering:pixelated}
+.lobinfo{display:flex;flex-direction:column;justify-content:space-between;padding:1.3vw 2vw}
+.lobinfo h2{font-size:2.4vw;line-height:1.25}
+.cnt{font:600 3vw Mitr}.cnt small{font:400 1.3vw Sarabun}
+.stage{flex:1;margin-top:1.5vw;position:relative;border:.22vw solid var(--ink);border-radius:1.2vw;background:linear-gradient(#fff 0 62%,#ffe7c7 62%);overflow:hidden}
+.stage .awn{position:absolute;left:0;right:0;top:0;height:2.2vw;background:repeating-linear-gradient(90deg,var(--c0) 0 4vw,#fff 4vw 8vw);border-bottom:.22vw solid var(--ink)}
+.walker{position:absolute;display:flex;flex-direction:column;align-items:center;transition:left 3s linear}
+.walker .tag{background:var(--ink);color:#fff;font-size:1vw;font-weight:600;padding:.1vw .7vw;border-radius:1vw;margin-top:.2vw;white-space:nowrap}
+.empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.6vw;color:#999}
+.qcard{padding:1.6vw 2.6vw;margin:1.2vw 0 1vw;font:500 2.7vw Mitr;line-height:1.35;text-align:center}
+.qcard .blank{display:inline-block;min-width:11vw;border-bottom:.4vw solid var(--c3);color:var(--c3)}
+.tbar{display:flex;align-items:center;gap:1vw;margin-bottom:1vw}
+.track{flex:1;height:1.3vw;border:.2vw solid var(--ink);border-radius:1vw;background:#fff;overflow:hidden}
+.track i{display:block;height:100%;background:var(--c1);transition:width .25s linear,background .3s}
+.tnum{font:600 2.6vw Mitr;width:4.5vw;text-align:right}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:1.2vw}
+.opt{display:flex;align-items:center;gap:1.3vw;padding:1.1vw 1.5vw;font-size:2vw;font-weight:800;min-height:6.5vw;background:#fff;border:.22vw solid var(--ink);border-radius:1.1vw;box-shadow:.35vw .35vw 0 var(--ink);animation:slide .4s backwards}
+.opt:nth-child(2){animation-delay:.08s}.opt:nth-child(3){animation-delay:.16s}.opt:nth-child(4){animation-delay:.24s}
+@keyframes slide{from{opacity:0;transform:translateY(1.5vw)}}
+.let{flex:none;width:4vw;height:4vw;border-radius:50%;border:.22vw solid var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font:600 2.1vw Mitr}
+.typebox{display:flex;align-items:center;justify-content:center;gap:2vw;padding:1.6vw;font-size:2.2vw;font-weight:800}
+.sent{margin-top:auto;display:flex;align-items:flex-end;gap:1vw;min-height:7vw}
+.sent .lbl{font:600 1.6vw Mitr;white-space:nowrap;padding-bottom:.6vw}
+.sent .row{display:flex;flex-wrap:wrap;gap:.3vw;align-items:flex-end;flex:1}
+.rgrid{display:grid;grid-template-columns:1fr 22vw;gap:1.6vw}
+.rows{display:flex;flex-direction:column;gap:.8vw}
+.rrow{display:flex;align-items:center;gap:1vw;background:#fff;border:.22vw solid var(--ink);border-radius:1vw;padding:.6vw 1vw;font-size:1.6vw;font-weight:800;transition:opacity .4s}
+.rrow .txt{width:40%}
+.rrow .bw{flex:1;height:2.2vw;background:#f3ece2;border-radius:.6vw;overflow:hidden}
+.rrow .bw i{display:block;height:100%;width:0;transition:width 1s cubic-bezier(.2,.9,.3,1)}
+.rrow .n{width:3.5vw;text-align:right;font:600 2vw Mitr}
+.rrow.dim{opacity:.35}
+.rrow.ok{box-shadow:.35vw .35vw 0 var(--c1);border-color:var(--c1)}
+.rrow .mark{font:600 1.2vw Mitr;background:var(--c1);color:#fff;padding:.15vw .8vw;border-radius:1vw}
+.answord{text-align:center;padding:1vw}
+.answord small{display:block;font-size:1.4vw;font-weight:600;color:#666}
+.answord b{font:600 4.6vw Mitr;color:var(--c1)}
+.words{display:flex;flex-wrap:wrap;gap:.6vw;justify-content:center;margin-top:.6vw}
+.words span{border:.18vw solid var(--ink);background:#fff;padding:.3vw 1vw;border-radius:.6vw;font-size:1.5vw;font-weight:600}
+.words span.y{background:var(--c1);color:#fff}
+.fast{padding:1.2vw;text-align:center;display:flex;flex-direction:column;align-items:center;gap:.4vw;height:100%;justify-content:center}
+.fast h3{font:500 1.4vw Mitr}
+.fast .nm{font:600 1.9vw Mitr}.fast .sec{font-size:1.3vw;font-weight:600;color:#666}
+.exp{padding:1vw 1.6vw;font-size:1.5vw;line-height:1.5;margin-top:1.2vw}
+.exp b{font-family:Mitr;font-weight:500;color:var(--c0)}.exp .src{font-size:1.05vw;color:#777;margin-top:.3vw}
+.talk{background:#ffe08a;padding:.8vw 1.6vw;font-size:1.55vw;font-weight:700;margin-top:1vw}
+.foot{display:flex;justify-content:flex-end;margin-top:auto;padding-top:1vw}
+.lanes{display:flex;flex-direction:column;gap:.7vw;margin-top:1.2vw}
+.lane{display:grid;grid-template-columns:3vw 13vw 1fr 12vw;align-items:center;gap:1vw;background:#fff;border:.22vw solid var(--ink);border-radius:1vw;padding:.3vw 1vw;height:6.6vw;animation:slide .4s backwards}
+.lane .rk{font:600 2.2vw Mitr;text-align:center}
+.lane .nm{font:600 1.6vw Mitr;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.lane .rt{position:relative;height:100%;border-left:.2vw dashed #ccc;background:repeating-linear-gradient(90deg,transparent 0 3vw,#f6efe4 3vw 3.2vw)}
+.lane .rt::after{content:"";position:absolute;right:0;top:0;bottom:0;width:1vw;background:repeating-conic-gradient(var(--ink) 0 25%,#fff 0 50%) 0 0/.5vw .5vw}
+.lane .runner{position:absolute;bottom:.2vw;left:0;transition:left 2s cubic-bezier(.3,.8,.4,1)}
+.lane .sc{text-align:right}.lane .sc b{font:600 2vw Mitr;display:block;line-height:1.1}
+.lane .sc small{font-size:1vw;font-weight:600;color:#666}
+.lane:first-child{background:#fff4cf}
+.legend{font-size:1.2vw;font-weight:600;color:#555}
+.pod{display:flex;align-items:flex-end;justify-content:center;gap:1.6vw;flex:1}
+.pod>div{width:19vw;display:flex;flex-direction:column;align-items:center}
+.pod .nm{font:600 2vw Mitr;margin-top:.3vw}.pod .sc{font-size:1.2vw;font-weight:700;margin-bottom:.5vw;color:#555;text-align:center}
+.pod .st{width:100%;border:.22vw solid var(--ink);border-bottom:none;border-radius:1vw 1vw 0 0;display:flex;justify-content:center;padding-top:.8vw;font:600 4vw Mitr;color:#fff}
+#conf{position:fixed;inset:0;pointer-events:none}
+.err{color:#d00;font-size:1.2vw;min-height:1.5vw;font-weight:600}
 </style></head><body>
 
-<section class="scr on" id="sLogin" style="align-items:center;justify-content:center;text-align:center;gap:1.5vw">
- <img src="../emblem.png" style="width:7vw;height:7vw;object-fit:contain" alt=""><div style="font-size:1.6vw;opacity:.85" id="course"></div>
- <h2 id="title" style="max-width:70vw"></h2>
- <div class="card" style="display:flex;flex-direction:column;gap:1vw;align-items:center;margin-top:1vw">
-  <div style="font-size:1.5vw;font-weight:600">รหัสครู</div>
+<section class="scr on" id="sLogin">
+ <div class="parade" id="parade"></div>
+ <div class="mitr" style="font-size:1.5vw" id="course"></div>
+ <h1 style="font-size:3vw;max-width:72vw;line-height:1.3" id="title"></h1>
+ <div class="card" style="display:flex;gap:1vw;align-items:center;padding:1.3vw 2vw;margin-top:.8vw">
   <input id="code" type="password" inputmode="numeric" placeholder="รหัสครู">
-  <button class="btn g" onclick="login()">สร้างห้องเกม</button>
-  <div class="err" id="lerr" style="color:#c00"></div>
+  <button class="btn" onclick="login()">สร้างห้องเกม</button>
  </div>
+ <div class="err" id="lerr"></div>
 </section>
 
 <section class="scr" id="sLobby">
- <div class="top"><img src="../emblem.png" style="width:3.2vw;height:3.2vw;object-fit:contain" alt=""><span class="round" id="lobTitle"></span><span class="sp"></span><button class="btn s" onclick="mute(this)">ปิดเสียง</button></div>
+ <div class="top"><img src="../emblem.png" alt=""><span class="chip" id="lobTitle"></span><span class="sp"></span><button class="btn s mu" onclick="mute()">ปิดเสียง</button></div>
  <div class="lob">
-  <div class="pinbox">
-   <small>เข้าเว็บ</small><div class="url" id="url"></div>
-   <small>แล้วพิมพ์รหัสเกม</small><div class="pin" id="pin"></div>
+  <div class="card join">
+   <div><small>เข้าเว็บ</small><div class="url" id="url"></div><small>รหัสเกม</small><div class="pin" id="pin"></div></div>
+   <div id="qr"></div>
   </div>
-  <div id="qr"></div>
+  <div class="card lobinfo">
+   <h2 id="lobH"></h2>
+   <div style="display:flex;align-items:flex-end;justify-content:space-between">
+    <div class="cnt"><span id="pc">0</span> <small>คนเข้าเกมแล้ว</small></div>
+    <button class="btn" onclick="startGame()">เริ่มเกม</button>
+   </div>
+  </div>
  </div>
- <div style="display:flex;align-items:center;gap:2vw;margin-top:1.5vw"><div class="cnt"><span id="pc">0</span> คน</div><span class="sp" style="flex:1"></span><button class="btn g" onclick="startGame()">เริ่มเกม</button></div>
- <div class="names" id="names"></div>
+ <div class="stage" id="stage"><div class="awn"></div><div class="empty" id="empty">สแกน QR แล้วเลือกตัวละคร ตัวละครของนักเรียนจะมาเดินตรงนี้</div></div>
 </section>
 
 <section class="scr" id="sQ">
- <div class="top"><span class="round" id="qRound"></span><span id="qNo"></span><span class="sp"></span><button class="btn s" onclick="mute(this)">ปิดเสียง</button><button class="btn s" onclick="doReveal()">ข้ามไปเฉลย</button></div>
- <div class="qtext" id="qText"></div>
- <div class="mid"><div class="timer" id="tm">20</div><div id="qMid" style="flex:1;padding:0 3vw"></div><div class="ansn"><b id="an">0</b>คำตอบ</div></div>
- <div class="opts" id="qOpts"></div>
+ <div class="top"><img src="../emblem.png" alt=""><span class="chip" id="qRound"></span><span class="chip alt" id="qNo"></span><span class="sp"></span><button class="btn s mu" onclick="mute()">ปิดเสียง</button><button class="btn s" onclick="doReveal()">เฉลยเลย</button></div>
+ <div class="card qcard" id="qText"></div>
+ <div class="tbar"><div class="track"><i id="tbar"></i></div><div class="tnum" id="tm"></div></div>
+ <div id="qOpts"></div>
+ <div class="sent"><div class="lbl">ส่งแล้ว <span id="an">0</span>/<span id="ap">0</span></div><div class="row" id="sentRow"></div></div>
 </section>
 
 <section class="scr" id="sR">
- <div class="top"><span class="round" id="rRound"></span><span class="sp"></span><button class="btn s" onclick="mute(this)">ปิดเสียง</button></div>
- <div class="qtext" id="rText" style="font-size:2.3vw;padding:1.2vw 2vw;margin:1vw 0"></div>
- <div id="rBody" style="flex:1"></div>
+ <div class="top"><img src="../emblem.png" alt=""><span class="chip" id="rRound"></span><span class="sp"></span><button class="btn s mu" onclick="mute()">ปิดเสียง</button></div>
+ <div class="card qcard" id="rText" style="font-size:2vw;padding:1vw 2vw;margin:1vw 0"></div>
+ <div class="rgrid"><div id="rMain"></div><div id="rSide"></div></div>
+ <div id="rBottom"></div>
  <div class="foot"><button class="btn" id="nextBtn" onclick="nextStep()">ถัดไป</button></div>
 </section>
 
 <section class="scr" id="sB">
- <h2 id="bTitle">คะแนนรวม</h2>
- <div class="lb" id="lb"></div>
- <div class="foot" style="margin-top:auto"><button class="btn" onclick="nextStep()">ถัดไป</button></div>
+ <div class="top"><img src="../emblem.png" alt=""><span class="chip">คะแนนรวม</span><span class="sp"></span><span class="legend">คะแนน = ความถูก + ความเร็ว</span></div>
+ <div class="lanes" id="lanes"></div>
+ <div class="foot"><button class="btn" onclick="nextStep()">ข้อถัดไป</button></div>
 </section>
 
 <section class="scr" id="sEnd">
- <h2>อันดับสุดท้าย</h2>
+ <div class="top"><img src="../emblem.png" alt=""><span class="chip">จบเกม</span></div>
+ <h1 style="text-align:center;font-size:3.2vw;margin-top:1vw">อันดับสุดท้าย</h1>
  <div class="pod" id="pod"></div>
- <div style="text-align:center;font-size:1.8vw;margin-top:1.5vw;font-weight:600">คาบหน้า ตัวละคร 4 คนจะมานั่งหน้าห้อง เตรียมคำถามมาคนละ 1 ข้อ</div>
+ <div class="card" style="padding:.8vw 1.6vw;font-size:1.6vw;font-weight:700;text-align:center;margin-top:1vw">คาบหน้า ตัวละคร 4 คนจะมานั่งหน้าห้อง เตรียมคำถามมาคนละ 1 ข้อ</div>
 </section>
+<canvas id="conf"></canvas>
 
 <script src="common.js"></script><script src="data.js"></script>
 <script>
-const D = window.K3; let code = "", pin = "", qi = -1, players = [], tStart = 0, tLeft = 0, tIv, poll, revealed = false;
-document.getElementById("course").textContent = D.course;
-document.getElementById("title").textContent = D.title;
-document.getElementById("lobTitle").textContent = D.course;
-const show = id => { document.querySelectorAll(".scr").forEach(s => s.classList.toggle("on", s.id === id)); };
-function mute(b) { const m = Music.toggle(); document.querySelectorAll(".top .btn.s:first-of-type").forEach(x => x.textContent = m ? "เปิดเสียง" : "ปิดเสียง"); }
+const D = window.K3; let code = "", pin = "", qi = -1, players = [], tStart = 0, tLeft = -1, tIv, poll, revealed = false, lastBoard = {};
+const $ = id => document.getElementById(id);
+$("course").textContent = D.course; $("title").textContent = D.title; $("lobTitle").textContent = D.course; $("lobH").textContent = D.title;
+$("parade").innerHTML = [0,1,2,3,4,5,6,7].map(i => `<span style="display:inline-block;animation:k3bob 1.4s ${i * .15}s ease-in-out infinite">${avEl(i, "", "normal", "5.5vw")}</span>`).join("");
+const show = id => document.querySelectorAll(".scr").forEach(s => s.classList.toggle("on", s.id === id));
+function mute() { const m = Music.toggle(); document.querySelectorAll(".mu").forEach(x => x.textContent = m ? "เปิดเสียง" : "ปิดเสียง"); }
 
 async function login() {
-  code = document.getElementById("code").value.trim();
+  code = $("code").value.trim();
   try {
     pin = await rpc("k3_teacher", { p_code: code, p_action: "new" });
-    const url = location.origin + location.pathname.replace(/host(\.html)?$/, "");
-    document.getElementById("url").textContent = (location.host + location.pathname.replace(/host(\.html)?$/, "")).replace(/\/$/, "");
-    document.getElementById("pin").textContent = pin;
-    const q = qrcode(0, "M"); q.addData(url + "?pin=" + pin); q.make();
-    document.getElementById("qr").innerHTML = q.createImgTag(6, 0);
+    const base = location.pathname.replace(/host(\.html)?$/, "");
+    $("url").textContent = (location.host + base).replace(/\/$/, "");
+    $("pin").textContent = pin;
+    const q = qrcode(0, "M"); q.addData(location.origin + base + "?pin=" + pin); q.make();
+    $("qr").innerHTML = q.createImgTag(6, 0);
     show("sLobby"); Music.play("lobby");
-    clearInterval(poll); poll = setInterval(lobbyPoll, 1500); lobbyPoll();
-  } catch (e) { document.getElementById("lerr").textContent = e.message.includes("BADCODE") ? "รหัสครูไม่ถูกต้อง" : "เชื่อมต่อไม่ได้ " + e.message; }
+    clearInterval(poll); poll = setInterval(lobbyPoll, 1500); lobbyPoll(); setTimeout(wander, 2000);
+  } catch (e) { $("lerr").textContent = e.message.includes("BADCODE") ? "รหัสครูไม่ถูกต้อง" : "เชื่อมต่อไม่ได้ " + e.message; }
 }
-let shown = new Set();
+const walkers = {};
 async function lobbyPoll() {
   players = await getPlayers(pin);
-  document.getElementById("pc").textContent = players.length;
-  const box = document.getElementById("names");
-  players.slice().reverse().forEach(p => { if (!shown.has(p.id)) { shown.add(p.id); const s = document.createElement("span"); s.textContent = p.name; box.prepend(s); } });
+  $("pc").textContent = players.length; $("empty").style.display = players.length ? "none" : "flex";
+  players.forEach(p => {
+    if (walkers[p.id]) return;
+    const w = document.createElement("div"); w.className = "walker";
+    w.innerHTML = avEl(p.avatar, "pop", "happy", "5vw") + `<span class="tag">${esc(p.name)}</span>`;
+    const top = 26 + Math.random() * 44;
+    w.style.left = (4 + Math.random() * 86) + "%"; w.style.top = top + "%"; w.style.zIndex = Math.round(top);
+    $("stage").appendChild(w); walkers[p.id] = w; Music.tick();
+    setTimeout(() => w.querySelector(".av").className = "av bob", 600);
+  });
+}
+function wander() {
+  if (!$("sLobby").classList.contains("on")) return;
+  Object.values(walkers).forEach(w => {
+    if (Math.random() < .45) return;
+    const av = w.querySelector(".av"), from = parseFloat(w.style.left), to = Math.max(3, Math.min(90, from + (Math.random() * 30 - 15)));
+    av.className = "av walk"; av.style.transform = to < from ? "scaleX(-1)" : "";
+    w.style.left = to + "%"; setTimeout(() => { av.className = "av bob"; av.style.transform = ""; }, 3000);
+  });
+  setTimeout(wander, 3600);
 }
 function startGame() { clearInterval(poll); goQ(0); }
 
+function optCards(Q) {
+  return '<div class="opts">' + Q.opts.map((t, k) => `<div class="opt"><span class="let" style="background:${COLORS[k]}">${LETTERS[k]}</span><span>${esc(t)}</span></div>`).join("") + "</div>";
+}
+const sentIds = new Set();
 async function goQ(i) {
   qi = i; revealed = false; const Q = D.Q[i];
   await rpc("k3_teacher", { p_code: code, p_action: "question", p_qi: i });
   players = await getPlayers(pin);
-  document.getElementById("qRound").textContent = Q.round;
-  document.getElementById("qNo").textContent = "ข้อ " + (i + 1) + " / " + D.Q.length + (Q.kind === "poll" ? "  โพล ไม่คิดคะแนน" : Q.kind === "type" ? "  พิมพ์คำตอบ" : "");
-  document.getElementById("qText").innerHTML = esc(Q.q).replace("______", '<span class="blank">&nbsp;</span>');
-  const o = document.getElementById("qOpts"), mid = document.getElementById("qMid");
-  if (Q.kind === "type") { o.innerHTML = ""; mid.innerHTML = '<div class="typehint">พิมพ์คำที่หายไปในมือถือ สะกดให้ถูก</div>'; }
-  else { mid.innerHTML = ""; o.innerHTML = Q.opts.map((t, k) => `<div class="opt" style="background:${COLORS[k]}">${SHAPES[k]}<span>${esc(t)}</span></div>`).join(""); }
-  document.getElementById("an").textContent = 0;
+  $("qRound").textContent = Q.round;
+  $("qNo").textContent = "ข้อ " + (i + 1) + "/" + D.Q.length + (Q.kind === "poll" ? " โพล ไม่คิดคะแนน" : Q.kind === "type" ? " พิมพ์คำตอบ" : "") + (Q.dbl ? " คะแนนสองเท่า" : "");
+  $("qText").innerHTML = esc(Q.q).replace("______", '<span class="blank">&nbsp;</span>');
+  $("qOpts").innerHTML = Q.kind === "type" ? `<div class="card typebox">${avEl(5, "bob", "happy", "5vw")}<span>พิมพ์คำที่หายไปในมือถือ สะกดให้ถูก ยิ่งเร็วยิ่งได้คะแนนมาก</span></div>` : optCards(Q);
+  $("an").textContent = 0; $("ap").textContent = players.length; $("sentRow").innerHTML = ""; sentIds.clear();
   show("sQ"); Music.play("question");
-  tStart = Date.now(); tLeft = Q.t; document.getElementById("tm").textContent = tLeft;
-  clearInterval(tIv); tIv = setInterval(tick, 250);
+  tStart = Date.now(); tLeft = -1; tick();
+  clearInterval(tIv); tIv = setInterval(tick, 200);
   clearInterval(poll); poll = setInterval(qPoll, 1200);
 }
 function tick() {
-  const left = Math.max(0, D.Q[qi].t - Math.floor((Date.now() - tStart) / 1000));
-  if (left !== tLeft) { tLeft = left; document.getElementById("tm").textContent = left; if (left <= 5 && left > 0) Music.tick(); }
-  if (left <= 0) doReveal();
+  const T = D.Q[qi].t, el = (Date.now() - tStart) / 1000, left = Math.max(0, Math.ceil(T - el));
+  const b = $("tbar"); b.style.width = Math.max(0, 100 - el / T * 100) + "%"; b.style.background = left <= 5 ? "var(--c0)" : "var(--c1)";
+  if (left !== tLeft) { tLeft = left; $("tm").textContent = left; if (left <= 5 && left > 0) Music.tick(); }
+  if (el >= T) doReveal();
 }
 async function qPoll() {
-  const s = await rpc("k3_stats", { p_pin: pin, p_qi: qi });
-  document.getElementById("an").textContent = s.n;
-  if (players.length && s.n >= players.length) doReveal();
+  const list = await rpc("k3_answered", { p_pin: pin, p_qi: qi });
+  $("an").textContent = list.length;
+  list.forEach(p => { if (sentIds.has(p.id)) return; sentIds.add(p.id); $("sentRow").insertAdjacentHTML("beforeend", avEl(p.avatar, "pop", "normal", "3.4vw")); });
+  if (players.length && list.length >= players.length) doReveal();
 }
 async function doReveal() {
   if (revealed) return; revealed = true;
@@ -177,48 +236,65 @@ async function doReveal() {
   await rpc("k3_teacher", { p_code: code, p_action: "reveal" });
   const Q = D.Q[qi], s = await rpc("k3_stats", { p_pin: pin, p_qi: qi });
   Music.stop(); Music.sting(true);
-  document.getElementById("rRound").textContent = Q.round;
-  document.getElementById("rText").innerHTML = esc(Q.q).replace("______", '<span class="blank">' + (Q.kind === "type" ? esc(Q.ans) : "&nbsp;") + "</span>");
-  let h = "";
+  $("rRound").textContent = Q.round;
+  $("rText").innerHTML = esc(Q.q).replace("______", '<span class="blank">' + (Q.kind === "type" ? esc(Q.ans) : "&nbsp;") + "</span>");
+  let main = "", side = "";
   if (Q.kind === "type") {
-    h += `<div class="answord"><small>คำตอบ</small>${esc(Q.ans)}<small>ตอบถูก ${s.right} จาก ${s.n} คน</small></div>`;
-    h += '<div class="words">' + s.texts.slice(0, 12).map(w => `<span class="${w.ok ? "y" : ""}">${esc(w.t)} (${w.c})</span>`).join("") + "</div>";
+    main = `<div class="card answord"><small>คำตอบ</small><b>${esc(Q.ans)}</b><small>ตอบถูก ${s.right} จาก ${s.n} คน</small><div class="words">` +
+      s.texts.slice(0, 12).map(w => `<span class="${w.ok ? "y" : ""}">${esc(w.t)} ${w.c}</span>`).join("") + "</div></div>";
   } else {
-    const n = Q.opts.length, mx = Math.max(1, ...Array.from({ length: n }, (_, k) => s.counts[k] || 0));
-    h += '<div class="bars">' + Q.opts.map((t, k) => { const v = s.counts[k] || 0, dim = Q.kind === "choice" && k !== Q.ans;
-      return `<div class="bar" style="opacity:${dim ? .35 : 1}"><div class="v">${v}</div><div class="b" style="background:${COLORS[k]};height:${v / mx * 75}%"></div><div class="ic" style="background:${COLORS[k]}">${SHAPES[k]}</div></div>`; }).join("") + "</div>";
-    h += '<div class="opts" style="grid-template-columns:repeat(' + (n === 2 ? 2 : 4) + ',1fr)">' + Q.opts.map((t, k) => `<div class="opt ${Q.kind === "choice" && k !== Q.ans ? "dim" : ""}" style="background:${COLORS[k]};font-size:1.5vw;min-height:4.5vw">${SHAPES[k]}<span>${esc(t)}</span>${Q.kind === "choice" && k === Q.ans ? '<span class="ok">ถูก</span>' : ""}</div>`).join("") + "</div>";
+    const mx = Math.max(1, ...Q.opts.map((_, k) => s.counts[k] || 0));
+    main = '<div class="rows">' + Q.opts.map((t, k) => {
+      const v = s.counts[k] || 0, ok = Q.kind === "choice" && k === Q.ans, dim = Q.kind === "choice" && !ok;
+      return `<div class="rrow ${ok ? "ok" : ""} ${dim ? "dim" : ""}"><span class="let" style="background:${COLORS[k]};width:3vw;height:3vw;font-size:1.6vw">${LETTERS[k]}</span><span class="txt">${esc(t)}</span><span class="bw"><i data-w="${v / mx * 100}" style="background:${COLORS[k]}"></i></span><span class="n">${v}</span>${ok ? '<span class="mark">ถูก</span>' : ""}</div>`;
+    }).join("") + "</div>";
   }
-  if (Q.exp) h += `<div class="exp" style="margin-top:1vw"><b>สรุป</b> ${esc(Q.exp)}${Q.src ? `<div class="src">ที่มา: ${esc(Q.src)}</div>` : ""}</div>`;
-  if (Q.talk) h += `<div class="talk">ครูถามต่อ: ${esc(Q.talk)}</div>`;
-  document.getElementById("rBody").innerHTML = h;
-  const nextIsBoard = Q.kind === "type" || qi === D.Q.length - 1;
-  document.getElementById("nextBtn").textContent = qi === D.Q.length - 1 ? "ดูอันดับสุดท้าย" : nextIsBoard ? "ดูคะแนนรวม" : "ข้อถัดไป";
+  if (Q.kind !== "poll") {
+    side = s.fast ? `<div class="card fast"><h3>ตอบถูกเร็วที่สุด</h3>${avEl(s.fast.avatar, "jump", "happy", "7vw")}<div class="nm">${esc(s.fast.name)}</div><div class="sec">${s.fast.sec} วินาที</div></div>`
+      : `<div class="card fast"><h3>ข้อนี้ยังไม่มีคนตอบถูก</h3>${avEl(0, "sad", "sad", "6vw")}</div>`;
+  } else {
+    side = `<div class="card fast"><h3>ตอบโพลแล้ว</h3><div class="nm" style="font-size:3.4vw">${s.n}</div><div class="sec">คน</div></div>`;
+  }
+  $("rMain").innerHTML = main; $("rSide").innerHTML = side;
+  $("rBottom").innerHTML = (Q.exp ? `<div class="card exp"><b>สรุป</b> ${esc(Q.exp)}${Q.src ? `<div class="src">ที่มา: ${esc(Q.src)}</div>` : ""}</div>` : "") + (Q.talk ? `<div class="card talk">ครูถามต่อ: ${esc(Q.talk)}</div>` : "");
+  setTimeout(() => document.querySelectorAll(".rrow .bw i").forEach(i => i.style.width = i.dataset.w + "%"), 60);
+  const last = qi === D.Q.length - 1;
+  $("nextBtn").textContent = last ? "ดูอันดับสุดท้าย" : Q.kind === "type" ? "ดูคะแนนรวม" : "ข้อถัดไป";
   show("sR");
 }
 async function board() {
   await rpc("k3_teacher", { p_code: code, p_action: "board" });
   players = await getPlayers(pin);
-  document.getElementById("lb").innerHTML = players.slice(0, 5).map((p, i) => `<div style="animation-delay:${i * .12}s"><span>${i + 1}. ${esc(p.name)}</span><span>${p.score}</span></div>`).join("");
+  const top = players.slice(0, 6), mx = Math.max(1, players[0] ? players[0].score : 1);
+  $("lanes").innerHTML = top.map((p, i) => `<div class="lane" style="animation-delay:${i * .08}s"><span class="rk">${i + 1}</span><span class="nm">${esc(p.name)}</span><div class="rt"><div class="runner" id="run${i}" style="left:${lastBoard[p.id] || 0}%">${avEl(p.avatar, "walk", "happy", "4.6vw")}</div></div><div class="sc"><b>${p.score}</b><small>ถูก ${p.score_ok} เร็ว ${p.score_speed}</small></div></div>`).join("");
   show("sB"); Music.play("lobby");
+  setTimeout(() => top.forEach((p, i) => { const pos = p.score / mx * 86; lastBoard[p.id] = pos; $("run" + i).style.left = pos + "%"; }), 300);
+  setTimeout(() => document.querySelectorAll(".runner .av").forEach(a => a.className = "av bob"), 2400);
 }
-let stage = "r";
 async function nextStep() {
   const Q = D.Q[qi];
-  if (document.getElementById("sR").classList.contains("on")) {
+  if ($("sR").classList.contains("on")) {
     if (qi === D.Q.length - 1) return finish();
     if (Q.kind === "type") return board();
     return goQ(qi + 1);
   }
-  if (document.getElementById("sB").classList.contains("on")) return goQ(qi + 1);
+  if ($("sB").classList.contains("on")) return goQ(qi + 1);
 }
 async function finish() {
   await rpc("k3_teacher", { p_code: code, p_action: "end" });
   players = await getPlayers(pin);
-  const p = players, ord = [1, 0, 2], hts = [16, 22, 12];
-  document.getElementById("pod").innerHTML = ord.map(i => p[i] ? `<div><div class="nm">${esc(p[i].name)}</div><div class="sc">${p[i].score} คะแนน</div><div class="st" style="height:${hts[ord.indexOf(i)]}vw">${i + 1}</div></div>` : "").join("");
-  show("sEnd"); Music.stop(); Music.fanfare();
+  const p = players, ord = [1, 0, 2], hts = { 0: 20, 1: 14, 2: 10 }, cols = { 0: "var(--c2)", 1: "var(--c3)", 2: "var(--c0)" };
+  $("pod").innerHTML = ord.map(i => p[i] ? `<div>${avEl(p[i].avatar, "jump", "happy", i === 0 ? "9vw" : "7vw")}<div class="nm">${esc(p[i].name)}</div><div class="sc">${p[i].score} คะแนน<br>ถูก ${p[i].score_ok} เร็ว ${p[i].score_speed}</div><div class="st" style="height:${hts[i]}vw;background:${cols[i]}">${i + 1}</div></div>` : "").join("");
+  show("sEnd"); Music.stop(); Music.fanfare(); confetti();
 }
-document.addEventListener("keydown", e => { if (e.key === "ArrowRight") { if (document.getElementById("sQ").classList.contains("on")) doReveal(); else nextStep(); } if (e.key === "Enter" && document.getElementById("sLogin").classList.contains("on")) login(); });
+function confetti() {
+  const c = $("conf"), x = c.getContext("2d"); c.width = innerWidth; c.height = innerHeight;
+  const P = Array.from({ length: 160 }, () => ({ x: Math.random() * c.width, y: -Math.random() * c.height, w: 6 + Math.random() * 8, h: 10 + Math.random() * 10, v: 2 + Math.random() * 3, r: Math.random() * 6, s: Math.random() * .2 - .1, col: ["#ff6b4a", "#14a89a", "#f5a524", "#5b6cff", "#1d2340"][Math.random() * 5 | 0] }));
+  let n = 0; (function f() { x.clearRect(0, 0, c.width, c.height); P.forEach(p => { p.y += p.v; p.x += Math.sin(p.y / 40); p.r += p.s; x.save(); x.translate(p.x, p.y); x.rotate(p.r); x.fillStyle = p.col; x.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); x.restore(); }); if (++n < 600) requestAnimationFrame(f); else x.clearRect(0, 0, c.width, c.height); })();
+}
+document.addEventListener("keydown", e => {
+  if (e.key === "Enter" && $("sLogin").classList.contains("on")) return login();
+  if (e.key === "ArrowRight") { if ($("sQ").classList.contains("on")) doReveal(); else nextStep(); }
+});
 </script>
 </body></html>
