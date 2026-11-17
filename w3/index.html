@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>เกมสัปดาห์ที่ 3 สินค้าราคาถูกจากจีน</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:Sarabun,sans-serif;background:linear-gradient(160deg,#2b0f54,#46178f 60%,#1b4d9c);color:#fff;min-height:100vh;min-height:100dvh}
+.scr{display:none;min-height:100vh;min-height:100dvh;flex-direction:column;padding:18px}
+.scr.on{display:flex}
+.c{align-items:center;justify-content:center;text-align:center;gap:14px}
+.box{background:#fff;color:#222;border-radius:14px;padding:22px;width:100%;max-width:380px;display:flex;flex-direction:column;gap:12px}
+input{font:700 20px Sarabun;padding:12px;border-radius:10px;border:2px solid #ccc;text-align:center;width:100%}
+input:focus{outline:none;border-color:#46178f}
+.btn{background:#333;color:#fff;border:none;border-radius:10px;font:800 19px Sarabun;padding:13px;cursor:pointer;box-shadow:0 4px 0 #000}
+.btn:active{transform:translateY(3px);box-shadow:none}
+.btn.p{background:#46178f;box-shadow:0 4px 0 #2b0f54}
+.err{color:#c00;font-weight:600;min-height:20px;font-size:15px}
+h1{font-size:24px;font-weight:800;line-height:1.3}
+.sub{opacity:.85;font-size:15px}
+.bar{display:flex;justify-content:space-between;align-items:center;font-size:14px;opacity:.9;margin-bottom:10px;gap:8px}
+.bar b{background:rgba(0,0,0,.25);padding:3px 10px;border-radius:20px;font-weight:600}
+.q{background:#fff;color:#222;border-radius:12px;padding:14px;font-size:17px;font-weight:700;line-height:1.4;margin-bottom:12px}
+.q .blank{display:inline-block;min-width:70px;border-bottom:3px solid #46178f}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:1}
+.grid.two{grid-template-columns:1fr}
+.o{border:none;border-radius:10px;color:#fff;font:800 17px Sarabun;padding:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:110px;box-shadow:0 5px 0 rgba(0,0,0,.3);cursor:pointer;line-height:1.3}
+.o:active{transform:translateY(4px);box-shadow:none}
+.o svg{width:34px;height:34px}
+.big{font-size:56px;font-weight:800;line-height:1}
+.res{border-radius:14px;padding:26px 18px;width:100%;max-width:380px}
+.res.ok{background:#26890c}.res.no{background:#e21b3c}.res.poll{background:rgba(255,255,255,.15)}
+.pts{display:inline-block;background:rgba(0,0,0,.25);border-radius:20px;padding:6px 16px;font-weight:800;font-size:20px;margin-top:10px}
+.me{position:fixed;left:0;right:0;bottom:0;background:rgba(0,0,0,.35);display:flex;justify-content:space-between;padding:10px 18px;font-weight:700;font-size:15px}
+.spin{width:44px;height:44px;border:5px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;animation:r 1s linear infinite}
+@keyframes r{to{transform:rotate(360deg)}}
+</style></head><body>
+
+<section class="scr on c" id="sJoin">
+ <img src="../emblem.png" style="width:72px;height:72px;object-fit:contain" alt=""><h1>เกมสินค้าราคาถูกจากจีน</h1><div class="sub">เหตุการณ์ปัจจุบัน 2 สัปดาห์ที่ 3</div>
+ <div class="box">
+  <input id="pin" inputmode="numeric" maxlength="6" placeholder="รหัสเกม">
+  <input id="name" maxlength="30" placeholder="ชื่อเล่น และเลขที่ เช่น ต้น 12">
+  <button class="btn p" onclick="join()">เข้าเกม</button>
+  <div class="err" id="jerr"></div>
+ </div>
+</section>
+
+<section class="scr c" id="sWait">
+ <div class="spin"></div><h1 id="wTitle">เข้าเกมแล้ว</h1><div class="sub" id="wSub">ดูชื่อตัวเองบนจอ แล้วรอครูเริ่มเกม</div>
+</section>
+
+<section class="scr" id="sQ">
+ <div class="bar"><b id="qRound"></b><span id="qTime"></span></div>
+ <div class="q" id="qText"></div>
+ <div class="grid" id="qOpts"></div>
+ <div id="qType" style="display:none;flex-direction:column;gap:10px">
+  <input id="txt" maxlength="40" placeholder="พิมพ์คำที่หายไป" autocomplete="off">
+  <button class="btn p" onclick="sendTxt()">ส่งคำตอบ</button>
+ </div>
+ <div style="height:44px"></div>
+</section>
+
+<section class="scr c" id="sRes"><div class="res" id="res"></div></section>
+
+<div class="me" id="me" style="display:none"><span id="meName"></span><span id="meScore"></span></div>
+
+<script src="common.js"></script><script src="data.js"></script>
+<script>
+const D = window.K3;
+let me = JSON.parse(localStorage.getItem("k3_me") || "null"), lastKey = "", answered = {}, qShownAt = 0, cdIv;
+const sp = new URLSearchParams(location.search); if (sp.get("pin")) document.getElementById("pin").value = sp.get("pin");
+const show = id => document.querySelectorAll(".scr").forEach(s => s.classList.toggle("on", s.id === id));
+
+async function join() {
+  const p = document.getElementById("pin").value.trim(), n = document.getElementById("name").value.trim(), e = document.getElementById("jerr");
+  if (!p || !n) { e.textContent = "กรอกรหัสเกมและชื่อให้ครบ"; return; }
+  try {
+    const id = await rpc("k3_join", { p_pin: p, p_name: n });
+    me = { id, pin: p, name: n }; localStorage.setItem("k3_me", JSON.stringify(me)); answered = {};
+    start();
+  } catch (x) {
+    e.textContent = x.message.includes("BADPIN") ? "รหัสเกมไม่ถูกต้อง หรือเกมยังไม่เปิด" : x.message.includes("DUPNAME") ? "ชื่อนี้มีคนใช้แล้ว เติมเลขที่ต่อท้าย" : "เชื่อมต่อไม่ได้ ลองใหม่อีกครั้ง";
+  }
+}
+function start() {
+  document.getElementById("me").style.display = "flex";
+  document.getElementById("meName").textContent = me.name;
+  show("sWait"); loop(); setInterval(loop, 1000);
+}
+async function loop() {
+  let g; try { g = await getGame(); } catch (e) { return; }
+  if (!g || g.pin !== me.pin) { if (g && g.pin && g.pin !== me.pin) { localStorage.removeItem("k3_me"); location.href = location.pathname; } return; }
+  const key = g.phase + ":" + g.qi;
+  if (key === lastKey) return; lastKey = key;
+  if (g.phase === "lobby") { show("sWait"); }
+  else if (g.phase === "question") showQ(g.qi);
+  else if (g.phase === "reveal") showRes(g.qi);
+  else if (g.phase === "board") showRank("คะแนนรวม");
+  else if (g.phase === "end") showRank("จบเกม", true);
+}
+let curQ = -1;
+function showQ(i) {
+  const Q = D.Q[i]; clearInterval(cdIv); curQ = i;
+  if (answered[i]) { waitMsg("ส่งคำตอบแล้ว", "รอครูเฉลย"); return; }
+  document.getElementById("qRound").textContent = "ข้อ " + (i + 1) + " " + Q.round;
+  document.getElementById("qText").innerHTML = esc(Q.q).replace("______", '<span class="blank">&nbsp;</span>');
+  const o = document.getElementById("qOpts"), t = document.getElementById("qType");
+  if (Q.kind === "type") { o.style.display = "none"; t.style.display = "flex"; document.getElementById("txt").value = ""; setTimeout(() => document.getElementById("txt").focus(), 100); }
+  else {
+    t.style.display = "none"; o.style.display = "grid"; o.className = "grid" + (Q.opts.length === 2 ? " two" : "");
+    o.innerHTML = Q.opts.map((x, k) => `<button class="o" style="background:${COLORS[k]}" onclick="pick(${i},${k})">${SHAPES[k]}<span>${esc(x)}</span></button>`).join("");
+  }
+  qShownAt = Date.now(); const tt = document.getElementById("qTime");
+  const cd = () => { const l = Math.max(0, Q.t - Math.floor((Date.now() - qShownAt) / 1000)); tt.textContent = l + " วินาที"; };
+  cd(); cdIv = setInterval(cd, 500); show("sQ");
+}
+function waitMsg(a, b) { clearInterval(cdIv); document.getElementById("wTitle").textContent = a; document.getElementById("wSub").textContent = b; show("sWait"); }
+async function send(i, choice, txt) {
+  answered[i] = true; waitMsg("ส่งคำตอบแล้ว", "รอครูเฉลย");
+  try { const r = await rpc("k3_answer", { p_player: me.id, p_qi: i, p_choice: choice, p_txt: txt }); if (r === "CLOSED" || r === "LATE") waitMsg("หมดเวลา", "รอข้อถัดไป"); } catch (e) { waitMsg("ส่งไม่สำเร็จ", "รอข้อถัดไป"); }
+}
+function pick(i, k) { send(i, k, null); }
+function sendTxt() { const v = document.getElementById("txt").value.trim(); if (!v) return; send(curQ, null, v); }
+document.getElementById("txt").addEventListener("keydown", e => { if (e.key === "Enter") sendTxt(); });
+async function showRes(i) {
+  clearInterval(cdIv); const Q = D.Q[i], m = await rpc("k3_mine", { p_player: me.id, p_qi: i });
+  document.getElementById("meScore").textContent = m.score + " คะแนน";
+  const r = document.getElementById("res");
+  if (Q.kind === "poll") { r.className = "res poll"; r.innerHTML = `<h1>${m.answered ? "ขอบคุณที่ตอบ" : "ข้อนี้ไม่ได้ตอบ"}</h1><div class="sub" style="margin-top:8px">ดูผลของทั้งห้องบนจอ</div>`; }
+  else if (m.correct) { r.className = "res ok"; r.innerHTML = `<div class="big">ถูก</div><div class="pts">+${m.points}</div><div class="sub" style="margin-top:12px">อันดับที่ ${m.rank}</div>`; }
+  else { r.className = "res no"; r.innerHTML = `<div class="big">${m.answered ? "ผิด" : "หมดเวลา"}</div>${Q.kind === "type" ? `<div style="margin-top:10px;font-weight:700">คำตอบ: ${esc(Q.ans)}</div>` : ""}<div class="sub" style="margin-top:12px">อันดับที่ ${m.rank}</div>`; }
+  show("sRes");
+}
+async function showRank(title, end) {
+  const m = await rpc("k3_mine", { p_player: me.id, p_qi: -1 });
+  document.getElementById("meScore").textContent = m.score + " คะแนน";
+  const r = document.getElementById("res"); r.className = "res poll";
+  r.innerHTML = `<div class="sub">${title}</div><div class="big" style="margin:8px 0">อันดับ ${m.rank}</div><div class="pts">${m.score} คะแนน</div>${end ? '<div class="sub" style="margin-top:14px">คาบหน้าเตรียมคำถามมาถามตัวละครคนละ 1 ข้อ</div>' : ""}`;
+  show("sRes");
+}
+if (me) { getGame().then(g => { if (g && g.pin === me.pin && g.phase !== "end") start(); else { localStorage.removeItem("k3_me"); me = null; } }); }
+</script>
+</body></html>
