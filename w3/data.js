@@ -24,7 +24,7 @@ window.K3 = {
   Q: [
     { kind: "practice", t: 20, cat: "หมวดผลไม้", sil: "img/banana-sil.png", img: "img/banana.jpg",
       q: "ผลไม้ชนิดนี้คืออะไร", opts: ["สตรอว์เบอร์รี", "ลิ้นจี่", "มังคุด", "กล้วย"], ans: 3 },
-    { kind: "practice", t: 20, cat: "หมวดสัตว์", sil: SIMG + "elephant-sil.png", img: SIMG + "elephant.jpg",
+    { kind: "practice", t: 20, cat: "หมวดสัตว์", sil: SIMG + "elephant2-sil.png", img: SIMG + "elephant2.jpg",
       q: "สัตว์ตัวนี้คืออะไร", opts: ["แมว", "กระต่าย", "ช้าง", "จิงโจ้"], ans: 2 },
     { kind: "practice", t: 20, cat: "หมวดผัก", sil: SIMG + "potato-sil.png", img: SIMG + "potato.jpg",
       q: "ผักชนิดนี้คืออะไร", opts: ["มันเทศ", "เผือก", "ฟักทอง", "มันฝรั่ง"], ans: 3 },
