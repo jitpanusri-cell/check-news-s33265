@@ -224,7 +224,7 @@ async function lobbyPoll() {
   players.forEach(p => {
     if (walkers[p.id]) return;
     const w = document.createElement("div"); w.className = "walker";
-    w.innerHTML = avEl(p.avatar, "pop", "happy", "5vw") + `<span class="tag">${esc(p.name)}</span>`;
+    w.innerHTML = avEl(p.avatar, "pop", "happy", "6.5vw") + `<span class="tag">${esc(p.name)}</span>`;
     const top = 22 + Math.random() * 46;
     w.style.left = (4 + Math.random() * 86) + "%"; w.style.top = top + "%"; w.style.zIndex = Math.round(top);
     $("stage").appendChild(w); walkers[p.id] = w; Music.meow(0.85 + Math.random() * 0.4);
