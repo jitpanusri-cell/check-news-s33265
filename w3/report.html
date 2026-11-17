@@ -31,6 +31,8 @@ input,select{font:600 16px Sarabun;padding:8px 14px;border-radius:30px;border:3p
 @media print{body{background:none;padding:0}.noprint{display:none}.card{box-shadow:none;border-width:1px;break-inside:avoid}}
 </style></head><body class="paws">
 <div class="wrap" id="app"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="common.js"></script><script src="data.js"></script>
 <script>
 const D = window.K3, $ = id => document.getElementById(id);
@@ -54,7 +56,7 @@ function render() {
   const when = g ? new Date(g.at).toLocaleString("th-TH", { dateStyle: "medium", timeStyle: "short" }) : "";
   let h = `<div class="card head"><img src="../emblem.png" alt=""><div><div class="mali" style="font-size:14px">${esc(D.course)}</div><h1 style="font-size:22px">รายงานผลเกม ${esc(D.title)}</h1><div style="font-weight:600;color:#776">รหัสเกม ${esc(pin)} ${when}</div></div><span class="sp"></span>
    <div class="noprint" style="display:flex;gap:8px;align-items:center"><select onchange="pin=this.value;load()">${data.games.map(x => `<option value="${x.pin}" ${x.pin === pin ? "selected" : ""}>${new Date(x.at).toLocaleString("th-TH", { dateStyle: "short", timeStyle: "short" })} (${x.n} คน)</option>`).join("")}</select>
-   <button class="btn w" onclick="csv()">ดาวน์โหลด CSV</button><button class="btn" onclick="print()">พิมพ์</button></div></div>`;
+   <button class="btn w" onclick="csv()">ดาวน์โหลด CSV</button><button class="btn w" id="zipBtn" onclick="zipSheets()">ใบบันทึกรายคน (zip)</button><button class="btn" onclick="print()">พิมพ์</button></div></div>`;
   h += `<div class="card stats"><div class="stat"><small>นักเรียนที่เล่น</small><b>${n}</b></div><div class="stat"><small>คะแนนเฉลี่ย</small><b>${avg}</b></div><div class="stat"><small>ตอบถูกเฉลี่ย</small><b>${avgOk}/${scored.length}</b></div><div class="stat"><small>คะแนนสูงสุด</small><b>${n ? pl[0].score : 0}</b></div></div>`;
   // รายข้อ
   h += `<div class="card"><h2 style="font-size:19px;margin-bottom:10px">ผลรายข้อ</h2><div class="scroll"><table><tr><th>ข้อ</th><th class="l">คำถาม</th><th>ประเภท</th><th>ตอบ</th><th>ผล</th></tr>`;
@@ -66,18 +68,66 @@ function render() {
   });
   h += `</table></div></div>`;
   // รายคน
-  h += `<div class="card"><h2 style="font-size:19px;margin-bottom:10px">ผลรายคน</h2><div class="scroll"><table><tr><th>อันดับ</th><th class="l">ชื่อ</th><th>รวม</th><th>ความถูก</th><th>ความเร็ว</th><th>ถูก</th>${scored.map(i => `<th>ข้อ ${i + 1}</th>`).join("")}<th class="l">คำที่พิมพ์</th></tr>`;
-  pl.forEach((p, r) => {
-    h += `<tr><td><b>${r + 1}</b></td><td class="l" style="white-space:nowrap">${avEl(p.avatar, "", "normal", "26px")} ${esc(p.name)}</td><td><b>${p.score}</b></td><td>${p.ok}</td><td>${p.speed}</td><td>${nOk(p)}/${scored.length}</td>` +
+  h += `<div class="card"><h2 style="font-size:19px;margin-bottom:10px">ผลรายคน (เรียงตามเลขที่)</h2><div class="scroll"><table><tr><th>เลขที่</th><th>อันดับ</th><th class="l">ชื่อ</th><th>รวม</th><th>ความถูก</th><th>ความเร็ว</th><th>ถูก</th>${scored.map(i => `<th>ข้อ ${i + 1}</th>`).join("")}<th class="l">คำที่พิมพ์</th></tr>`;
+  pl.map((p, r) => [p, r]).sort((a, b) => (a[0].no || 99) - (b[0].no || 99)).forEach(([p, r]) => {
+    h += `<tr><td><b>${p.no || "-"}</b></td><td>${r + 1}</td><td class="l" style="white-space:nowrap">${avEl(p.avatar, "", "normal", "26px")} ${esc(p.name)}</td><td><b>${p.score}</b></td><td>${p.ok}</td><td>${p.speed}</td><td>${nOk(p)}/${scored.length}</td>` +
       scored.map(i => { const a = p.ans[i]; return `<td><span class="dot ${a ? (a.r ? "y" : "n") : "x"}" title="${a ? (a.t ? esc(a.t) + " " : "") + a.s + " วินาที" : "ไม่ได้ตอบ"}"></span></td>`; }).join("") +
       `<td class="l" style="font-size:13px;color:#665">${D.Q.map((q, i) => q.kind === "type" && p.ans[i] ? esc(p.ans[i].t) : "").filter(Boolean).join(", ")}</td></tr>`;
   });
   h += `</table></div><div style="margin-top:8px;font-size:13px;color:#776"><span class="dot y"></span> ถูก <span class="dot n"></span> ผิด <span class="dot x"></span> ไม่ได้ตอบ</div></div>`;
+  h += `<div class="card"><h2 style="font-size:19px;margin-bottom:10px">สะท้อนคิดท้ายคาบ</h2><div class="scroll"><table><tr><th>เลขที่</th><th class="l">ชื่อ</th>${D.reflect.map((t, k) => `<th class="l" style="white-space:normal">${k + 1}. ${esc(t)}</th>`).join("")}</tr>` +
+    pl.slice().sort((a, b) => (a.no || 99) - (b.no || 99)).map(p => `<tr><td>${p.no || "-"}</td><td class="l" style="white-space:nowrap">${esc(p.name)}</td>${[1, 2, 3].map(k => `<td class="l" style="font-size:13px;min-width:200px">${p.ref ? esc(p.ref["a" + k] || "") : '<span style="color:#bbb">ไม่ได้ส่ง</span>'}</td>`).join("")}</tr>`).join("") + `</table></div></div>`;
   $("app").innerHTML = h;
 }
+function sheetHtml(p, rank) {
+  const rows = D.Q.map((q, i) => [q, i]).filter(([q]) => q.kind !== "practice");
+  const ansTxt = (q, a) => !a ? "-" : q.kind === "type" ? esc(a.t || "") : q.opts[a.c] != null ? esc(q.opts[a.c]) : "-";
+  const res = (q, a) => q.kind === "poll" ? "" : !a ? '<span style="color:#999">ไม่ได้ตอบ</span>' : a.r ? '<b style="color:#1f9d74">ถูก</b>' : '<b style="color:#e03a4e">ผิด</b>';
+  const nOk = scored.filter(i => p.ans[i] && p.ans[i].r).length;
+  return `<div class="pg" style="width:1123px;height:794px;background:#fff;font-family:Sarabun;color:#2b2540;padding:26px 32px;box-sizing:border-box;position:relative">
+  <div style="display:flex;align-items:center;gap:14px;border-bottom:3px solid #2b2540;padding-bottom:10px">
+   <img src="../emblem.png" style="width:56px;height:56px;object-fit:contain">
+   <div style="flex:1"><div style="font-size:14px;font-weight:600">ใบบันทึกผลกิจกรรม ${esc(D.course)}</div><div style="font:700 21px Mali">${esc(D.title)}</div></div>
+   <div style="border:2px solid #2b2540;border-radius:14px;padding:6px 14px;font-size:15px;line-height:1.6"><b>ชื่อ</b> ${esc(p.name)} &nbsp; <b>เลขที่</b> ${p.no || "-"}<br><b>วันที่เล่น</b> ${new Date().toLocaleDateString("th-TH", { dateStyle: "medium" })}</div>
+  </div>
+  <div style="display:grid;grid-template-columns:1.25fr 1fr;gap:20px;margin-top:12px">
+   <div><table style="width:100%;border-collapse:collapse;font-size:12px">
+    <tr style="background:#ffe3e8"><th style="padding:4px;border-bottom:2px solid #2b2540;width:30px">ข้อ</th><th style="padding:4px;border-bottom:2px solid #2b2540;text-align:left">คำถาม</th><th style="padding:4px;border-bottom:2px solid #2b2540;text-align:left;width:150px">คำตอบ</th><th style="padding:4px;border-bottom:2px solid #2b2540;width:58px">ผล</th></tr>
+    ${rows.map(([q, i]) => `<tr><td style="padding:3px 4px;border-bottom:1px solid #eee;text-align:center">${i + 1}</td><td style="padding:3px 4px;border-bottom:1px solid #eee">${esc(q.q.length > 58 ? q.q.slice(0, 56) + "…" : q.q)}</td><td style="padding:3px 4px;border-bottom:1px solid #eee">${ansTxt(q, p.ans[i])}</td><td style="padding:3px 4px;border-bottom:1px solid #eee;text-align:center">${res(q, p.ans[i])}</td></tr>`).join("")}
+   </table></div>
+   <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center">
+     ${[["ตอบถูก", nOk + "/" + scored.length], ["ความถูก", p.ok], ["ความเร็ว", p.speed], ["อันดับ", rank + 1]].map(([a, b]) => `<div style="border:2px solid #2b2540;border-radius:12px;padding:4px"><div style="font-size:12px;font-weight:700;color:#776">${a}</div><div style="font:700 20px Mali">${b}</div></div>`).join("")}
+    </div>
+    <div style="border:2px solid #2b2540;border-radius:14px;padding:8px 12px;flex:1">
+     <div style="font:700 16px Mali;margin-bottom:4px">สะท้อนคิดท้ายคาบ</div>
+     ${D.reflect.map((t, k) => `<div style="font-size:12.5px;font-weight:700;margin-top:6px">${k + 1}. ${esc(t)}</div><div style="font-size:13px;line-height:1.45;min-height:46px;border-bottom:1px dotted #aaa;white-space:pre-wrap">${p.ref ? esc(p.ref["a" + (k + 1)] || "") : '<span style="color:#bbb">ไม่ได้ส่ง</span>'}</div>`).join("")}
+    </div>
+   </div>
+  </div>
+  <div style="position:absolute;left:32px;right:32px;bottom:14px;border-top:1px solid #2b2540;padding-top:4px;font-size:11px;display:flex;justify-content:space-between"><span>กลุ่มสาระการเรียนรู้สังคมศึกษา ศาสนาและวัฒนธรรม</span><span>โรงเรียนมหาวชิราวุธ จังหวัดสงขลา</span></div>
+  </div>`;
+}
+async function zipSheets() {
+  const b = $("zipBtn"), zip = new JSZip(), box = document.createElement("div");
+  box.style.cssText = "position:fixed;left:-2000px;top:0"; document.body.appendChild(box);
+  await document.fonts.ready;
+  const list = data.players.map((p, r) => [p, r]).sort((a, c) => (a[0].no || 99) - (c[0].no || 99));
+  for (let i = 0; i < list.length; i++) {
+    const [p, r] = list[i]; b.textContent = "กำลังสร้าง " + (i + 1) + "/" + list.length;
+    box.innerHTML = sheetHtml(p, r);
+    const c = await html2canvas(box.querySelector(".pg"), { scale: 1.5, backgroundColor: "#fff" });
+    const blob = await new Promise(z => c.toBlob(z, "image/png"));
+    zip.file(String(p.no || 0).padStart(2, "0") + " " + p.name.replace(/[\\/:*?"<>|]/g, "") + ".png", blob);
+  }
+  box.remove();
+  const z = await zip.generateAsync({ type: "blob" }), a = document.createElement("a");
+  a.href = URL.createObjectURL(z); a.download = "ใบบันทึก-สัปดาห์3-" + pin + ".zip"; a.click();
+  b.textContent = "ใบบันทึกรายคน (zip)";
+}
 function csv() {
-  const rows = [["อันดับ", "ชื่อ", "คะแนนรวม", "ความถูก", "ความเร็ว", ...D.Q.map((q, i) => "ข้อ " + (i + 1) + " " + KIND[q.kind])]];
-  data.players.forEach((p, r) => rows.push([r + 1, p.name, p.score, p.ok, p.speed, ...D.Q.map((q, i) => { const a = p.ans[i]; if (!a) return ""; if (q.kind === "poll") return q.opts[a.c]; if (q.kind === "type") return (a.r ? "ถูก " : "ผิด ") + a.t; return a.r ? "ถูก" : "ผิด " + LETTERS[a.c]; })]));
+  const rows = [["เลขที่", "อันดับ", "ชื่อ", "คะแนนรวม", "ความถูก", "ความเร็ว", ...D.Q.map((q, i) => "ข้อ " + (i + 1) + " " + KIND[q.kind]), ...D.reflect.map((t, k) => "สะท้อนคิด " + (k + 1))]];
+  data.players.forEach((p, r) => rows.push([p.no || "", r + 1, p.name, p.score, p.ok, p.speed, ...D.Q.map((q, i) => { const a = p.ans[i]; if (!a) return ""; if (q.kind === "poll") return q.opts[a.c]; if (q.kind === "type") return (a.r ? "ถูก " : "ผิด ") + a.t; return a.r ? "ถูก" : "ผิด " + LETTERS[a.c]; }), ...(p.ref ? [p.ref.a1, p.ref.a2, p.ref.a3] : ["", "", ""])]));
   const s = "﻿" + rows.map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(",")).join("\n");
   const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([s], { type: "text/csv" })); a.download = "รายงานผลเกม-สัปดาห์3-" + pin + ".csv"; a.click();
 }

@@ -39,6 +39,8 @@ h1{font-size:23px;line-height:1.35}
 .sc{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;margin-top:8px}
 .sc div{border:2px solid var(--ink);border-radius:16px;padding:8px;background:#fff}
 .sc small{display:block;font-size:13px;font-weight:700;color:#776}.sc b{font:700 22px Mali}
+textarea{font:600 16px Sarabun;padding:10px 12px;border-radius:16px;border:3px solid var(--ink);width:100%;min-height:84px;resize:vertical}
+.rq{font:600 16px Mali;margin-bottom:6px}
 .me{position:fixed;left:0;right:0;bottom:0;background:var(--ink);color:#fff;display:flex;align-items:center;gap:10px;padding:5px 14px;font-weight:700;font-size:15px}
 .me .sp{flex:1}
 </style></head><body class="paws">
@@ -48,7 +50,7 @@ h1{font-size:23px;line-height:1.35}
  <h1>เกมสินค้าราคาถูกจากจีน</h1><div class="sub">เหตุการณ์ปัจจุบัน 2 สัปดาห์ที่ 3</div>
  <div class="card box">
   <input id="pin" inputmode="numeric" maxlength="6" placeholder="รหัสเกม 6 หลัก">
-  <input id="name" maxlength="30" placeholder="ชื่อเล่น และเลขที่ เช่น ต้น 12">
+  <div style="display:grid;grid-template-columns:1fr 96px;gap:8px"><input id="name" maxlength="30" placeholder="ชื่อเล่น"><input id="no" inputmode="numeric" maxlength="2" placeholder="เลขที่"></div>
   <div class="mali" style="text-align:left">เลือกแมวของตัวเอง</div>
   <div class="pick" id="pick"></div>
   <button class="btn" onclick="join()">เข้าเกม</button>
@@ -73,6 +75,12 @@ h1{font-size:23px;line-height:1.35}
  </div>
 </section>
 
+<section class="scr" id="sRef">
+ <h1 style="margin-bottom:4px">สะท้อนคิดท้ายคาบ</h1><div class="sub" style="margin-bottom:12px">ตอบเป็นประโยคของตัวเอง ข้อละ 1–3 บรรทัด</div>
+ <div id="refQ" style="display:flex;flex-direction:column;gap:12px"></div>
+ <button class="btn" style="margin-top:14px" onclick="sendRef()">ส่งคำตอบ</button>
+ <div class="err" id="rerr"></div>
+</section>
 <section class="scr c" id="sRes"><div class="card res" id="res"></div></section>
 
 <div class="me" id="me" style="display:none"><span id="meAv"></span><span id="meName"></span><span class="sp"></span><span id="meScore"></span></div>
@@ -87,18 +95,19 @@ function drawPick() { $("pick").innerHTML = AV_NAMES.map((n, i) => `<button clas
 drawPick();
 
 async function join() {
-  const p = $("pin").value.trim(), n = $("name").value.trim(), e = $("jerr");
-  if (!p || !n) { e.textContent = "กรอกรหัสเกมและชื่อให้ครบ"; return; }
+  const p = $("pin").value.trim(), n = $("name").value.trim(), no = parseInt($("no").value, 10), e = $("jerr");
+  if (!p || !n || !no) { e.textContent = "กรอกรหัสเกม ชื่อ และเลขที่ให้ครบ"; return; }
+  if (no < 1 || no > 60) { e.textContent = "เลขที่ต้องอยู่ระหว่าง 1–60"; return; }
   try {
-    const id = await rpc("k3_join", { p_pin: p, p_name: n, p_avatar: av });
-    me = { id, pin: p, name: n, av }; localStorage.setItem("k3_me", JSON.stringify(me)); answered = {};
+    const id = await rpc("k3_join", { p_pin: p, p_name: n, p_avatar: av, p_no: no });
+    me = { id, pin: p, name: n, av, no }; localStorage.setItem("k3_me", JSON.stringify(me)); answered = {};
     start();
   } catch (x) {
     e.textContent = x.message.includes("BADPIN") ? "รหัสเกมไม่ถูกต้อง หรือเกมยังไม่เปิด" : x.message.includes("DUPNAME") ? "ชื่อนี้มีคนใช้แล้ว เติมเลขที่ต่อท้าย" : "เชื่อมต่อไม่ได้ ลองใหม่อีกครั้ง";
   }
 }
 function start() {
-  $("me").style.display = "flex"; $("meName").textContent = me.name; $("meAv").innerHTML = avEl(me.av, "", "normal", "30px");
+  $("me").style.display = "flex"; $("meName").textContent = me.name + (me.no ? " เลขที่ " + me.no : ""); $("meAv").innerHTML = avEl(me.av, "", "normal", "30px");
   waitMsg("เข้าเกมแล้ว", "หาแมวของตัวเองบนจอทีวี แล้วรอครูเริ่มเกม", "walk");
   loop(); setInterval(loop, 1000);
 }
@@ -114,6 +123,7 @@ async function loop() {
   else if (g.phase === "reveal") showRes(g.qi);
   else if (g.phase === "board") showRank("คะแนนรวม");
   else if (g.phase === "end") showRank("จบเกม", true);
+  else if (g.phase === "reflect") showReflect();
 }
 function waitMsg(a, b, cls) { clearInterval(cdIv); $("wAv").innerHTML = avEl(me.av, cls || "walk", "normal", "130px"); $("wTitle").textContent = a; $("wSub").textContent = b; show("sWait"); }
 function showQ(i) {
@@ -121,7 +131,7 @@ function showQ(i) {
   if (answered[i]) { waitMsg("ส่งคำตอบแล้ว", "รอครูเฉลยบนจอทีวี"); return; }
   $("qRound").textContent = Q.cat ? Q.cat : Q.kind === "poll" ? "โพล" : Q.kind === "type" ? "พิมพ์คำตอบ" : Q.dbl ? "คะแนนสองเท่า" : "เลือกคำตอบ";
   $("qText").innerHTML = esc(Q.q).replace("______", '<span class="blank">&nbsp;</span>');
-  $("qImg").innerHTML = Q.sil ? `<div class="qimg"><img src="${Q.sil}" alt="" style="width:100%;max-height:30vh;object-fit:contain;display:block"></div>` : "";
+  $("qImg").innerHTML = Q.pair ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">${Q.pair.map((u, k) => `<div class="card" style="position:relative;padding:4px;box-shadow:none"><span class="let" style="position:absolute;left:4px;top:4px;width:30px;height:30px;font-size:15px;background:${COLORS[k]}">${LETTERS[k]}</span><img src="${u}" alt="" style="width:100%;border-radius:12px;display:block"></div>`).join("")}</div>` : Q.photo ? `<div class="qimg"><img src="${Q.photo}" alt="" style="width:100%;max-height:30vh;object-fit:contain;display:block;border-radius:14px"></div>` : Q.sil ? `<div class="qimg"><img src="${Q.sil}" alt="" style="width:100%;max-height:30vh;object-fit:contain;display:block"></div>` : "";
   if (Q.kind === "type") { $("qOpts").style.display = "none"; $("qType").style.display = "flex"; $("txt").value = ""; setTimeout(() => $("txt").focus(), 100); }
   else {
     $("qType").style.display = "none"; $("qOpts").style.display = "grid";
@@ -159,6 +169,19 @@ async function showRank(title, end) {
   r.innerHTML = avEl(me.av, m.rank <= 3 ? "jump" : "bob", "happy", "110px") + `<div class="sub">${title}</div><div class="big">อันดับ ${m.rank}</div><div class="sc"><div><small>ความถูก</small><b>${m.score_ok}</b></div><div><small>ความเร็ว</small><b>${m.score_speed}</b></div></div><div class="mali" style="font-size:20px;margin-top:6px">รวม ${m.score} คะแนน</div>${end ? '<div class="sub" style="margin-top:10px">คาบหน้าเตรียมคำถามมาถามตัวละครคนละ 1 ข้อ</div>' : ""}`;
   show("sRes");
 }
-if (me) getGame().then(g => { if (g && g.pin === me.pin && g.phase !== "end") { if (me.av == null) me.av = 0; start(); } else { localStorage.removeItem("k3_me"); me = null; } });
+let refDone = false;
+function showReflect() {
+  clearInterval(cdIv);
+  if (refDone) { waitMsg("ส่งสะท้อนคิดแล้ว", "ขอบคุณครับ ถ้าอยากแก้ไขให้รีเฟรชหน้าแล้วส่งใหม่", "jump"); return; }
+  $("refQ").innerHTML = D.reflect.map((t, k) => `<div><div class="rq">${k + 1}. ${esc(t)}</div><textarea id="ra${k}" maxlength="1000"></textarea></div>`).join("");
+  show("sRef");
+}
+async function sendRef() {
+  const a = [0, 1, 2].map(k => $("ra" + k).value.trim());
+  if (a.some(x => x.length < 5)) { $("rerr").textContent = "ตอบให้ครบทั้ง 3 ข้อ"; return; }
+  try { await rpc("k3_reflect_save", { p_player: me.id, p_a1: a[0], p_a2: a[1], p_a3: a[2] }); refDone = true; showReflect(); }
+  catch (e) { $("rerr").textContent = "ส่งไม่สำเร็จ ลองใหม่อีกครั้ง"; }
+}
+if (me) getGame().then(g => { if (g && g.pin === me.pin) { if (me.av == null) me.av = 0; start(); } else { localStorage.removeItem("k3_me"); me = null; } });
 </script>
 </body></html>
