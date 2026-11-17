@@ -68,7 +68,7 @@ input{font:600 1.6vw Sarabun;padding:.7vw 1.2vw;border-radius:.8vw;border:.2vw s
 .words span{border:.18vw solid var(--ink);background:#fff;padding:.3vw 1vw;border-radius:.6vw;font-size:1.5vw;font-weight:600}
 .words span.y{background:var(--c1);color:#fff}
 .fast{padding:1.2vw;text-align:center;display:flex;flex-direction:column;align-items:center;gap:.4vw;height:100%;justify-content:center}
-.fast h3{font:500 1.4vw Mitr}
+.fast h3{font:500 1.4vw Mitr;margin-bottom:2.5vw}
 .fast .nm{font:600 1.9vw Mitr}.fast .sec{font-size:1.3vw;font-weight:600;color:#666}
 .exp{padding:1vw 1.6vw;font-size:1.5vw;line-height:1.5;margin-top:1.2vw}
 .exp b{font-family:Mitr;font-weight:500;color:var(--c0)}.exp .src{font-size:1.05vw;color:#777;margin-top:.3vw}
@@ -265,7 +265,7 @@ async function doReveal() {
 async function board() {
   await rpc("k3_teacher", { p_code: code, p_action: "board" });
   players = await getPlayers(pin);
-  const top = players.slice(0, 6), mx = Math.max(1, players[0] ? players[0].score : 1);
+  const top = players.slice(0, 5), mx = Math.max(1, players[0] ? players[0].score : 1);
   $("lanes").innerHTML = top.map((p, i) => `<div class="lane" style="animation-delay:${i * .08}s"><span class="rk">${i + 1}</span><span class="nm">${esc(p.name)}</span><div class="rt"><div class="runner" id="run${i}" style="left:${lastBoard[p.id] || 0}%">${avEl(p.avatar, "walk", "happy", "4.6vw")}</div></div><div class="sc"><b>${p.score}</b><small>ถูก ${p.score_ok} เร็ว ${p.score_speed}</small></div></div>`).join("");
   show("sB"); Music.play("lobby");
   setTimeout(() => top.forEach((p, i) => { const pos = p.score / mx * 86; lastBoard[p.id] = pos; $("run" + i).style.left = pos + "%"; }), 300);
@@ -283,7 +283,7 @@ async function nextStep() {
 async function finish() {
   await rpc("k3_teacher", { p_code: code, p_action: "end" });
   players = await getPlayers(pin);
-  const p = players, ord = [1, 0, 2], hts = { 0: 20, 1: 14, 2: 10 }, cols = { 0: "var(--c2)", 1: "var(--c3)", 2: "var(--c0)" };
+  const p = players, ord = [1, 0, 2], hts = { 0: 15, 1: 10, 2: 7 }, cols = { 0: "var(--c2)", 1: "var(--c3)", 2: "var(--c0)" };
   $("pod").innerHTML = ord.map(i => p[i] ? `<div>${avEl(p[i].avatar, "jump", "happy", i === 0 ? "9vw" : "7vw")}<div class="nm">${esc(p[i].name)}</div><div class="sc">${p[i].score} คะแนน<br>ถูก ${p[i].score_ok} เร็ว ${p[i].score_speed}</div><div class="st" style="height:${hts[i]}vw;background:${cols[i]}">${i + 1}</div></div>` : "").join("");
   show("sEnd"); Music.stop(); Music.fanfare(); confetti();
 }
