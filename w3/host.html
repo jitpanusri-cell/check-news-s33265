@@ -48,7 +48,7 @@ input{font:600 1.6vw Sarabun;padding:.7vw 1.2vw;border-radius:2vw;border:.2vw so
 .track i{display:block;height:100%;background:var(--c1);transition:width .25s linear,background .3s}
 .tnum{font:700 2.6vw Mali;width:4.5vw;text-align:right}
 .qbody{display:flex;gap:1.4vw}
-.qimg{flex:none;width:30vw;padding:.6vw}.qimg svg,.qimg img{width:100%;display:block;border-radius:1.2vw}
+.qimg{flex:none;width:26vw;padding:.6vw}.qimg svg,.qimg img{width:100%;display:block;border-radius:1.2vw}
 .opts{display:grid;grid-template-columns:1fr 1fr;gap:1.1vw;flex:1}
 .qbody.img .opts{grid-template-columns:1fr}
 .opt{display:flex;align-items:center;gap:1.2vw;padding:.9vw 1.4vw;font-size:1.9vw;font-weight:800;min-height:5.6vw;background:#fff;border:.2vw solid var(--ink);border-radius:3vw;box-shadow:0 .35vw 0 var(--ink);animation:slide .4s backwards}
@@ -241,7 +241,7 @@ function startGame() { clearInterval(poll); showPart(0); }
 async function showPart(i) {
   pi = i; ii = 0; const p = P[i];
   await T("intro");
-  $("pNo").textContent = i === 0 ? "เริ่มกันเลย" : "พาร์ท " + i + " จาก " + (P.length - 1);
+  $("pNo").textContent = i === 0 ? "ก่อนเริ่ม" : "พาร์ท " + i + " จาก " + (P.length - 1);
   $("pTitle").textContent = p.title.replace(/^พาร์ท \d+ /, "");
   $("pSub").textContent = p.sub;
   $("pCats").innerHTML = parade("5vw");
