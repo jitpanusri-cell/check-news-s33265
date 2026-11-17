@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>รายงานผลเกม สัปดาห์ที่ 3</title>
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@600;700&family=Sarabun:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#2b2540;--c0:#ff7a8a;--c1:#3cb6a0;--c2:#ffa94d;--c3:#8a7dff}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Sarabun,sans-serif;color:var(--ink);background-size:80px 80px;padding:24px}
+h1,h2,.mali{font-family:Mali,Sarabun,sans-serif;font-weight:700}
+.wrap{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.card{background:#fff;border:3px solid var(--ink);border-radius:20px;box-shadow:0 5px 0 var(--ink);padding:18px 22px}
+.head{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.head img{width:56px;height:56px;object-fit:contain}
+.sp{flex:1}
+.btn{font:700 15px Mali;background:var(--c0);color:#fff;border:3px solid var(--ink);border-radius:30px;padding:6px 18px;box-shadow:0 3px 0 var(--ink);cursor:pointer}
+.btn.w{background:#fff;color:var(--ink)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.stat{text-align:center}.stat small{display:block;font-weight:700;color:#776}.stat b{font:700 30px Mali}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{background:#ffe3e8;font-weight:800;padding:7px 6px;border-bottom:2px solid var(--ink);text-align:center;white-space:nowrap}
+td{padding:6px;border-bottom:1px solid #eee;text-align:center;vertical-align:middle}
+td.l,th.l{text-align:left}
+.dot{display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid var(--ink)}
+.dot.y{background:var(--c1)}.dot.n{background:var(--c0)}.dot.x{background:#eee;border-color:#ccc}
+.bar{height:12px;background:#f3ece4;border-radius:8px;overflow:hidden;min-width:120px}.bar i{display:block;height:100%;background:var(--c1)}
+.poll{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}.poll span{background:#f3ece4;border-radius:10px;padding:1px 8px;font-weight:700;font-size:13px}
+.av{vertical-align:middle}
+.login{max-width:420px;margin:60px auto;text-align:center;display:flex;flex-direction:column;gap:12px}
+input,select{font:600 16px Sarabun;padding:8px 14px;border-radius:30px;border:3px solid var(--ink)}
+.scroll{overflow-x:auto}
+@media print{body{background:none;padding:0}.noprint{display:none}.card{box-shadow:none;border-width:1px;break-inside:avoid}}
+</style></head><body class="paws">
+<div class="wrap" id="app"></div>
+<script src="common.js"></script><script src="data.js"></script>
+<script>
+const D = window.K3, $ = id => document.getElementById(id);
+let code = sessionStorage.getItem("k3_code") || "", pin = new URLSearchParams(location.search).get("pin") || "", data = null;
+const KIND = { practice: "ตัวอย่าง", choice: "เลือกตอบ", type: "พิมพ์คำ", poll: "โพล" };
+const scored = D.Q.map((q, i) => i).filter(i => D.Q[i].kind === "choice" || D.Q[i].kind === "type");
+function loginView(msg) {
+  $("app").innerHTML = `<div class="card login">${avEl(0, "bob", "normal", "90px").replace('class="av', 'style="margin:0 auto" class="av')}<h2>รายงานผลเกม สัปดาห์ที่ 3</h2><input id="code" type="password" placeholder="รหัสครู"><button class="btn" onclick="code=$('code').value.trim();sessionStorage.setItem('k3_code',code);load()">เปิดรายงาน</button><div style="color:#d00;font-weight:700">${msg || ""}</div></div>`;
+}
+async function load() {
+  try { data = await rpc("k3_report", { p_code: code, p_pin: pin || "" }); }
+  catch (e) { return loginView(e.message.includes("BADCODE") ? "รหัสครูไม่ถูกต้อง" : "เชื่อมต่อไม่ได้"); }
+  if (!pin && data.games.length) { pin = data.games[0].pin; return load(); }
+  render();
+}
+function render() {
+  const pl = data.players, n = pl.length, g = data.games.find(x => x.pin === pin);
+  const avg = n ? Math.round(pl.reduce((a, p) => a + p.score, 0) / n) : 0;
+  const nOk = p => scored.filter(i => p.ans[i] && p.ans[i].r).length;
+  const avgOk = n ? (pl.reduce((a, p) => a + nOk(p), 0) / n).toFixed(1) : 0;
+  const when = g ? new Date(g.at).toLocaleString("th-TH", { dateStyle: "medium", timeStyle: "short" }) : "";
+  let h = `<div class="card head"><img src="../emblem.png" alt=""><div><div class="mali" style="font-size:14px">${esc(D.course)}</div><h1 style="font-size:22px">รายงานผลเกม ${esc(D.title)}</h1><div style="font-weight:600;color:#776">รหัสเกม ${esc(pin)} ${when}</div></div><span class="sp"></span>
+   <div class="noprint" style="display:flex;gap:8px;align-items:center"><select onchange="pin=this.value;load()">${data.games.map(x => `<option value="${x.pin}" ${x.pin === pin ? "selected" : ""}>${new Date(x.at).toLocaleString("th-TH", { dateStyle: "short", timeStyle: "short" })} (${x.n} คน)</option>`).join("")}</select>
+   <button class="btn w" onclick="csv()">ดาวน์โหลด CSV</button><button class="btn" onclick="print()">พิมพ์</button></div></div>`;
+  h += `<div class="card stats"><div class="stat"><small>นักเรียนที่เล่น</small><b>${n}</b></div><div class="stat"><small>คะแนนเฉลี่ย</small><b>${avg}</b></div><div class="stat"><small>ตอบถูกเฉลี่ย</small><b>${avgOk}/${scored.length}</b></div><div class="stat"><small>คะแนนสูงสุด</small><b>${n ? pl[0].score : 0}</b></div></div>`;
+  // รายข้อ
+  h += `<div class="card"><h2 style="font-size:19px;margin-bottom:10px">ผลรายข้อ</h2><div class="scroll"><table><tr><th>ข้อ</th><th class="l">คำถาม</th><th>ประเภท</th><th>ตอบ</th><th>ผล</th></tr>`;
+  D.Q.forEach((q, i) => {
+    const a = pl.map(p => p.ans[i]).filter(Boolean); let res = "";
+    if (q.kind === "poll") res = `<div class="poll">${q.opts.map((o, k) => `<span>${esc(o)} ${a.filter(x => x.c === k).length}</span>`).join("")}</div>`;
+    else { const ok = a.filter(x => x.r).length, pc = a.length ? Math.round(ok / a.length * 100) : 0; res = `<div style="display:flex;gap:8px;align-items:center;justify-content:center"><div class="bar"><i style="width:${pc}%"></i></div><b>${pc}%</b><small>(${ok}/${a.length})</small></div>`; }
+    h += `<tr><td>${i + 1}</td><td class="l">${esc(q.q)}</td><td>${KIND[q.kind]}</td><td>${a.length}</td><td>${res}</td></tr>`;
+  });
+  h += `</table></div></div>`;
+  // รายคน
+  h += `<div class="card"><h2 style="font-size:19px;margin-bottom:10px">ผลรายคน</h2><div class="scroll"><table><tr><th>อันดับ</th><th class="l">ชื่อ</th><th>รวม</th><th>ความถูก</th><th>ความเร็ว</th><th>ถูก</th>${scored.map(i => `<th>ข้อ ${i + 1}</th>`).join("")}<th class="l">คำที่พิมพ์</th></tr>`;
+  pl.forEach((p, r) => {
+    h += `<tr><td><b>${r + 1}</b></td><td class="l" style="white-space:nowrap">${avEl(p.avatar, "", "normal", "26px")} ${esc(p.name)}</td><td><b>${p.score}</b></td><td>${p.ok}</td><td>${p.speed}</td><td>${nOk(p)}/${scored.length}</td>` +
+      scored.map(i => { const a = p.ans[i]; return `<td><span class="dot ${a ? (a.r ? "y" : "n") : "x"}" title="${a ? (a.t ? esc(a.t) + " " : "") + a.s + " วินาที" : "ไม่ได้ตอบ"}"></span></td>`; }).join("") +
+      `<td class="l" style="font-size:13px;color:#665">${D.Q.map((q, i) => q.kind === "type" && p.ans[i] ? esc(p.ans[i].t) : "").filter(Boolean).join(", ")}</td></tr>`;
+  });
+  h += `</table></div><div style="margin-top:8px;font-size:13px;color:#776"><span class="dot y"></span> ถูก <span class="dot n"></span> ผิด <span class="dot x"></span> ไม่ได้ตอบ</div></div>`;
+  $("app").innerHTML = h;
+}
+function csv() {
+  const rows = [["อันดับ", "ชื่อ", "คะแนนรวม", "ความถูก", "ความเร็ว", ...D.Q.map((q, i) => "ข้อ " + (i + 1) + " " + KIND[q.kind])]];
+  data.players.forEach((p, r) => rows.push([r + 1, p.name, p.score, p.ok, p.speed, ...D.Q.map((q, i) => { const a = p.ans[i]; if (!a) return ""; if (q.kind === "poll") return q.opts[a.c]; if (q.kind === "type") return (a.r ? "ถูก " : "ผิด ") + a.t; return a.r ? "ถูก" : "ผิด " + LETTERS[a.c]; })]));
+  const s = "﻿" + rows.map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(",")).join("\n");
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([s], { type: "text/csv" })); a.download = "รายงานผลเกม-สัปดาห์3-" + pin + ".csv"; a.click();
+}
+code ? load() : loginView();
+</script>
+</body></html>

@@ -1,55 +1,55 @@
 <!DOCTYPE html>
 <html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <title>เกมสัปดาห์ที่ 3 สินค้าราคาถูกจากจีน</title>
-<link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Sarabun:wght@400;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@500;600;700&family=Sarabun:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
-:root{--ink:#1d2340;--cream:#fff7ec;--c0:#ff6b4a;--c1:#14a89a;--c2:#f5a524;--c3:#5b6cff}
+:root{--ink:#2b2540;--c0:#ff7a8a;--c1:#3cb6a0;--c2:#ffa94d;--c3:#8a7dff}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:Sarabun,sans-serif;color:var(--ink);background:var(--cream);background-image:radial-gradient(#f1dfc6 1.2px,transparent 1.2px);background-size:18px 18px;min-height:100vh;min-height:100dvh}
-h1,h2,.mitr{font-family:Mitr,Sarabun,sans-serif;font-weight:600}
-.scr{display:none;min-height:100vh;min-height:100dvh;flex-direction:column;padding:16px 16px 60px}
+body{font-family:Sarabun,sans-serif;color:var(--ink);min-height:100vh;min-height:100dvh;background-size:80px 80px}
+h1,h2,.mali{font-family:Mali,Sarabun,sans-serif;font-weight:700}
+.scr{display:none;min-height:100vh;min-height:100dvh;flex-direction:column;padding:16px 16px 64px}
 .scr.on{display:flex}
 .c{align-items:center;justify-content:center;text-align:center;gap:12px}
-.card{background:#fff;border:3px solid var(--ink);border-radius:16px;box-shadow:5px 5px 0 var(--ink)}
+.card{background:#fff;border:3px solid var(--ink);border-radius:20px;box-shadow:0 5px 0 var(--ink)}
 .box{padding:18px;width:100%;max-width:400px;display:flex;flex-direction:column;gap:12px}
-input{font:700 19px Sarabun;padding:12px;border-radius:12px;border:3px solid var(--ink);text-align:center;width:100%;background:#fff}
+input{font:700 19px Sarabun;padding:12px;border-radius:30px;border:3px solid var(--ink);text-align:center;width:100%;background:#fff}
 input:focus{outline:none;border-color:var(--c3)}
-.btn{font:500 19px Mitr;background:var(--c0);color:#fff;border:3px solid var(--ink);border-radius:12px;padding:11px;box-shadow:4px 4px 0 var(--ink);cursor:pointer}
-.btn:active{transform:translate(3px,3px);box-shadow:none}
-.btn:disabled{opacity:.4}
+.btn{font:700 19px Mali;background:var(--c0);color:#fff;border:3px solid var(--ink);border-radius:30px;padding:11px;box-shadow:0 4px 0 var(--ink);cursor:pointer}
+.btn:active{transform:translateY(3px);box-shadow:none}
 .err{color:#d00;font-weight:700;min-height:20px;font-size:15px}
-h1{font-size:23px;line-height:1.3}
-.sub{font-size:15px;color:#555;font-weight:600}
+h1{font-size:23px;line-height:1.35}
+.sub{font-size:15px;color:#665;font-weight:600}
 .pick{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.pick button{background:#fff;border:3px solid #ddd;border-radius:14px;padding:6px 2px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;font:600 11px Sarabun;color:var(--ink);cursor:pointer}
-.pick button.on{border-color:var(--ink);background:#fff4cf;box-shadow:3px 3px 0 var(--ink)}
+.pick button{background:#fff;border:3px solid #eee;border-radius:16px;padding:6px 2px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;font:600 11px Sarabun;color:var(--ink);cursor:pointer}
+.pick button.on{border-color:var(--ink);background:#ffe3e8;box-shadow:0 3px 0 var(--ink)}
 .bar{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:700;margin-bottom:10px;gap:8px}
-.chip{background:var(--ink);color:var(--cream);padding:3px 10px;border-radius:20px;font-family:Mitr;font-weight:500}
-.track{height:10px;border:2px solid var(--ink);border-radius:10px;background:#fff;overflow:hidden;margin-bottom:10px}
+.chip{background:var(--ink);color:#fff;padding:3px 12px;border-radius:20px;font-family:Mali}
+.track{height:12px;border:2px solid var(--ink);border-radius:10px;background:#fff;overflow:hidden;margin-bottom:10px}
 .track i{display:block;height:100%;background:var(--c1);transition:width .3s linear}
-.q{padding:14px;font:500 17px Mitr;line-height:1.45;margin-bottom:12px}
-.q .blank{display:inline-block;min-width:70px;border-bottom:3px solid var(--c3)}
+.q{padding:14px;font:600 17px Mali;line-height:1.5;margin-bottom:12px}
+.q .blank{display:inline-block;min-width:70px;border-bottom:3px dashed var(--c3)}
+.qimg{width:100%;max-width:260px;margin:0 auto 10px;display:block}.qimg svg{width:100%;border-radius:14px;display:block}
 .grid{display:grid;grid-template-columns:1fr;gap:10px}
-.o{display:flex;align-items:center;gap:12px;background:#fff;border:3px solid var(--ink);border-radius:14px;padding:12px;font:700 17px Sarabun;color:var(--ink);text-align:left;box-shadow:4px 4px 0 var(--ink);cursor:pointer;min-height:64px}
-.o:active{transform:translate(3px,3px);box-shadow:none}
-.let{flex:none;width:40px;height:40px;border-radius:50%;border:3px solid var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font:600 20px Mitr}
+.o{display:flex;align-items:center;gap:12px;background:#fff;border:3px solid var(--ink);border-radius:40px;padding:10px 14px 10px 10px;font:700 17px Sarabun;color:var(--ink);text-align:left;box-shadow:0 4px 0 var(--ink);cursor:pointer;min-height:62px}
+.o:active{transform:translateY(3px);box-shadow:none}
+.let{flex:none;width:40px;height:40px;border-radius:50%;border:3px solid var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font:700 20px Mali}
 .res{padding:20px;width:100%;max-width:400px;display:flex;flex-direction:column;align-items:center;gap:6px}
-.res .big{font:600 44px Mitr;line-height:1.1}
+.res .big{font:700 42px Mali;line-height:1.15}
 .res.ok .big{color:var(--c1)}.res.no .big{color:var(--c0)}
 .sc{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;margin-top:8px}
-.sc div{border:2px solid var(--ink);border-radius:12px;padding:8px;background:#fff}
-.sc small{display:block;font-size:13px;font-weight:700;color:#666}.sc b{font:600 22px Mitr}
-.me{position:fixed;left:0;right:0;bottom:0;background:var(--ink);color:#fff;display:flex;align-items:center;gap:10px;padding:6px 14px;font-weight:700;font-size:15px}
+.sc div{border:2px solid var(--ink);border-radius:16px;padding:8px;background:#fff}
+.sc small{display:block;font-size:13px;font-weight:700;color:#776}.sc b{font:700 22px Mali}
+.me{position:fixed;left:0;right:0;bottom:0;background:var(--ink);color:#fff;display:flex;align-items:center;gap:10px;padding:5px 14px;font-weight:700;font-size:15px}
 .me .sp{flex:1}
-</style></head><body>
+</style></head><body class="paws">
 
 <section class="scr on c" id="sJoin">
- <img src="../emblem.png" style="width:64px;height:64px;object-fit:contain" alt="">
+ <img src="../emblem.png" style="width:60px;height:60px;object-fit:contain" alt="">
  <h1>เกมสินค้าราคาถูกจากจีน</h1><div class="sub">เหตุการณ์ปัจจุบัน 2 สัปดาห์ที่ 3</div>
  <div class="card box">
   <input id="pin" inputmode="numeric" maxlength="6" placeholder="รหัสเกม 6 หลัก">
   <input id="name" maxlength="30" placeholder="ชื่อเล่น และเลขที่ เช่น ต้น 12">
-  <div class="mitr" style="font-weight:500;text-align:left">เลือกตัวละคร</div>
+  <div class="mali" style="text-align:left">เลือกแมวของตัวเอง</div>
   <div class="pick" id="pick"></div>
   <button class="btn" onclick="join()">เข้าเกม</button>
   <div class="err" id="jerr"></div>
@@ -58,13 +58,14 @@ h1{font-size:23px;line-height:1.3}
 
 <section class="scr c" id="sWait">
  <div id="wAv"></div>
- <h1 id="wTitle">เข้าเกมแล้ว</h1><div class="sub" id="wSub">ดูตัวละครของตัวเองบนจอทีวี แล้วรอครูเริ่มเกม</div>
+ <h1 id="wTitle">เข้าเกมแล้ว</h1><div class="sub" id="wSub"></div>
 </section>
 
 <section class="scr" id="sQ">
  <div class="bar"><span class="chip" id="qRound"></span><span id="qTime"></span></div>
  <div class="track"><i id="tb"></i></div>
  <div class="card q" id="qText"></div>
+ <div id="qImg"></div>
  <div class="grid" id="qOpts"></div>
  <div id="qType" style="display:none;flex-direction:column;gap:10px">
   <input id="txt" maxlength="40" placeholder="พิมพ์คำที่หายไป" autocomplete="off">
@@ -82,7 +83,7 @@ const D = window.K3; const $ = id => document.getElementById(id);
 let me = JSON.parse(localStorage.getItem("k3_me") || "null"), lastKey = "", answered = {}, qShownAt = 0, cdIv, curQ = -1, av = Math.random() * 8 | 0;
 const sp = new URLSearchParams(location.search); if (sp.get("pin")) $("pin").value = sp.get("pin");
 const show = id => document.querySelectorAll(".scr").forEach(s => s.classList.toggle("on", s.id === id));
-function drawPick() { $("pick").innerHTML = AV_NAMES.map((n, i) => `<button class="${i === av ? "on" : ""}" onclick="av=${i};drawPick()">${avEl(i, i === av ? "bob" : "", i === av ? "happy" : "normal", "52px")}<span>${n}</span></button>`).join(""); }
+function drawPick() { $("pick").innerHTML = AV_NAMES.map((n, i) => `<button class="${i === av ? "on" : ""}" onclick="av=${i};drawPick()">${avEl(i, i === av ? "bob" : "", i === av ? "happy" : "normal", "54px")}<span>${n}</span></button>`).join(""); }
 drawPick();
 
 async function join() {
@@ -98,7 +99,7 @@ async function join() {
 }
 function start() {
   $("me").style.display = "flex"; $("meName").textContent = me.name; $("meAv").innerHTML = avEl(me.av, "", "normal", "30px");
-  waitMsg("เข้าเกมแล้ว", "ดูตัวละครของตัวเองบนจอทีวี แล้วรอครูเริ่มเกม", "bob");
+  waitMsg("เข้าเกมแล้ว", "หาแมวของตัวเองบนจอทีวี แล้วรอครูเริ่มเกม", "walk");
   loop(); setInterval(loop, 1000);
 }
 async function loop() {
@@ -106,18 +107,21 @@ async function loop() {
   if (!g) return;
   if (g.pin !== me.pin) { if (g.pin) { localStorage.removeItem("k3_me"); location.href = location.pathname; } return; }
   const key = g.phase + ":" + g.qi; if (key === lastKey) return; lastKey = key;
-  if (g.phase === "lobby") waitMsg("เข้าเกมแล้ว", "ดูตัวละครของตัวเองบนจอทีวี แล้วรอครูเริ่มเกม", "bob");
+  if (g.phase === "lobby") waitMsg("เข้าเกมแล้ว", "หาแมวของตัวเองบนจอทีวี แล้วรอครูเริ่มเกม", "walk");
+  else if (g.phase === "intro") waitMsg("เตรียมตัว", "ดูหัวข้อบนจอทีวี ข้อแรกกำลังจะมา", "jump");
+  else if (g.phase === "summary") waitMsg("สรุปพาร์ทนี้", "อ่านสรุปบนจอทีวี", "bob");
   else if (g.phase === "question") showQ(g.qi);
   else if (g.phase === "reveal") showRes(g.qi);
   else if (g.phase === "board") showRank("คะแนนรวม");
   else if (g.phase === "end") showRank("จบเกม", true);
 }
-function waitMsg(a, b, cls) { clearInterval(cdIv); $("wAv").innerHTML = avEl(me.av, cls || "walk", "normal", "120px"); $("wTitle").textContent = a; $("wSub").textContent = b; show("sWait"); }
+function waitMsg(a, b, cls) { clearInterval(cdIv); $("wAv").innerHTML = avEl(me.av, cls || "walk", "normal", "130px"); $("wTitle").textContent = a; $("wSub").textContent = b; show("sWait"); }
 function showQ(i) {
   const Q = D.Q[i]; clearInterval(cdIv); curQ = i;
-  if (answered[i]) { waitMsg("ส่งคำตอบแล้ว", "รอครูเฉลยบนจอ"); return; }
-  $("qRound").textContent = "ข้อ " + (i + 1) + (Q.kind === "poll" ? " โพล" : Q.dbl ? " คะแนนสองเท่า" : "");
+  if (answered[i]) { waitMsg("ส่งคำตอบแล้ว", "รอครูเฉลยบนจอทีวี"); return; }
+  $("qRound").textContent = Q.kind === "poll" ? "โพล" : Q.kind === "type" ? "พิมพ์คำตอบ" : Q.dbl ? "คะแนนสองเท่า" : "เลือกคำตอบ";
   $("qText").innerHTML = esc(Q.q).replace("______", '<span class="blank">&nbsp;</span>');
+  $("qImg").innerHTML = Q.img ? `<div class="qimg">${Q.img}</div>` : "";
   if (Q.kind === "type") { $("qOpts").style.display = "none"; $("qType").style.display = "flex"; $("txt").value = ""; setTimeout(() => $("txt").focus(), 100); }
   else {
     $("qType").style.display = "none"; $("qOpts").style.display = "grid";
@@ -128,7 +132,7 @@ function showQ(i) {
   cd(); cdIv = setInterval(cd, 250); show("sQ");
 }
 async function send(i, choice, txt) {
-  answered[i] = true; waitMsg("ส่งคำตอบแล้ว", "รอครูเฉลยบนจอ");
+  answered[i] = true; waitMsg("ส่งคำตอบแล้ว", "รอครูเฉลยบนจอทีวี");
   try { const r = await rpc("k3_answer", { p_player: me.id, p_qi: i, p_choice: choice, p_txt: txt }); if (r === "CLOSED" || r === "LATE") waitMsg("หมดเวลา", "รอข้อถัดไป", "sad"); } catch (e) { waitMsg("ส่งไม่สำเร็จ", "รอข้อถัดไป", "sad"); }
 }
 function sendTxt() { const v = $("txt").value.trim(); if (v) send(curQ, null, v); }
@@ -138,12 +142,13 @@ async function showRes(i) {
   $("meScore").textContent = m.score + " คะแนน";
   const r = $("res");
   if (Q.kind === "poll") { r.className = "card res"; r.innerHTML = avEl(me.av, "bob", "happy", "110px") + `<h1>${m.answered ? "ขอบคุณที่ตอบ" : "ข้อนี้ไม่ได้ตอบ"}</h1><div class="sub">ดูผลของทั้งห้องบนจอทีวี</div>`; }
+  else if (m.correct && Q.kind === "practice") { r.className = "card res ok"; r.innerHTML = avEl(me.av, "jump", "happy", "120px") + `<div class="big">ถูก</div><div class="sub">ตอบใน ${m.sec} วินาที</div>`; }
   else if (m.correct) {
     r.className = "card res ok";
     r.innerHTML = avEl(me.av, "jump", "happy", "120px") + `<div class="big">ถูก</div><div class="sub">ตอบใน ${m.sec} วินาที</div><div class="sc"><div><small>ความถูก</small><b>+${m.pts_ok}</b></div><div><small>ความเร็ว</small><b>+${m.pts_speed}</b></div></div><div class="sub" style="margin-top:6px">ตอนนี้อันดับที่ ${m.rank}</div>`;
   } else {
     r.className = "card res no";
-    r.innerHTML = avEl(me.av, "sad", "sad", "110px") + `<div class="big">${m.answered ? "ยังไม่ถูก" : "หมดเวลา"}</div>${Q.kind === "type" ? `<div style="font-weight:700">คำตอบคือ ${esc(Q.ans)}</div>` : ""}<div class="sub">ข้อหน้าเอาใหม่ ตอนนี้อันดับที่ ${m.rank}</div>`;
+    r.innerHTML = avEl(me.av, "sad", "sad", "110px") + `<div class="big">${m.answered ? "ยังไม่ถูก" : "หมดเวลา"}</div>${Q.kind === "type" ? `<div style="font-weight:700">คำตอบคือ ${esc(Q.ans)}</div>` : ""}<div class="sub">ข้อหน้าเอาใหม่${Q.kind === "practice" ? "" : " ตอนนี้อันดับที่ " + m.rank}</div>`;
   }
   show("sRes");
 }
@@ -151,7 +156,7 @@ async function showRank(title, end) {
   const m = await rpc("k3_mine", { p_player: me.id, p_qi: -1 });
   $("meScore").textContent = m.score + " คะแนน";
   const r = $("res"); r.className = "card res";
-  r.innerHTML = avEl(me.av, m.rank <= 3 ? "jump" : "bob", "happy", "110px") + `<div class="sub">${title}</div><div class="big">อันดับ ${m.rank}</div><div class="sc"><div><small>ความถูก</small><b>${m.score_ok}</b></div><div><small>ความเร็ว</small><b>${m.score_speed}</b></div></div><div class="mitr" style="font-size:20px;margin-top:6px">รวม ${m.score} คะแนน</div>${end ? '<div class="sub" style="margin-top:10px">คาบหน้าเตรียมคำถามมาถามตัวละครคนละ 1 ข้อ</div>' : ""}`;
+  r.innerHTML = avEl(me.av, m.rank <= 3 ? "jump" : "bob", "happy", "110px") + `<div class="sub">${title}</div><div class="big">อันดับ ${m.rank}</div><div class="sc"><div><small>ความถูก</small><b>${m.score_ok}</b></div><div><small>ความเร็ว</small><b>${m.score_speed}</b></div></div><div class="mali" style="font-size:20px;margin-top:6px">รวม ${m.score} คะแนน</div>${end ? '<div class="sub" style="margin-top:10px">คาบหน้าเตรียมคำถามมาถามตัวละครคนละ 1 ข้อ</div>' : ""}`;
   show("sRes");
 }
 if (me) getGame().then(g => { if (g && g.pin === me.pin && g.phase !== "end") { if (me.av == null) me.av = 0; start(); } else { localStorage.removeItem("k3_me"); me = null; } });

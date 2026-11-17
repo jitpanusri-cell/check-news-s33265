@@ -1,103 +1,120 @@
 <!DOCTYPE html>
 <html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>จอทีวี เกมสัปดาห์ที่ 3</title>
-<link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Sarabun:wght@400;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@500;600;700&family=Sarabun:wght@400;600;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <style>
-:root{--ink:#1d2340;--cream:#fff7ec;--c0:#ff6b4a;--c1:#14a89a;--c2:#f5a524;--c3:#5b6cff}
+:root{--ink:#2b2540;--cream:#fff6ee;--c0:#ff7a8a;--c1:#3cb6a0;--c2:#ffa94d;--c3:#8a7dff}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Sarabun,sans-serif;color:var(--ink);background:var(--cream);background-image:radial-gradient(#f1dfc6 1.2px,transparent 1.2px);background-size:1.6vw 1.6vw;min-height:100vh;overflow:hidden}
-h1,h2,.mitr{font-family:Mitr,Sarabun,sans-serif;font-weight:600}
-.scr{display:none;height:100vh;flex-direction:column;padding:1.6vw 2.6vw}
+body{font-family:Sarabun,sans-serif;color:var(--ink);min-height:100vh;overflow:hidden;background-size:7vw 7vw}
+h1,h2,h3,.mali{font-family:Mali,Sarabun,sans-serif;font-weight:700}
+.scr{display:none;height:100vh;flex-direction:column;padding:1.5vw 2.6vw}
 .scr.on{display:flex}
-.card{background:#fff;border:.22vw solid var(--ink);border-radius:1.2vw;box-shadow:.45vw .45vw 0 var(--ink)}
-.top{display:flex;align-items:center;gap:1vw;font-size:1.25vw;font-weight:600}
+.card{background:#fff;border:.2vw solid var(--ink);border-radius:1.6vw;box-shadow:0 .5vw 0 var(--ink)}
+.top{display:flex;align-items:center;gap:1vw;font-size:1.25vw;font-weight:600;min-height:3.2vw}
 .top img{width:3vw;height:3vw;object-fit:contain}
-.chip{background:var(--ink);color:var(--cream);padding:.3vw 1.1vw;border-radius:2vw;font-family:Mitr;font-weight:500}
+.chip{background:var(--ink);color:#fff;padding:.3vw 1.2vw;border-radius:2vw;font-family:Mali;font-weight:600}
 .chip.alt{background:#fff;color:var(--ink);border:.15vw solid var(--ink)}
 .sp{flex:1}
-.btn{font:500 1.5vw Mitr;background:var(--c0);color:#fff;border:.22vw solid var(--ink);border-radius:.9vw;padding:.6vw 2.2vw;box-shadow:.35vw .35vw 0 var(--ink);cursor:pointer}
-.btn:active{transform:translate(.25vw,.25vw);box-shadow:none}
-.btn.s{font-size:1vw;padding:.3vw 1vw;background:#fff;color:var(--ink);box-shadow:.2vw .2vw 0 var(--ink)}
-input{font:600 1.6vw Sarabun;padding:.7vw 1.2vw;border-radius:.8vw;border:.2vw solid var(--ink);width:22vw;text-align:center}
+.btn{font:700 1.5vw Mali;background:var(--c0);color:#fff;border:.2vw solid var(--ink);border-radius:2vw;padding:.55vw 2.4vw;box-shadow:0 .35vw 0 var(--ink);cursor:pointer}
+.btn:active{transform:translateY(.3vw);box-shadow:none}
+.btn.s{font-size:1vw;padding:.25vw 1.1vw;background:#fff;color:var(--ink);box-shadow:0 .2vw 0 var(--ink)}
+.btn.y{background:var(--c2);color:var(--ink)}
+input{font:600 1.6vw Sarabun;padding:.7vw 1.2vw;border-radius:2vw;border:.2vw solid var(--ink);width:22vw;text-align:center}
 #sLogin{align-items:center;justify-content:center;text-align:center;gap:1.2vw}
-.parade{display:flex;gap:1vw;justify-content:center;margin-bottom:.5vw}
-.lob{display:grid;grid-template-columns:auto 1fr;gap:2vw;margin-top:1.2vw;align-items:stretch}
-.join{display:flex;gap:1.6vw;align-items:center;padding:1.3vw 2vw}
-.join small{font-size:1.25vw;font-weight:600;color:#666}
-.join .url{font:600 1.9vw Mitr;color:var(--c3)}
-.pin{font:600 6.4vw Mitr;letter-spacing:.5vw;line-height:1}
-#qr img{width:13vw;height:13vw;display:block;image-rendering:pixelated}
-.lobinfo{display:flex;flex-direction:column;justify-content:space-between;padding:1.3vw 2vw}
-.lobinfo h2{font-size:2.4vw;line-height:1.25}
-.cnt{font:600 3vw Mitr}.cnt small{font:400 1.3vw Sarabun}
-.stage{flex:1;margin-top:1.5vw;position:relative;border:.22vw solid var(--ink);border-radius:1.2vw;background:linear-gradient(#fff 0 62%,#ffe7c7 62%);overflow:hidden}
-.stage .awn{position:absolute;left:0;right:0;top:0;height:2.2vw;background:repeating-linear-gradient(90deg,var(--c0) 0 4vw,#fff 4vw 8vw);border-bottom:.22vw solid var(--ink)}
+.parade{display:flex;gap:.8vw;justify-content:center}
+.lob{display:grid;grid-template-columns:auto 1fr;gap:2vw;margin-top:1vw}
+.join{display:flex;gap:1.6vw;align-items:center;padding:1.2vw 2vw}
+.join small{font-size:1.25vw;font-weight:600;color:#776}
+.join .url{font:700 1.8vw Mali;color:var(--c3)}
+.pin{font:700 6.2vw Mali;letter-spacing:.4vw;line-height:1.05}
+#qr img{width:12.5vw;height:12.5vw;display:block;image-rendering:pixelated}
+.lobinfo{display:flex;flex-direction:column;justify-content:space-between;padding:1.2vw 2vw}
+.lobinfo h2{font-size:2.3vw;line-height:1.3}
+.cnt{font:700 3vw Mali}.cnt small{font:400 1.3vw Sarabun}
+.stage{flex:1;margin-top:1.4vw;position:relative;border:.2vw solid var(--ink);border-radius:1.6vw;background:linear-gradient(#fff 0 60%,#ffe3e8 60%);overflow:hidden}
+.stage .rug{position:absolute;left:0;right:0;top:0;height:1.8vw;background:repeating-linear-gradient(90deg,var(--c0) 0 3vw,#fff 3vw 6vw);border-bottom:.2vw solid var(--ink)}
 .walker{position:absolute;display:flex;flex-direction:column;align-items:center;transition:left 3s linear}
-.walker .tag{background:var(--ink);color:#fff;font-size:1vw;font-weight:600;padding:.1vw .7vw;border-radius:1vw;margin-top:.2vw;white-space:nowrap}
-.empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.6vw;color:#999}
-.qcard{padding:1.6vw 2.6vw;margin:1.2vw 0 1vw;font:500 2.7vw Mitr;line-height:1.35;text-align:center}
-.qcard .blank{display:inline-block;min-width:11vw;border-bottom:.4vw solid var(--c3);color:var(--c3)}
+.walker .tag{background:var(--ink);color:#fff;font-size:1vw;font-weight:600;padding:.1vw .7vw;border-radius:1vw;margin-top:.1vw;white-space:nowrap}
+.empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.6vw;color:#a99}
+#sPart{align-items:center;justify-content:center;text-align:center;gap:1.4vw}
+#sPart .pno{font:700 1.8vw Mali;background:var(--c2);border:.2vw solid var(--ink);border-radius:2vw;padding:.3vw 1.6vw}
+#sPart h1{font-size:4.2vw;line-height:1.25;max-width:80vw;animation:zoom .6s cubic-bezier(.3,1.5,.5,1)}
+@keyframes zoom{from{transform:scale(.6);opacity:0}}
+.qcard{padding:1.5vw 2.6vw;margin:1vw 0;font:600 2.6vw Mali;line-height:1.4;text-align:center}
+.qcard .blank{display:inline-block;min-width:11vw;border-bottom:.4vw dashed var(--c3);color:var(--c3)}
 .tbar{display:flex;align-items:center;gap:1vw;margin-bottom:1vw}
-.track{flex:1;height:1.3vw;border:.2vw solid var(--ink);border-radius:1vw;background:#fff;overflow:hidden}
+.track{flex:1;height:1.4vw;border:.2vw solid var(--ink);border-radius:1vw;background:#fff;overflow:hidden}
 .track i{display:block;height:100%;background:var(--c1);transition:width .25s linear,background .3s}
-.tnum{font:600 2.6vw Mitr;width:4.5vw;text-align:right}
-.opts{display:grid;grid-template-columns:1fr 1fr;gap:1.2vw}
-.opt{display:flex;align-items:center;gap:1.3vw;padding:1.1vw 1.5vw;font-size:2vw;font-weight:800;min-height:6.5vw;background:#fff;border:.22vw solid var(--ink);border-radius:1.1vw;box-shadow:.35vw .35vw 0 var(--ink);animation:slide .4s backwards}
+.tnum{font:700 2.6vw Mali;width:4.5vw;text-align:right}
+.qbody{display:flex;gap:1.4vw}
+.qimg{flex:none;width:30vw;padding:.6vw}.qimg svg,.qimg img{width:100%;display:block;border-radius:1.2vw}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:1.1vw;flex:1}
+.qbody.img .opts{grid-template-columns:1fr}
+.opt{display:flex;align-items:center;gap:1.2vw;padding:.9vw 1.4vw;font-size:1.9vw;font-weight:800;min-height:5.6vw;background:#fff;border:.2vw solid var(--ink);border-radius:3vw;box-shadow:0 .35vw 0 var(--ink);animation:slide .4s backwards}
+.qbody.img .opt{min-height:4.4vw;font-size:1.7vw}
 .opt:nth-child(2){animation-delay:.08s}.opt:nth-child(3){animation-delay:.16s}.opt:nth-child(4){animation-delay:.24s}
 @keyframes slide{from{opacity:0;transform:translateY(1.5vw)}}
-.let{flex:none;width:4vw;height:4vw;border-radius:50%;border:.22vw solid var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font:600 2.1vw Mitr}
-.typebox{display:flex;align-items:center;justify-content:center;gap:2vw;padding:1.6vw;font-size:2.2vw;font-weight:800}
-.sent{margin-top:auto;display:flex;align-items:flex-end;gap:1vw;min-height:7vw}
-.sent .lbl{font:600 1.6vw Mitr;white-space:nowrap;padding-bottom:.6vw}
-.sent .row{display:flex;flex-wrap:wrap;gap:.3vw;align-items:flex-end;flex:1}
-.rgrid{display:grid;grid-template-columns:1fr 22vw;gap:1.6vw}
-.rows{display:flex;flex-direction:column;gap:.8vw}
-.rrow{display:flex;align-items:center;gap:1vw;background:#fff;border:.22vw solid var(--ink);border-radius:1vw;padding:.6vw 1vw;font-size:1.6vw;font-weight:800;transition:opacity .4s}
-.rrow .txt{width:40%}
-.rrow .bw{flex:1;height:2.2vw;background:#f3ece2;border-radius:.6vw;overflow:hidden}
+.let{flex:none;width:3.8vw;height:3.8vw;border-radius:50%;border:.2vw solid var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font:700 2vw Mali}
+.typebox{display:flex;align-items:center;justify-content:center;gap:2vw;padding:1.4vw;font-size:2.1vw;font-weight:800;flex:1}
+.sent{margin-top:auto;display:flex;align-items:flex-end;gap:1vw;min-height:6.5vw}
+.sent .lbl{font:700 1.6vw Mali;white-space:nowrap;padding-bottom:.5vw}
+.sent .row{display:flex;flex-wrap:wrap;gap:.2vw;align-items:flex-end;flex:1}
+.rgrid{display:grid;grid-template-columns:1fr 21vw;gap:1.6vw}
+.rows{display:flex;flex-direction:column;gap:.7vw}
+.rrow{display:flex;align-items:center;gap:1vw;background:#fff;border:.2vw solid var(--ink);border-radius:3vw;padding:.5vw 1vw;font-size:1.55vw;font-weight:800;transition:opacity .4s}
+.rrow .txt{width:42%}
+.rrow .bw{flex:1;height:2vw;background:#f6ece4;border-radius:1vw;overflow:hidden}
 .rrow .bw i{display:block;height:100%;width:0;transition:width 1s cubic-bezier(.2,.9,.3,1)}
-.rrow .n{width:3.5vw;text-align:right;font:600 2vw Mitr}
+.rrow .n{width:3.5vw;text-align:right;font:700 2vw Mali}
 .rrow.dim{opacity:.35}
-.rrow.ok{box-shadow:.35vw .35vw 0 var(--c1);border-color:var(--c1)}
-.rrow .mark{font:600 1.2vw Mitr;background:var(--c1);color:#fff;padding:.15vw .8vw;border-radius:1vw}
+.rrow.ok{border-color:var(--c1);box-shadow:0 .35vw 0 var(--c1)}
+.rrow .mark{font:700 1.2vw Mali;background:var(--c1);color:#fff;padding:.1vw .9vw;border-radius:1vw}
 .answord{text-align:center;padding:1vw}
-.answord small{display:block;font-size:1.4vw;font-weight:600;color:#666}
-.answord b{font:600 4.6vw Mitr;color:var(--c1)}
-.words{display:flex;flex-wrap:wrap;gap:.6vw;justify-content:center;margin-top:.6vw}
-.words span{border:.18vw solid var(--ink);background:#fff;padding:.3vw 1vw;border-radius:.6vw;font-size:1.5vw;font-weight:600}
+.answord small{display:block;font-size:1.4vw;font-weight:600;color:#776}
+.answord b{font:700 4.4vw Mali;color:var(--c1)}
+.words{display:flex;flex-wrap:wrap;gap:.6vw;justify-content:center;margin-top:.5vw}
+.words span{border:.16vw solid var(--ink);background:#fff;padding:.25vw 1vw;border-radius:2vw;font-size:1.45vw;font-weight:600}
 .words span.y{background:var(--c1);color:#fff}
-.fast{padding:1.2vw;text-align:center;display:flex;flex-direction:column;align-items:center;gap:.4vw;height:100%;justify-content:center}
-.fast h3{font:500 1.4vw Mitr;margin-bottom:2.5vw}
-.fast .nm{font:600 1.9vw Mitr}.fast .sec{font-size:1.3vw;font-weight:600;color:#666}
-.exp{padding:1vw 1.6vw;font-size:1.5vw;line-height:1.5;margin-top:1.2vw}
-.exp b{font-family:Mitr;font-weight:500;color:var(--c0)}.exp .src{font-size:1.05vw;color:#777;margin-top:.3vw}
-.talk{background:#ffe08a;padding:.8vw 1.6vw;font-size:1.55vw;font-weight:700;margin-top:1vw}
-.foot{display:flex;justify-content:flex-end;margin-top:auto;padding-top:1vw}
-.lanes{display:flex;flex-direction:column;gap:.7vw;margin-top:1.2vw}
-.lane{display:grid;grid-template-columns:3vw 13vw 1fr 12vw;align-items:center;gap:1vw;background:#fff;border:.22vw solid var(--ink);border-radius:1vw;padding:.3vw 1vw;height:6.6vw;animation:slide .4s backwards}
-.lane .rk{font:600 2.2vw Mitr;text-align:center}
-.lane .nm{font:600 1.6vw Mitr;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
-.lane .rt{position:relative;height:100%;border-left:.2vw dashed #ccc;background:repeating-linear-gradient(90deg,transparent 0 3vw,#f6efe4 3vw 3.2vw)}
-.lane .rt::after{content:"";position:absolute;right:0;top:0;bottom:0;width:1vw;background:repeating-conic-gradient(var(--ink) 0 25%,#fff 0 50%) 0 0/.5vw .5vw}
-.lane .runner{position:absolute;bottom:.2vw;left:0;transition:left 2s cubic-bezier(.3,.8,.4,1)}
-.lane .sc{text-align:right}.lane .sc b{font:600 2vw Mitr;display:block;line-height:1.1}
-.lane .sc small{font-size:1vw;font-weight:600;color:#666}
-.lane:first-child{background:#fff4cf}
-.legend{font-size:1.2vw;font-weight:600;color:#555}
+.fast{padding:1vw;text-align:center;display:flex;flex-direction:column;align-items:center;gap:.3vw;height:100%;justify-content:center}
+.fast h3{font-size:1.4vw;margin-bottom:2.2vw}
+.fast .nm{font:700 1.8vw Mali}.fast .sec{font-size:1.25vw;font-weight:600;color:#776}
+.exp{padding:.9vw 1.6vw;font-size:1.45vw;line-height:1.5;margin-top:1.1vw}
+.exp b{font-family:Mali;color:var(--c0)}.exp .src{font-size:1vw;color:#887;margin-top:.2vw}
+.foot{display:flex;justify-content:flex-end;gap:1vw;margin-top:auto;padding-top:.8vw}
+.talkpop{position:fixed;inset:0;background:rgba(43,37,64,.55);display:none;align-items:center;justify-content:center;z-index:20}
+.talkpop.on{display:flex}
+.talkpop .card{max-width:70vw;padding:2.4vw 3vw;text-align:center;display:flex;flex-direction:column;align-items:center;gap:1vw;animation:zoom .4s cubic-bezier(.3,1.5,.5,1)}
+.talkpop h3{font-size:1.6vw;color:var(--c0)}.talkpop p{font:700 3vw Mali;line-height:1.35}
+.sumwrap{flex:1;display:grid;grid-template-columns:1fr 22vw;gap:2vw;align-items:center;margin-top:1vw}
+.sumlist{display:flex;flex-direction:column;gap:1.2vw}
+.sumlist div{display:flex;gap:1.2vw;align-items:flex-start;padding:1.2vw 1.6vw;font-size:1.9vw;font-weight:700;line-height:1.45;animation:slide .5s backwards}
+.sumlist div:nth-child(2){animation-delay:.25s}.sumlist div:nth-child(3){animation-delay:.5s}
+.sumlist .no{flex:none;width:3.4vw;height:3.4vw;border-radius:50%;background:var(--c3);color:#fff;border:.2vw solid var(--ink);display:flex;align-items:center;justify-content:center;font:700 1.8vw Mali}
+.lanes{display:flex;flex-direction:column;gap:.7vw;margin-top:1vw}
+.lane{display:grid;grid-template-columns:3vw 13vw 1fr 12vw;align-items:center;gap:1vw;background:#fff;border:.2vw solid var(--ink);border-radius:3vw;padding:.2vw 1.4vw;height:6.4vw;animation:slide .4s backwards}
+.lane .rk{font:700 2.2vw Mali;text-align:center}
+.lane .nm{font:700 1.6vw Mali;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.lane .rt{position:relative;height:100%;background:radial-gradient(circle,#f6e2d3 .25vw,transparent .3vw) 0 50%/2.4vw 2.4vw repeat-x}
+.lane .rt::after{content:"";position:absolute;right:0;top:15%;bottom:15%;width:.9vw;background:repeating-conic-gradient(var(--ink) 0 25%,#fff 0 50%) 0 0/.45vw .45vw;border-radius:.2vw}
+.lane .runner{position:absolute;bottom:.1vw;left:0;transition:left 2s cubic-bezier(.3,.8,.4,1)}
+.lane .sc{text-align:right}.lane .sc b{font:700 2vw Mali;display:block;line-height:1.1}
+.lane .sc small{font-size:1vw;font-weight:600;color:#776}
+.lane:first-child{background:#fff1c9}
+.legend{font-size:1.2vw;font-weight:600;color:#665}
 .pod{display:flex;align-items:flex-end;justify-content:center;gap:1.6vw;flex:1}
 .pod>div{width:19vw;display:flex;flex-direction:column;align-items:center}
-.pod .nm{font:600 2vw Mitr;margin-top:.3vw}.pod .sc{font-size:1.2vw;font-weight:700;margin-bottom:.5vw;color:#555;text-align:center}
-.pod .st{width:100%;border:.22vw solid var(--ink);border-bottom:none;border-radius:1vw 1vw 0 0;display:flex;justify-content:center;padding-top:.8vw;font:600 4vw Mitr;color:#fff}
-#conf{position:fixed;inset:0;pointer-events:none}
+.pod .nm{font:700 2vw Mali;margin-top:.2vw}.pod .sc{font-size:1.2vw;font-weight:700;margin-bottom:.5vw;color:#665;text-align:center}
+.pod .st{width:100%;border:.2vw solid var(--ink);border-bottom:none;border-radius:1.4vw 1.4vw 0 0;display:flex;justify-content:center;padding-top:.6vw;font:700 3.6vw Mali;color:#fff}
+#conf{position:fixed;inset:0;pointer-events:none;z-index:15}
 .err{color:#d00;font-size:1.2vw;min-height:1.5vw;font-weight:600}
-</style></head><body>
+</style></head><body class="paws strollon">
 
 <section class="scr on" id="sLogin">
  <div class="parade" id="parade"></div>
- <div class="mitr" style="font-size:1.5vw" id="course"></div>
- <h1 style="font-size:3vw;max-width:72vw;line-height:1.3" id="title"></h1>
- <div class="card" style="display:flex;gap:1vw;align-items:center;padding:1.3vw 2vw;margin-top:.8vw">
+ <div class="mali" style="font-size:1.5vw" id="course"></div>
+ <h1 style="font-size:3vw;max-width:72vw;line-height:1.35" id="title"></h1>
+ <div class="card" style="display:flex;gap:1vw;align-items:center;padding:1.2vw 2vw;margin-top:.6vw">
   <input id="code" type="password" inputmode="numeric" placeholder="รหัสครู">
   <button class="btn" onclick="login()">สร้างห้องเกม</button>
  </div>
@@ -119,52 +136,73 @@ input{font:600 1.6vw Sarabun;padding:.7vw 1.2vw;border-radius:.8vw;border:.2vw s
    </div>
   </div>
  </div>
- <div class="stage" id="stage"><div class="awn"></div><div class="empty" id="empty">สแกน QR แล้วเลือกตัวละคร ตัวละครของนักเรียนจะมาเดินตรงนี้</div></div>
+ <div class="stage" id="stage"><div class="rug"></div><div class="empty" id="empty">สแกน QR แล้วเลือกแมวของตัวเอง แมวจะมาเดินเล่นตรงนี้</div></div>
+</section>
+
+<section class="scr" id="sPart">
+ <div class="pno" id="pNo"></div>
+ <h1 id="pTitle"></h1>
+ <div class="mali" style="font-size:1.8vw" id="pSub"></div>
+ <div class="parade" id="pCats" style="margin-top:1vw"></div>
+ <button class="btn" style="margin-top:1vw" onclick="partGo()">เริ่ม</button>
 </section>
 
 <section class="scr" id="sQ">
  <div class="top"><img src="../emblem.png" alt=""><span class="chip" id="qRound"></span><span class="chip alt" id="qNo"></span><span class="sp"></span><button class="btn s mu" onclick="mute()">ปิดเสียง</button><button class="btn s" onclick="doReveal()">เฉลยเลย</button></div>
  <div class="card qcard" id="qText"></div>
  <div class="tbar"><div class="track"><i id="tbar"></i></div><div class="tnum" id="tm"></div></div>
- <div id="qOpts"></div>
+ <div class="qbody" id="qBody"></div>
  <div class="sent"><div class="lbl">ส่งแล้ว <span id="an">0</span>/<span id="ap">0</span></div><div class="row" id="sentRow"></div></div>
 </section>
 
 <section class="scr" id="sR">
  <div class="top"><img src="../emblem.png" alt=""><span class="chip" id="rRound"></span><span class="sp"></span><button class="btn s mu" onclick="mute()">ปิดเสียง</button></div>
- <div class="card qcard" id="rText" style="font-size:2vw;padding:1vw 2vw;margin:1vw 0"></div>
+ <div class="card qcard" id="rText" style="font-size:1.9vw;padding:.9vw 2vw;margin:.9vw 0"></div>
  <div class="rgrid"><div id="rMain"></div><div id="rSide"></div></div>
  <div id="rBottom"></div>
- <div class="foot"><button class="btn" id="nextBtn" onclick="nextStep()">ถัดไป</button></div>
+ <div class="foot"><button class="btn y" id="talkBtn" onclick="talk(true)">คำถามต่อ</button><button class="btn" id="nextBtn" onclick="nextStep()">ถัดไป</button></div>
+</section>
+
+<section class="scr" id="sSum">
+ <div class="top"><img src="../emblem.png" alt=""><span class="chip" id="sTitle"></span></div>
+ <h1 style="font-size:3vw;margin-top:1vw">สรุปพาร์ทนี้</h1>
+ <div class="sumwrap"><div class="sumlist" id="sList"></div><div style="text-align:center" id="sCat"></div></div>
+ <div class="foot"><button class="btn" onclick="board()">ดูคะแนนรวม</button></div>
 </section>
 
 <section class="scr" id="sB">
  <div class="top"><img src="../emblem.png" alt=""><span class="chip">คะแนนรวม</span><span class="sp"></span><span class="legend">คะแนน = ความถูก + ความเร็ว</span></div>
  <div class="lanes" id="lanes"></div>
- <div class="foot"><button class="btn" onclick="nextStep()">ข้อถัดไป</button></div>
+ <div class="foot"><button class="btn" id="bNext" onclick="afterBoard()">ไปพาร์ทถัดไป</button></div>
 </section>
 
 <section class="scr" id="sEnd">
- <div class="top"><img src="../emblem.png" alt=""><span class="chip">จบเกม</span></div>
- <h1 style="text-align:center;font-size:3.2vw;margin-top:1vw">อันดับสุดท้าย</h1>
+ <div class="top"><img src="../emblem.png" alt=""><span class="chip">จบเกม</span><span class="sp"></span><button class="btn s mu" onclick="mute()">ปิดเสียง</button></div>
+ <h1 style="text-align:center;font-size:3.2vw;margin-top:.5vw">อันดับสุดท้าย</h1>
  <div class="pod" id="pod"></div>
- <div class="card" style="padding:.8vw 1.6vw;font-size:1.6vw;font-weight:700;text-align:center;margin-top:1vw">คาบหน้า ตัวละคร 4 คนจะมานั่งหน้าห้อง เตรียมคำถามมาคนละ 1 ข้อ</div>
+ <div class="foot" style="justify-content:center"><button class="btn y" onclick="openReport()">ดูรายงานผล</button></div>
 </section>
+
+<div class="talkpop" id="talkPop" onclick="talk(false)"><div class="card"><h3>ครูถามต่อ</h3><p id="talkTxt"></p><div id="talkCat"></div></div></div>
 <canvas id="conf"></canvas>
 
 <script src="common.js"></script><script src="data.js"></script>
 <script>
-const D = window.K3; let code = "", pin = "", qi = -1, players = [], tStart = 0, tLeft = -1, tIv, poll, revealed = false, lastBoard = {};
+const D = window.K3, P = D.parts; let code = "", pin = "", qi = -1, pi = 0, ii = 0, players = [], tStart = 0, tLeft = -1, tIv, poll, revealed = false, lastBoard = {};
 const $ = id => document.getElementById(id);
 $("course").textContent = D.course; $("title").textContent = D.title; $("lobTitle").textContent = D.course; $("lobH").textContent = D.title;
-$("parade").innerHTML = [0,1,2,3,4,5,6,7].map(i => `<span style="display:inline-block;animation:k3bob 1.4s ${i * .15}s ease-in-out infinite">${avEl(i, "", "normal", "5.5vw")}</span>`).join("");
-const show = id => document.querySelectorAll(".scr").forEach(s => s.classList.toggle("on", s.id === id));
+const parade = (sz) => [0,1,2,3,4,5,6,7].map(i => `<span style="display:inline-block;animation:k3bob 1.4s ${i * .15}s ease-in-out infinite">${avEl(i, "", i % 3 ? "normal" : "happy", sz)}</span>`).join("");
+$("parade").innerHTML = parade("6vw");
+addStrollers(2, "5vw");
+const show = id => { document.querySelectorAll(".scr").forEach(s => s.classList.toggle("on", s.id === id)); document.body.classList.toggle("strollon", ["sLogin", "sPart", "sSum", "sEnd"].includes(id)); };
 function mute() { const m = Music.toggle(); document.querySelectorAll(".mu").forEach(x => x.textContent = m ? "เปิดเสียง" : "ปิดเสียง"); }
+const T = (a, q) => rpc("k3_teacher", { p_code: code, p_action: a, p_qi: q == null ? null : q });
 
 async function login() {
   code = $("code").value.trim();
   try {
     pin = await rpc("k3_teacher", { p_code: code, p_action: "new" });
+    sessionStorage.setItem("k3_code", code);
     const base = location.pathname.replace(/host(\.html)?$/, "");
     $("url").textContent = (location.host + base).replace(/\/$/, "");
     $("pin").textContent = pin;
@@ -182,9 +220,9 @@ async function lobbyPoll() {
     if (walkers[p.id]) return;
     const w = document.createElement("div"); w.className = "walker";
     w.innerHTML = avEl(p.avatar, "pop", "happy", "5vw") + `<span class="tag">${esc(p.name)}</span>`;
-    const top = 26 + Math.random() * 44;
+    const top = 22 + Math.random() * 46;
     w.style.left = (4 + Math.random() * 86) + "%"; w.style.top = top + "%"; w.style.zIndex = Math.round(top);
-    $("stage").appendChild(w); walkers[p.id] = w; Music.tick();
+    $("stage").appendChild(w); walkers[p.id] = w; Music.meow(0.85 + Math.random() * 0.4);
     setTimeout(() => w.querySelector(".av").className = "av bob", 600);
   });
 }
@@ -198,103 +236,133 @@ function wander() {
   });
   setTimeout(wander, 3600);
 }
-function startGame() { clearInterval(poll); goQ(0); }
+function startGame() { clearInterval(poll); showPart(0); }
 
-function optCards(Q) {
-  return '<div class="opts">' + Q.opts.map((t, k) => `<div class="opt"><span class="let" style="background:${COLORS[k]}">${LETTERS[k]}</span><span>${esc(t)}</span></div>`).join("") + "</div>";
+async function showPart(i) {
+  pi = i; ii = 0; const p = P[i];
+  await T("intro");
+  $("pNo").textContent = i === 0 ? "เริ่มกันเลย" : "พาร์ท " + i + " จาก " + (P.length - 1);
+  $("pTitle").textContent = p.title.replace(/^พาร์ท \d+ /, "");
+  $("pSub").textContent = p.sub;
+  $("pCats").innerHTML = parade("5vw");
+  show("sPart"); Music.play("p" + p.music); Music.meow(1.1);
 }
+function partGo() { goQ(P[pi].items[0]); }
+
+function optCards(Q) { return '<div class="opts">' + Q.opts.map((t, k) => `<div class="opt"><span class="let" style="background:${COLORS[k]}">${LETTERS[k]}</span><span>${esc(t)}</span></div>`).join("") + "</div>"; }
 const sentIds = new Set();
 async function goQ(i) {
   qi = i; revealed = false; const Q = D.Q[i];
-  await rpc("k3_teacher", { p_code: code, p_action: "question", p_qi: i });
+  await T("question", i);
   players = await getPlayers(pin);
-  $("qRound").textContent = Q.round;
-  $("qNo").textContent = "ข้อ " + (i + 1) + "/" + D.Q.length + (Q.kind === "poll" ? " โพล ไม่คิดคะแนน" : Q.kind === "type" ? " พิมพ์คำตอบ" : "") + (Q.dbl ? " คะแนนสองเท่า" : "");
+  $("qRound").textContent = P[pi].title;
+  $("qNo").textContent = "ข้อ " + (ii + 1) + "/" + P[pi].items.length + (Q.kind === "poll" ? " โพล ไม่คิดคะแนน" : Q.kind === "type" ? " พิมพ์คำตอบ" : "") + (Q.dbl ? " คะแนนสองเท่า" : "");
   $("qText").innerHTML = esc(Q.q).replace("______", '<span class="blank">&nbsp;</span>');
-  $("qOpts").innerHTML = Q.kind === "type" ? `<div class="card typebox">${avEl(5, "bob", "happy", "5vw")}<span>พิมพ์คำที่หายไปในมือถือ สะกดให้ถูก ยิ่งเร็วยิ่งได้คะแนนมาก</span></div>` : optCards(Q);
+  const b = $("qBody"); b.className = "qbody" + (Q.img ? " img" : "");
+  b.innerHTML = Q.kind === "type" ? `<div class="card typebox">${avEl(0, "bob", "happy", "5vw")}<span>พิมพ์คำที่หายไปในมือถือ สะกดให้ถูก ยิ่งเร็วยิ่งได้คะแนนมาก</span></div>`
+    : (Q.img ? `<div class="card qimg">${Q.img}</div>` : "") + optCards(Q);
   $("an").textContent = 0; $("ap").textContent = players.length; $("sentRow").innerHTML = ""; sentIds.clear();
-  show("sQ"); Music.play("question");
+  show("sQ"); Music.play("p" + P[pi].music);
   tStart = Date.now(); tLeft = -1; tick();
   clearInterval(tIv); tIv = setInterval(tick, 200);
   clearInterval(poll); poll = setInterval(qPoll, 1200);
 }
 function tick() {
-  const T = D.Q[qi].t, el = (Date.now() - tStart) / 1000, left = Math.max(0, Math.ceil(T - el));
-  const b = $("tbar"); b.style.width = Math.max(0, 100 - el / T * 100) + "%"; b.style.background = left <= 5 ? "var(--c0)" : "var(--c1)";
+  const TT = D.Q[qi].t, el = (Date.now() - tStart) / 1000, left = Math.max(0, Math.ceil(TT - el));
+  const b = $("tbar"); b.style.width = Math.max(0, 100 - el / TT * 100) + "%"; b.style.background = left <= 5 ? "var(--c0)" : "var(--c1)";
   if (left !== tLeft) { tLeft = left; $("tm").textContent = left; if (left <= 5 && left > 0) Music.tick(); }
-  if (el >= T) doReveal();
+  if (el >= TT) doReveal();
 }
 async function qPoll() {
   const list = await rpc("k3_answered", { p_pin: pin, p_qi: qi });
   $("an").textContent = list.length;
-  list.forEach(p => { if (sentIds.has(p.id)) return; sentIds.add(p.id); $("sentRow").insertAdjacentHTML("beforeend", avEl(p.avatar, "pop", "normal", "3.4vw")); });
+  list.forEach(p => { if (sentIds.has(p.id)) return; sentIds.add(p.id); $("sentRow").insertAdjacentHTML("beforeend", avEl(p.avatar, "pop", "normal", "3.6vw")); });
   if (players.length && list.length >= players.length) doReveal();
 }
 async function doReveal() {
   if (revealed) return; revealed = true;
   clearInterval(tIv); clearInterval(poll);
-  await rpc("k3_teacher", { p_code: code, p_action: "reveal" });
+  await T("reveal");
   const Q = D.Q[qi], s = await rpc("k3_stats", { p_pin: pin, p_qi: qi });
   Music.stop(); Music.sting(true);
-  $("rRound").textContent = Q.round;
+  $("rRound").textContent = P[pi].title;
   $("rText").innerHTML = esc(Q.q).replace("______", '<span class="blank">' + (Q.kind === "type" ? esc(Q.ans) : "&nbsp;") + "</span>");
   let main = "", side = "";
+  const hasAns = Q.kind === "choice" || Q.kind === "practice";
   if (Q.kind === "type") {
     main = `<div class="card answord"><small>คำตอบ</small><b>${esc(Q.ans)}</b><small>ตอบถูก ${s.right} จาก ${s.n} คน</small><div class="words">` +
       s.texts.slice(0, 12).map(w => `<span class="${w.ok ? "y" : ""}">${esc(w.t)} ${w.c}</span>`).join("") + "</div></div>";
   } else {
     const mx = Math.max(1, ...Q.opts.map((_, k) => s.counts[k] || 0));
     main = '<div class="rows">' + Q.opts.map((t, k) => {
-      const v = s.counts[k] || 0, ok = Q.kind === "choice" && k === Q.ans, dim = Q.kind === "choice" && !ok;
+      const v = s.counts[k] || 0, ok = hasAns && k === Q.ans, dim = hasAns && !ok;
       return `<div class="rrow ${ok ? "ok" : ""} ${dim ? "dim" : ""}"><span class="let" style="background:${COLORS[k]};width:3vw;height:3vw;font-size:1.6vw">${LETTERS[k]}</span><span class="txt">${esc(t)}</span><span class="bw"><i data-w="${v / mx * 100}" style="background:${COLORS[k]}"></i></span><span class="n">${v}</span>${ok ? '<span class="mark">ถูก</span>' : ""}</div>`;
     }).join("") + "</div>";
   }
   if (Q.kind !== "poll") {
     side = s.fast ? `<div class="card fast"><h3>ตอบถูกเร็วที่สุด</h3>${avEl(s.fast.avatar, "jump", "happy", "7vw")}<div class="nm">${esc(s.fast.name)}</div><div class="sec">${s.fast.sec} วินาที</div></div>`
-      : `<div class="card fast"><h3>ข้อนี้ยังไม่มีคนตอบถูก</h3>${avEl(0, "sad", "sad", "6vw")}</div>`;
-  } else {
-    side = `<div class="card fast"><h3>ตอบโพลแล้ว</h3><div class="nm" style="font-size:3.4vw">${s.n}</div><div class="sec">คน</div></div>`;
-  }
+      : `<div class="card fast"><h3>ข้อนี้ยังไม่มีคนตอบถูก</h3>${avEl(1, "sad", "sad", "6vw")}</div>`;
+  } else side = `<div class="card fast"><h3>ตอบโพลแล้ว</h3>${avEl(2, "bob", "happy", "6vw")}<div class="nm" style="font-size:3vw">${s.n} คน</div></div>`;
   $("rMain").innerHTML = main; $("rSide").innerHTML = side;
-  $("rBottom").innerHTML = (Q.exp ? `<div class="card exp"><b>สรุป</b> ${esc(Q.exp)}${Q.src ? `<div class="src">ที่มา: ${esc(Q.src)}</div>` : ""}</div>` : "") + (Q.talk ? `<div class="card talk">ครูถามต่อ: ${esc(Q.talk)}</div>` : "");
+  $("rBottom").innerHTML = Q.exp ? `<div class="card exp"><b>สรุป</b> ${esc(Q.exp)}${Q.src ? `<div class="src">ที่มา: ${esc(Q.src)}</div>` : ""}</div>` : "";
   setTimeout(() => document.querySelectorAll(".rrow .bw i").forEach(i => i.style.width = i.dataset.w + "%"), 60);
-  const last = qi === D.Q.length - 1;
-  $("nextBtn").textContent = last ? "ดูอันดับสุดท้าย" : Q.kind === "type" ? "ดูคะแนนรวม" : "ข้อถัดไป";
+  $("talkBtn").style.display = Q.talk ? "" : "none";
+  const lastInPart = ii === P[pi].items.length - 1;
+  $("nextBtn").textContent = !lastInPart ? "ข้อถัดไป" : P[pi].summary ? "สรุปพาร์ท" : "ไปพาร์ทถัดไป";
   show("sR");
 }
+function talk(on) {
+  const Q = D.Q[qi];
+  if (on && Q.talk) { $("talkTxt").textContent = Q.talk; $("talkCat").innerHTML = avEl(qi % 8, "bob", "normal", "6vw"); Music.meow(1); }
+  $("talkPop").classList.toggle("on", !!on);
+}
+function nextStep() {
+  if (ii < P[pi].items.length - 1) { ii++; return goQ(P[pi].items[ii]); }
+  if (P[pi].summary) return showSum();
+  return pi < P.length - 1 ? showPart(pi + 1) : finish();
+}
+async function showSum() {
+  await T("summary");
+  $("sTitle").textContent = P[pi].title;
+  $("sList").innerHTML = P[pi].summary.map((t, k) => `<div class="card"><span class="no">${k + 1}</span><span>${esc(t)}</span></div>`).join("");
+  $("sCat").innerHTML = avEl(pi % 8, "bob", "happy", "15vw");
+  show("sSum"); Music.play("lobby");
+}
 async function board() {
-  await rpc("k3_teacher", { p_code: code, p_action: "board" });
+  await T("board");
   players = await getPlayers(pin);
   const top = players.slice(0, 5), mx = Math.max(1, players[0] ? players[0].score : 1);
-  $("lanes").innerHTML = top.map((p, i) => `<div class="lane" style="animation-delay:${i * .08}s"><span class="rk">${i + 1}</span><span class="nm">${esc(p.name)}</span><div class="rt"><div class="runner" id="run${i}" style="left:${lastBoard[p.id] || 0}%">${avEl(p.avatar, "walk", "happy", "4.6vw")}</div></div><div class="sc"><b>${p.score}</b><small>ถูก ${p.score_ok} เร็ว ${p.score_speed}</small></div></div>`).join("");
-  show("sB"); Music.play("lobby");
+  $("lanes").innerHTML = top.map((p, i) => `<div class="lane" style="animation-delay:${i * .08}s"><span class="rk">${i + 1}</span><span class="nm">${esc(p.name)}</span><div class="rt"><div class="runner" id="run${i}" style="left:${lastBoard[p.id] || 0}%">${avEl(p.avatar, "walk", "happy", "4.8vw")}</div></div><div class="sc"><b>${p.score}</b><small>ถูก ${p.score_ok} เร็ว ${p.score_speed}</small></div></div>`).join("");
+  $("bNext").textContent = pi < P.length - 1 ? "ไปพาร์ทถัดไป" : "ประกาศผล";
+  show("sB");
   setTimeout(() => top.forEach((p, i) => { const pos = p.score / mx * 86; lastBoard[p.id] = pos; $("run" + i).style.left = pos + "%"; }), 300);
   setTimeout(() => document.querySelectorAll(".runner .av").forEach(a => a.className = "av bob"), 2400);
 }
-async function nextStep() {
-  const Q = D.Q[qi];
-  if ($("sR").classList.contains("on")) {
-    if (qi === D.Q.length - 1) return finish();
-    if (Q.kind === "type") return board();
-    return goQ(qi + 1);
-  }
-  if ($("sB").classList.contains("on")) return goQ(qi + 1);
-}
+function afterBoard() { return pi < P.length - 1 ? showPart(pi + 1) : finish(); }
 async function finish() {
-  await rpc("k3_teacher", { p_code: code, p_action: "end" });
+  await T("end");
   players = await getPlayers(pin);
-  const p = players, ord = [1, 0, 2], hts = { 0: 15, 1: 10, 2: 7 }, cols = { 0: "var(--c2)", 1: "var(--c3)", 2: "var(--c0)" };
+  const p = players, ord = [1, 0, 2], hts = { 0: 14, 1: 9.5, 2: 6.5 }, cols = { 0: "var(--c2)", 1: "var(--c3)", 2: "var(--c0)" };
   $("pod").innerHTML = ord.map(i => p[i] ? `<div>${avEl(p[i].avatar, "jump", "happy", i === 0 ? "9vw" : "7vw")}<div class="nm">${esc(p[i].name)}</div><div class="sc">${p[i].score} คะแนน<br>ถูก ${p[i].score_ok} เร็ว ${p[i].score_speed}</div><div class="st" style="height:${hts[i]}vw;background:${cols[i]}">${i + 1}</div></div>` : "").join("");
-  show("sEnd"); Music.stop(); Music.fanfare(); confetti();
+  show("sEnd"); Music.stop(); Music.fanfare(); setTimeout(() => Music.meow(1.2), 900); confetti();
 }
+function openReport() { window.open("report.html?pin=" + pin, "_blank"); }
 function confetti() {
   const c = $("conf"), x = c.getContext("2d"); c.width = innerWidth; c.height = innerHeight;
-  const P = Array.from({ length: 160 }, () => ({ x: Math.random() * c.width, y: -Math.random() * c.height, w: 6 + Math.random() * 8, h: 10 + Math.random() * 10, v: 2 + Math.random() * 3, r: Math.random() * 6, s: Math.random() * .2 - .1, col: ["#ff6b4a", "#14a89a", "#f5a524", "#5b6cff", "#1d2340"][Math.random() * 5 | 0] }));
-  let n = 0; (function f() { x.clearRect(0, 0, c.width, c.height); P.forEach(p => { p.y += p.v; p.x += Math.sin(p.y / 40); p.r += p.s; x.save(); x.translate(p.x, p.y); x.rotate(p.r); x.fillStyle = p.col; x.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); x.restore(); }); if (++n < 600) requestAnimationFrame(f); else x.clearRect(0, 0, c.width, c.height); })();
+  const P2 = Array.from({ length: 160 }, () => ({ x: Math.random() * c.width, y: -Math.random() * c.height, w: 6 + Math.random() * 8, h: 10 + Math.random() * 10, v: 2 + Math.random() * 3, r: Math.random() * 6, s: Math.random() * .2 - .1, col: ["#ff7a8a", "#3cb6a0", "#ffa94d", "#8a7dff", "#2b2540"][Math.random() * 5 | 0] }));
+  let n = 0; (function f() { x.clearRect(0, 0, c.width, c.height); P2.forEach(p => { p.y += p.v; p.x += Math.sin(p.y / 40); p.r += p.s; x.save(); x.translate(p.x, p.y); x.rotate(p.r); x.fillStyle = p.col; x.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); x.restore(); }); if (++n < 600) requestAnimationFrame(f); else x.clearRect(0, 0, c.width, c.height); })();
 }
 document.addEventListener("keydown", e => {
   if (e.key === "Enter" && $("sLogin").classList.contains("on")) return login();
-  if (e.key === "ArrowRight") { if ($("sQ").classList.contains("on")) doReveal(); else nextStep(); }
+  if (e.key === "Escape") return talk(false);
+  if (e.key === "ArrowRight") {
+    if ($("talkPop").classList.contains("on")) return talk(false);
+    if ($("sQ").classList.contains("on")) doReveal();
+    else if ($("sR").classList.contains("on")) nextStep();
+    else if ($("sPart").classList.contains("on")) partGo();
+    else if ($("sSum").classList.contains("on")) board();
+    else if ($("sB").classList.contains("on")) afterBoard();
+  }
 });
 </script>
 </body></html>
