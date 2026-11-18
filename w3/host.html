@@ -195,7 +195,7 @@ input{font:600 1.6vw Sarabun;padding:.7vw 1.2vw;border-radius:2vw;border:.2vw so
  <div class="top"><img src="../emblem.png" alt=""><span class="chip">จบเกม</span><span class="sp"></span><button class="btn s mu" onclick="mute()">ปิดเสียง</button></div>
  <h1 style="text-align:center;font-size:3.2vw;margin-top:.5vw">อันดับสุดท้าย</h1>
  <div class="pod" id="pod"></div>
- <div class="foot" style="justify-content:center"><button class="btn" onclick="showReflect()">ให้นักเรียนเขียนสะท้อนคิด</button><button class="btn y" onclick="openReport()">ดูรายงานผล</button></div>
+ <div class="foot" style="justify-content:center;gap:1.5vw"><button class="btn" style="font-size:2vw;padding:.8vw 3vw" onclick="showReflect()">ต่อไป: ให้นักเรียนเขียนสะท้อนคิด</button></div>
 </section>
 
 <section class="scr" id="sRef">
@@ -400,6 +400,7 @@ document.addEventListener("keydown", e => {
   if (e.key === "ArrowRight") {
     if ($("talkPop").classList.contains("on")) return talk(false);
     if ($("sQ").classList.contains("on")) doReveal();
+    else if ($("sEnd").classList.contains("on")) showReflect();
     else if ($("sR").classList.contains("on")) nextStep();
     else if ($("sPart").classList.contains("on")) partGo();
     else if ($("sSum").classList.contains("on")) board();
